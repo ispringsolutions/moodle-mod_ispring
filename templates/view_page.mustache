@@ -1,0 +1,46 @@
+{{!
+    Copyright (C) 2023 iSpring Solutions Inc.
+
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_ispring/view_page
+
+    /mod/ispring/view.php page template
+
+    Example context (json):
+    {
+        "play_button_url": "/mod/ispring/play.php?id=1",
+        "play_button_text": "Play content",
+        "module_info_text": "Grading method: Highest grade",
+        "warning": "This learning content was updated since the last time you took it.",
+        "report": "<!-- user sessions report as HTML document -->",
+        "report_title": "My results"
+    }
+}}
+<div class="tertiary-navigation">
+    <div>
+        <a class="btn btn-primary" href="{{play_button_url}}">{{play_button_text}}</a>
+    </div>
+</div>
+<p class="py-3">{{module_info_text}}</p>
+{{#warning}}
+    <div class="alert alert-warning">{{warning}}</div>
+{{/warning}}
+{{#report}}
+    <h3 class="my-3">{{report_title}}</h3>
+    {{{report}}}
+{{/report}}
