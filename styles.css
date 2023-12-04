@@ -1,0 +1,32 @@
+.modicon_ispring.activityiconcontainer,
+.modtype_ispring .activityiconcontainer
+{
+    background-color: #A72259;
+}
+
+.modicon_ispring.activityiconcontainer .activityicon:not(.nofilter),
+.modtype_ispring .activityiconcontainer .activityicon:not(.nofilter)
+{
+    filter: brightness(0) invert(1);
+}
+
+.path-mod-ispring .detailed-report__username
+{
+    color: #42484E;
+    margin: 24px 0;
+    font-size: 28px;
+    line-height: 36px;
+}
+
+.path-mod-ispring .detailed-report__report,
+.path-mod-ispring .player
+{
+    width: 100%;
+    height: 800px;
+    border: 0;
+}
+
+.path-mod-ispring .player
+{
+    margin-top: 19px;
+}
