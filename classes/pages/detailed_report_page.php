@@ -28,11 +28,12 @@ namespace mod_ispring\pages;
 class detailed_report_page extends base_page
 {
     private const PLAYER_ID = 'mod-ispring-report-player';
+    private const PRELOADER_ID = 'mod-ispring-preloader';
 
     public function __construct(
         private readonly int $session_id,
         private readonly string $report_url,
-        private readonly \moodle_url $back_url,
+        private readonly string $back_url,
         private readonly int $user_id,
         string $url,
         array $args = null
@@ -45,7 +46,7 @@ class detailed_report_page extends base_page
 
     public function get_content(): string
     {
-        $content = $this->get_output()->single_button($this->back_url, get_string('back', 'ispring'));
+        $content = $this->get_output()->single_button($this->back_url, get_string('back', 'ispring'), 'get');
 
         $user = \core_user::get_user($this->user_id);
         if (!$user)
@@ -54,17 +55,21 @@ class detailed_report_page extends base_page
         }
         $content .= \html_writer::tag('div', \fullname($user), ['class' => 'detailed-report__username']);
 
+        $content .= \html_writer::start_tag('div', ['class' => 'container']);
+        $content .= \html_writer::tag('div', '', ['class' => 'preloader', 'id' => self::PRELOADER_ID]);
         $content .= \html_writer::start_tag('iframe', [
             'id' => self::PLAYER_ID,
             'class' => 'detailed-report__report',
         ]);
         $content .= \html_writer::end_tag('iframe');
+        $content .= \html_writer::end_tag('div');
 
         $this->get_page()->requires->js_call_amd('mod_ispring/detailed_report_api', 'init', [
             $this->session_id,
             current_language(),
             self::PLAYER_ID,
             $this->report_url,
+            self::PRELOADER_ID,
         ]);
 
         return $content;

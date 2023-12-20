@@ -41,7 +41,7 @@ class capability_utils
         {
             return true;
         }
-        if (has_capability('mod/ispring:viewmydetailedreports', $context) && $USER->id === $user_id)
+        if (has_capability('mod/ispring:viewmydetailedreports', $context) && $USER->id == $user_id)
         {
             return true;
         }

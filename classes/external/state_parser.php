@@ -30,14 +30,15 @@ class state_parser
     public static function parse_state(string $data): state
     {
         $parsed_data = self::parse_json($data);
-        self::require_properties($parsed_data, ['duration', 'id', 'persistState', 'status']);
+        self::require_properties($parsed_data, ['duration', 'id', 'persistState', 'status', 'playerId']);
         self::require_properties_are_numeric($parsed_data, ['duration']);
 
         return new state(
             (int)$parsed_data->duration,
             $parsed_data->id,
             json_encode($parsed_data->persistState),
-            $parsed_data->status
+            $parsed_data->status,
+            $parsed_data->playerId,
         );
     }
 
@@ -62,10 +63,12 @@ class state_parser
     {
         $parsed_data = self::parse_json($data);
 
-        self::require_properties($parsed_data, ['status']);
+        self::require_properties($parsed_data, ['status', 'playerId', 'sessionRestored']);
 
         return new start_state(
             $parsed_data->status,
+            $parsed_data->playerId,
+            $parsed_data->sessionRestored,
         );
     }
 

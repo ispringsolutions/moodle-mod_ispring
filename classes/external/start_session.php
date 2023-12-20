@@ -29,6 +29,7 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_ispring\common\infrastructure\context_utils;
 use mod_ispring\di_container;
 
 class start_session extends external_api
@@ -52,17 +53,39 @@ class start_session extends external_api
             ['content_id' => $content_id, 'state' => $state]
         );
 
+        self::require_access_to_content($content_id);
         $state = state_parser::parse_start_state($state);
 
-        $session_id = di_container::get_session_api()->add($content_id, $USER->id, $state->get_status());
+        $session_id = di_container::get_session_api()->add(
+            $content_id,
+            $USER->id,
+            $state->get_status(),
+            $state->get_player_id(),
+            $state->get_session_restored()
+        );
 
         return ['session_id' => $session_id];
     }
 
-    public static function execute_returns()
+    public static function execute_returns(): external_single_structure
     {
         return new external_single_structure([
             'session_id' => new external_value(PARAM_INT, 'session id')
         ]);
+    }
+
+    private static function require_access_to_content(int $content_id): void
+    {
+        $content_api = di_container::get_content_api();
+        $module_context = context_utils::get_module_context($content_api, $content_id);
+
+        try
+        {
+            self::validate_context($module_context);
+        }
+        catch (\Throwable $e)
+        {
+            throw new \moodle_exception('contentnotfound', 'ispring');
+        }
     }
 }

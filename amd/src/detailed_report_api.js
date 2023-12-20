@@ -38,7 +38,7 @@ class Api {
     }
 }
 
-export const init = (sessionId, languageCode, iframeId, reportUrl) => {
+export const init = (sessionId, languageCode, iframeId, reportUrl, preloaderId) => {
     call([{
         methodname: 'mod_ispring_get_report_data',
         args: {
@@ -48,5 +48,6 @@ export const init = (sessionId, languageCode, iframeId, reportUrl) => {
         .then((result) => {
             window['ispring_report_connector'] = new Api(result['report_data'], languageCode);
             document.getElementById(iframeId).src = reportUrl;
+            document.getElementById(preloaderId).remove();
         });
 };

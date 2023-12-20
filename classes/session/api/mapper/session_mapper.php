@@ -54,6 +54,7 @@ class session_mapper
             $input->get_persist_state_id(),
             $input->get_persist_state(),
             $input->get_status(),
+            $input->get_player_id(),
         );
     }
 

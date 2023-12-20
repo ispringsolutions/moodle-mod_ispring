@@ -32,9 +32,12 @@ use mod_ispring\report\entity\session;
 
 class global_report extends system_report
 {
+    public const PARAM_ISPRING_MODULE_ID = 'ispring_id';
+    public const PARAM_PAGE_URL = 'page_url';
+
     protected function initialise(): void
     {
-        $entity_main = new session();
+        $entity_main = new session($this->get_parameter(self::PARAM_PAGE_URL, '', PARAM_TEXT));
 
         $entity_main_alias = $entity_main->get_table_alias('ispring_session');
 
@@ -54,7 +57,9 @@ class global_report extends system_report
         $this->add_entity($entity_content->add_join(
             "LEFT JOIN {ispring_content} {$entity_content_alias} ON {$entity_content_alias}.id = {$entity_main_alias}.ispring_content_id"
         ));
-        $this->add_base_condition_simple("{$entity_content_alias}.ispring_id", $this->get_parameter('ispring_id', 0, 'int'));
+
+        $ispring_module_id = $this->get_parameter(self::PARAM_ISPRING_MODULE_ID, 0, PARAM_INT);
+        $this->add_base_condition_simple("{$entity_content_alias}.ispring_id", $ispring_module_id);
 
         $this->add_columns();
         $this->add_filters();

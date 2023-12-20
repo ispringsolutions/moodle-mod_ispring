@@ -30,8 +30,12 @@ use mod_ispring\report\global_report;
 
 class report_page extends base_page
 {
+    private const EN_LINK_DOCUMENTATION = 'https://www.ispringsolutions.com/go/moodle-documentation';
+    private const RU_LINK_DOCUMENTATION = 'https://www.ispring.ru/go/moodle-documentation';
+
     public function __construct(
         private readonly int $ispring_id,
+        private readonly bool $passing_requirements_were_updated,
         string $url,
         array $args = null,
     )
@@ -41,22 +45,42 @@ class report_page extends base_page
 
     public function get_content(): string
     {
-        $report = system_report_factory::create(
+        $content = '';
+        if ($this->passing_requirements_were_updated)
+        {
+            $content .= $this->get_output()->box_start('generalbox alert alert-warning');
+            $content .= \html_writer::span(get_string('passingrequirementshavebeenupdatedteachertext', 'ispring', $this->get_url()));
+            $content .= $this->get_output()->box_end();
+        }
+
+        $content .= system_report_factory::create(
             global_report::class,
             $this->get_page()->context,
             '',
             '',
             0,
             $this->get_report_params()
-        );
+        )->output();
 
-        return $report->output();
+        return $content;
     }
 
     private function get_report_params(): array
     {
         return [
-            'ispring_id' => $this->ispring_id,
+            global_report::PARAM_ISPRING_MODULE_ID => $this->ispring_id,
+            global_report::PARAM_PAGE_URL => $this->get_page()->url->out(),
         ];
+    }
+
+    private function get_url(): string
+    {
+        $lang = current_language();
+        if (current_language() == 'ru')
+        {
+            return self::RU_LINK_DOCUMENTATION;
+        }
+
+        return self::EN_LINK_DOCUMENTATION . '?lang=' . $lang;
     }
 }

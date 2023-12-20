@@ -23,13 +23,23 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\session\app\adapter;
+namespace mod_ispring\common\infrastructure\lock;
 
-interface content_api_interface
+use core\lock\lock_config;
+use mod_ispring\common\app\lock\lock_interface;
+
+class locking_service
 {
-    public function get_ispring_module_id_by_content_id(int $id): int;
+    private const LOCK_NAME_PREFIX = 'mod_ispring_';
 
-    public function get_newest_content_id(int $ispring_module_id): int;
-
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public static function get_lock(string $name, string $resource, int $timeout): lock_interface
+    {
+        $lock_factory = lock_config::get_lock_factory(self::LOCK_NAME_PREFIX . $name);
+        $lock = $lock_factory->get_lock($resource, $timeout);
+        if (!$lock)
+        {
+            throw new \RuntimeException('Failed to obtain lock');
+        }
+        return new auto_release_lock_wrapper($lock);
+    }
 }

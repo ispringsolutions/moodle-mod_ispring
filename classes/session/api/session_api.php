@@ -44,9 +44,9 @@ class session_api implements session_api_interface
     {
     }
 
-    public function add(int $content_id, int $user_id, string $status): int
+    public function add(int $content_id, int $user_id, string $status, string $player_id, bool $session_restored): int
     {
-        return $this->session_service->add($content_id, $user_id, $status);
+        return $this->session_service->add($content_id, $user_id, $status, $player_id, $session_restored);
     }
 
     public function get_last_by_content_id(int $content_id, int $user_id): ?session_output
@@ -65,13 +65,7 @@ class session_api implements session_api_interface
 
     public function end(int $session_id, int $user_id, end_input $data): bool
     {
-        $session = $this->session_query_service->get($session_id);
-        if (!$session)
-        {
-            return false;
-        }
-
-        return $this->session_service->end($session, $user_id, session_mapper::get_end_data($data));
+        return $this->session_service->end($session_id, $user_id, session_mapper::get_end_data($data));
     }
 
     public function get_grades_for_gradebook(int $id, int $user_id): ?array
@@ -117,5 +111,19 @@ class session_api implements session_api_interface
     public function delete_by_content_id(int $content_id): bool
     {
         return $this->session_service->delete_by_content_id($content_id);
+    }
+
+    public function passing_requirements_were_updated(int $ispring_module_id): bool
+    {
+        $content_ids = $this->content_api->get_ids_by_ispring_module_id($ispring_module_id);
+
+        return $this->session_query_service->passing_requirements_were_updated($content_ids);
+    }
+
+    public function passing_requirements_were_updated_for_user(int $ispring_module_id, int $user_id): bool
+    {
+        $content_ids = $this->content_api->get_ids_by_ispring_module_id($ispring_module_id);
+
+        return $this->session_query_service->passing_requirements_were_updated_for_user($content_ids, $user_id);
     }
 }

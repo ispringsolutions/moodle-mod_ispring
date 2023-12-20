@@ -30,6 +30,8 @@ use html_writer;
 class play_page extends base_page
 {
     private const PLAYER_ID = 'mod-ispring-player';
+    private const PRELOADER_ID = 'mod-ispring-preloader';
+    private const ERROR_BOX_ID = 'mod-ispring-error-box';
 
     public function __construct(
         private readonly int $content_id,
@@ -44,19 +46,27 @@ class play_page extends base_page
 
     public function get_content(): string
     {
-        $content = $this->get_output()->single_button($this->return_url, get_string('back', 'ispring'));
+        $content = $this->get_output()->box_start('generalbox alert alert-warning hidden', self::ERROR_BOX_ID);
+        $content .= $this->get_output()->box_end();
 
+        $content .= $this->get_output()->single_button($this->return_url, get_string('back', 'ispring'));
+
+        $content .= \html_writer::start_tag('div', ['class' => 'container']);
+        $content .= \html_writer::tag('div', '', ['class' => 'preloader', 'id' => self::PRELOADER_ID]);
         $content .= html_writer::start_tag('iframe', [
             'id' => self::PLAYER_ID,
             'class' => 'player',
             ]);
         $content .= html_writer::end_tag('iframe');
+        $content .= \html_writer::end_tag('div');
 
         $this->get_page()->requires->js_call_amd('mod_ispring/api', 'init', [
             $this->content_id,
             $this->content_url,
             self::PLAYER_ID,
-            $this->return_url
+            $this->return_url,
+            self::PRELOADER_ID,
+            self::ERROR_BOX_ID,
         ]);
 
         return $content;

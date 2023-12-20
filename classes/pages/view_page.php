@@ -38,6 +38,7 @@ class view_page extends base_page
         private readonly session_api_interface $session_api,
         private readonly int $cm_id,
         private readonly int $user_id,
+        private readonly bool $passing_requirements_were_updated,
         string $url,
         array $args = null
     )
@@ -48,6 +49,14 @@ class view_page extends base_page
 
     public function get_content(): string
     {
+        $warning = '';
+        if ($this->passing_requirements_were_updated)
+        {
+            $warning .= $this->get_output()->box_start('generalbox alert alert-warning');
+            $warning .= \html_writer::span(get_string('passingrequirementshavebeenupdatedstudenttext', 'ispring'));
+            $warning .= $this->get_output()->box_end();
+        }
+
         $module_has_sessions = $this->session_api->ispring_module_has_sessions_with_user_id(
             $this->ispring_module->get_id(),
             $this->user_id,
@@ -74,6 +83,7 @@ class view_page extends base_page
                 [
                     module_user_sessions_report::PARAM_ISPRING_MODULE_ID => $this->ispring_module->get_id(),
                     module_user_sessions_report::PARAM_USER_ID => $this->user_id,
+                    module_user_sessions_report::PARAM_PAGE_URL => $this->get_page()->url->out(),
                 ],
             );
         }
@@ -84,6 +94,7 @@ class view_page extends base_page
             'module_info_text' => $module_info_text,
             'report' => $module_has_sessions ? $report->output() : null,
             'report_title' => $module_has_sessions ? get_string('studentsessionsreporttitle', 'ispring') : null,
+            'warning' => $warning
         ]);
     }
 

@@ -26,7 +26,7 @@
 namespace mod_ispring\external;
 
 use external_value;
-use mod_ispring\content\api\content_api_interface;
+use mod_ispring\common\infrastructure\context_utils;
 use mod_ispring\di_container;
 
 class get_player_data extends \external_api
@@ -83,12 +83,6 @@ class get_player_data extends \external_api
     private static function get_module_context(int $content_id): \context_module
     {
         $content_api = di_container::get_content_api();
-        $content = $content_api->get_by_id($content_id);
-        if (!$content)
-        {
-            throw new \moodle_exception('contentnotfound', 'ispring');
-        }
-        [, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
-        return \context_module::instance($cm->id);
+        return context_utils::get_module_context($content_api, $content_id);
     }
 }

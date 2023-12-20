@@ -64,8 +64,7 @@ class session_query_service implements session_query_service_interface
             $session = array_values($sessions)[0];
 
             return $this->get_session($session);
-        }
-        catch (\Exception)
+        } catch (\Exception)
         {
             return null;
         }
@@ -93,8 +92,7 @@ class session_query_service implements session_query_service_interface
             return $session !== false
                 ? $this->get_session($session)
                 : null;
-        }
-        catch (\Exception)
+        } catch (\Exception)
         {
             return null;
         }
@@ -117,8 +115,7 @@ class session_query_service implements session_query_service_interface
                 1,
             );
             return count($sessions) > 0;
-        }
-        catch (\Exception)
+        } catch (\Exception)
         {
             return false;
         }
@@ -135,8 +132,7 @@ class session_query_service implements session_query_service_interface
             }
 
             return $this->get_session($session);
-        }
-        catch (\Exception)
+        } catch (\Exception)
         {
             return null;
         }
@@ -154,6 +150,45 @@ class session_query_service implements session_query_service_interface
             grading_options::LAST->value => $this->get_last_grade($content_id, $user_id),
             default => [],
         };
+    }
+
+    public function exist(int $session_id): bool
+    {
+        return $this->database->record_exists('ispring_session', ['id' => $session_id]);
+    }
+
+    public function passing_requirements_were_updated(array $content_ids): bool
+    {
+        if (empty($content_ids))
+        {
+            return false;
+        }
+
+        $params = $content_ids;
+        $params[] = session_state::INCOMPLETE;
+        $records = $this->database->get_records_sql("
+            SELECT ROW_NUMBER() OVER () AS i, COUNT(max_score), COUNT(min_score)
+            FROM {ispring_session}
+                WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($content_ids)) . ")
+                AND status != ?
+            GROUP BY max_score, min_score;",
+            $params
+        );
+        return count($records) > 1;
+    }
+
+    public function passing_requirements_were_updated_for_user(array $content_ids, int $user_id): bool
+    {
+        if (empty($content_ids))
+        {
+            return false;
+        }
+
+        $current_requirements = $this->get_current_requirements($content_ids);
+
+        $current_user_requirements = $this->get_current_requirements($content_ids, $user_id);
+
+        return $current_requirements && $current_user_requirements && $current_requirements != $current_user_requirements;
     }
 
     private function get_highest_grade(int $content_id, int $user_id): array
@@ -281,20 +316,6 @@ class session_query_service implements session_query_service_interface
         return $result;
     }
 
-    private function get_all_users(int $content_id): array
-    {
-        return array_keys($this->database->get_records('ispring_session',
-            ['ispring_content_id' => $content_id],
-            '',
-            'DISTINCT(user_id)',
-        ));
-    }
-
-    public function exist(int $session_id): bool
-    {
-        return $this->database->record_exists('ispring_session', ['id' => $session_id]);
-    }
-
     private static function get_session(\stdClass $data): session
     {
         return new session(
@@ -313,6 +334,53 @@ class session_query_service implements session_query_service_interface
             $data->min_score,
             $data->passing_score,
             $data->detailed_report,
+            $data->player_id ?? '',
         );
+    }
+
+    private function get_current_requirements(array $content_ids, ?int $user_id = null): ?\stdClass
+    {
+        try
+        {
+            $user_condition = '';
+            if ($user_id)
+            {
+                $user_condition = ' AND user_id = ' . $user_id;
+            }
+            $params = $content_ids;
+            $params[] = session_state::INCOMPLETE;
+            $requirements = $this->database->get_records_sql("
+                SELECT max_score, min_score
+                FROM {ispring_session}
+                    WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($content_ids)) . ") 
+                    AND status != ?
+                    $user_condition
+                ORDER BY id DESC",
+                $params,
+                0,
+                1
+            );
+            $requirement = reset($requirements);
+
+            if (!$requirement)
+            {
+                return null;
+            }
+
+            return $requirement;
+        } catch (\Exception)
+        {
+            return null;
+        }
+    }
+
+    private static function generate_sql_params_template(int $count): string
+    {
+        if ($count <= 0)
+        {
+            return '';
+        }
+
+        return "?" . str_repeat(', ?', $count - 1);
     }
 }
