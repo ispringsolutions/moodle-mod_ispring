@@ -33,15 +33,17 @@ class module_user_sessions_report extends system_report
 {
     public const PARAM_ISPRING_MODULE_ID = 'ispring_module_id';
     public const PARAM_USER_ID = 'user_id';
+    public const PARAM_PAGE_URL = 'page_url';
 
     protected function initialise(): void
     {
         $ispring_module_id = $this->get_parameter(self::PARAM_ISPRING_MODULE_ID, 0, PARAM_INT);
         $user_id = $this->get_parameter(self::PARAM_USER_ID, 0, PARAM_INT);
+        $page_url = $this->get_parameter(self::PARAM_PAGE_URL, '', PARAM_TEXT);
 
         $show_detailed_reports = capability_utils::can_view_detailed_reports_for_user($this->get_context(), $user_id);
 
-        $entity_session = new session();
+        $entity_session = new session($page_url);
         $entity_session_alias = $entity_session->get_table_alias('ispring_session');
         $this->add_entity($entity_session);
 

@@ -27,13 +27,15 @@ namespace mod_ispring\external;
 
 use external_api;
 use external_function_parameters;
-use external_single_structure;
 use external_value;
 use mod_ispring\di_container;
 use mod_ispring\session\api\input\update_input;
+use mod_ispring\session\app\exception\player_conflict_exception;
 
 class set_state extends external_api
 {
+    private const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
+
     /**
      * @return external_function_parameters
      */
@@ -45,7 +47,8 @@ class set_state extends external_api
         ]);
     }
 
-    public static function execute(int $session_id, string $state): void {
+    public static function execute(int $session_id, string $state): array
+    {
         global $USER;
 
         ['session_id' => $session_id, 'state' => $state] = self::validate_parameters(
@@ -55,16 +58,30 @@ class set_state extends external_api
 
         $parsed_state = state_parser::parse_state($state);
 
-        di_container::get_session_api()->update($session_id, $USER->id, new update_input(
-            $parsed_state->get_duration(),
-            $parsed_state->get_id(),
-            $parsed_state->get_persist_state(),
-            $parsed_state->get_status(),
-        ));
+        try
+        {
+            di_container::get_session_api()->update($session_id, $USER->id, new update_input(
+                $parsed_state->get_duration(),
+                $parsed_state->get_id(),
+                $parsed_state->get_persist_state(),
+                $parsed_state->get_status(),
+                $parsed_state->get_player_id(),
+            ));
+        } catch (player_conflict_exception $exception)
+        {
+            return ['warning' => [[
+                'warningcode' => self::INVALID_PLAYER_ID_CODE,
+                'message' => get_string('invalidplayerid', 'ispring'),
+            ]]];
+        }
+
+        return ['warning' => []];
     }
 
-    public static function execute_returns()
+    public static function execute_returns(): \external_single_structure
     {
-        return null;
+        return new \external_single_structure([
+            'warning' => new \external_warnings(),
+        ]);
     }
 }

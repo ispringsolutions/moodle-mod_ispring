@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/ispring/db" VERSION="2023090733" COMMENT="XMLDB file for Moodle mod/ispring"
+<XMLDB PATH="mod/ispring/db" VERSION="2023120302" COMMENT="XMLDB file for Moodle mod/ispring"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -54,6 +54,7 @@
         <FIELD NAME="min_score" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="Min score"/>
         <FIELD NAME="passing_score" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Passing score"/>
         <FIELD NAME="detailed_report" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Detailed report"/>
+        <FIELD NAME="player_id" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Player id"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

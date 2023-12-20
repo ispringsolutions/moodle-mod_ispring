@@ -19,6 +19,7 @@
 }
 
 .path-mod-ispring .detailed-report__report,
+.path-mod-ispring .container,
 .path-mod-ispring .player
 {
     width: 100%;
@@ -29,4 +30,62 @@
 .path-mod-ispring .player
 {
     margin-top: 19px;
+}
+
+.path-mod-ispring .preloader
+{
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.path-mod-ispring .preloader::after
+{
+    content: '';
+    position: absolute;
+    background: url([[pix:mod_ispring|preloader]]);
+    background-size: cover;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    animation: mod_ispring_preloader_spin 1s infinite linear;
+}
+
+@keyframes mod_ispring_preloader_spin
+{
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes mod_ispring_preloader_spin
+{
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+#page-mod-ispring-view .reportbuilder-table
+{
+    white-space: nowrap;
+}
+
+.path-mod-ispring .hidden
+{
+    display: none;
 }

@@ -35,6 +35,12 @@ use mod_ispring\session\domain\model\session_state;
 
 class session extends base_entity
 {
+    public function __construct(
+        private readonly string $page_url,
+    )
+    {
+    }
+
     protected function get_default_table_aliases(): array
     {
         return [
@@ -66,9 +72,9 @@ class session extends base_entity
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
             ->add_field("{$alias}.id")
-            ->add_callback(static function(string $session_id): string {
-                $link = new \moodle_url('/mod/ispring/detailed_report.php', ['session_id' => $session_id]);
-                return \html_writer::link($link->out(), get_string('reviewattempt', 'ispring'));
+            ->add_callback(function(string $session_id): string {
+                $link = $this->get_detailed_report_link($session_id);
+                return \html_writer::link($link->out(false), get_string('reviewattempt', 'ispring'));
             });
 
         $columns[] = (new column(
@@ -239,5 +245,15 @@ class session extends base_entity
     private static function format_duration(?int $duration): string
     {
         return $duration ? format_time($duration) : '-';
+    }
+
+    private function get_detailed_report_link(string $session_id): \moodle_url
+    {
+        $args = ['session_id' => $session_id];
+        if ($this->page_url)
+        {
+            $args['return_url'] = $this->page_url;
+        }
+        return new \moodle_url('/mod/ispring/detailed_report.php', $args);
     }
 }

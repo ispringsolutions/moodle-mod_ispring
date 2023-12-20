@@ -44,11 +44,15 @@ $event = course_module_viewed::create([
 ]);
 $event->trigger();
 
+$session_api = di_container::get_session_api();
+$passing_requirements_were_updated = $session_api->passing_requirements_were_updated_for_user($ispring->get_id(), $USER->id);
+
 $page = new view_page(
     $ispring,
-    di_container::get_session_api(),
+    $session_api,
     $cm_id,
     $USER->id,
+    $passing_requirements_were_updated,
     '/mod/ispring/view.php',
     ['id' => $cm_id],
 );

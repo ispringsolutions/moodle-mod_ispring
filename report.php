@@ -38,9 +38,15 @@ require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 $module_context = context_module::instance($argparser->get_cm()->id);
 require_capability('mod/ispring:viewallreports', $module_context);
 
-$content_api = di_container::get_content_api();
+$ispring_module_id = $argparser->get_ispring_module()->get_id();
+$passing_requirements_were_updated = di_container::get_session_api()->passing_requirements_were_updated($ispring_module_id);
 
-$page = new report_page($argparser->get_ispring_module()->get_id(), '/mod/ispring/report.php', ['id' => $cm_id]);
+$page = new report_page(
+    $ispring_module_id,
+    $passing_requirements_were_updated,
+    '/mod/ispring/report.php',
+    ['id' => $cm_id]
+);
 
 $page->set_title(get_string('report', 'ispring'));
 $page->set_secondary_active_tab('report');

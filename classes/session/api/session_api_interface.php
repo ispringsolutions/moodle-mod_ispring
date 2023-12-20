@@ -37,9 +37,11 @@ interface session_api_interface
      * @param int $content_id
      * @param int $user_id
      * @param string $status
+     * @param string $player_id
+     * @param bool $session_restored
      * @return int
      */
-    public function add(int $content_id, int $user_id, string $status): int;
+    public function add(int $content_id, int $user_id, string $status, string $player_id, bool $session_restored): int;
 
     /**
      * End session and save state
@@ -103,4 +105,19 @@ interface session_api_interface
      * @return detailed_report_output|null
      */
     public function get_detailed_report(int $session_id): ?detailed_report_output;
+
+    /**
+     * Returns true if passing requirements were updated
+     * @param int $ispring_module_id
+     * @return bool
+     */
+    public function passing_requirements_were_updated(int $ispring_module_id): bool;
+
+    /**
+     * Returns true if passing requirements were updated for given user
+     * @param int $ispring_module_id
+     * @param int $user_id
+     * @return bool
+     */
+    public function passing_requirements_were_updated_for_user(int $ispring_module_id, int $user_id): bool;
 }

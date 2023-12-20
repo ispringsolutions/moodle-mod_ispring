@@ -23,13 +23,32 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\session\app\adapter;
+namespace mod_ispring\common\infrastructure\lock;
 
-interface content_api_interface
+use core\lock\lock;
+use mod_ispring\common\app\lock\lock_interface;
+
+class auto_release_lock_wrapper implements lock_interface
 {
-    public function get_ispring_module_id_by_content_id(int $id): int;
+    public function __construct(
+        private readonly lock $lock,
+    )
+    {
+    }
 
-    public function get_newest_content_id(int $ispring_module_id): int;
+    public function __destruct()
+    {
+        try
+        {
+            $this->release();
+        }
+        catch (\Throwable)
+        {
+        }
+    }
 
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public function release(): void
+    {
+        $this->lock->release();
+    }
 }

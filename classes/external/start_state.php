@@ -29,6 +29,8 @@ class start_state
 {
     public function __construct(
         private readonly string $status,
+        private readonly string $player_id,
+        private readonly bool $session_restored,
     )
     {
     }
@@ -39,5 +41,15 @@ class start_state
     public function get_status(): string
     {
         return $this->status;
+    }
+
+    public function get_player_id(): string
+    {
+        return $this->player_id;
+    }
+
+    public function get_session_restored(): bool
+    {
+        return $this->session_restored;
     }
 }

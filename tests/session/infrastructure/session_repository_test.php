@@ -101,6 +101,7 @@ class session_repository_test extends \advanced_testcase
         $session->detailed_report = '_report';
         $session->score = 10;
         $session->end_time = 10;
+        $session->player_id = '12313';
 
         return $DB->insert_record('ispring_session', $session);
     }

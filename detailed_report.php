@@ -29,6 +29,8 @@ use mod_ispring\pages\detailed_report_page;
 require_once('../../config.php');
 
 $session_id = required_param('session_id', PARAM_INT);
+$return_url = optional_param('return_url', '', PARAM_LOCALURL);
+
 $session_api = di_container::get_session_api();
 $content_api = di_container::get_content_api();
 
@@ -55,17 +57,23 @@ if (!capability_utils::can_view_detailed_reports_for_user($module_context, $deta
 }
 
 $report_url = $content_api->get_report_url($module_context->id, $detailed_report->get_content_id());
-
 if (!$report_url)
 {
     throw new \moodle_exception('reportnotfound', 'ispring');
 }
+
+$can_view_general_report = has_capability('mod/ispring:viewallreports', $module_context);
+if (!$return_url)
+{
+    $return_url = $can_view_general_report ? "report.php?id={$cm->id}" : "view.php?id={$cm->id}";
+}
+
 $page_url = '/mod/ispring/detailed_report.php';
 $page_args = ['session_id' => $session_id];
 $page = new detailed_report_page(
     $session_id,
     $report_url,
-    new \moodle_url('/mod/ispring/report.php', ['id' => $cm->id]),
+    $return_url,
     $detailed_report->get_user_id(),
     $page_url,
     $page_args
@@ -74,7 +82,10 @@ $page = new detailed_report_page(
 $page->set_title(get_string('detailedreport', 'ispring'));
 $page->set_secondary_active_tab('report');
 
-$page->add_navbar(get_string('report', 'ispring'), '/mod/ispring/report.php', ['id' => $cm->id]);
+if ($can_view_general_report)
+{
+    $page->add_navbar(get_string('report', 'ispring'), '/mod/ispring/report.php', ['id' => $cm->id]);
+}
 $page->add_navbar(get_string('detailedreport', 'ispring'), $page_url, $page_args);
 
 $page->set_context($module_context);

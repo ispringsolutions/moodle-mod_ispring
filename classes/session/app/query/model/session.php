@@ -43,6 +43,7 @@ class session
         private readonly float $min_score,
         private readonly ?float $passing_score,
         private readonly ?string $detailed_report,
+        private readonly string $player_id,
     )
     {
     }
@@ -165,5 +166,13 @@ class session
     public function get_detailed_report(): ?string
     {
         return $this->detailed_report;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_player_id(): string
+    {
+        return $this->player_id;
     }
 }

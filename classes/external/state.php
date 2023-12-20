@@ -31,7 +31,8 @@ class state
         private readonly int $duration,
         private readonly string $id,
         private readonly string $persist_state,
-        private readonly string $status
+        private readonly string $status,
+        private readonly string $player_id,
     )
     {
     }
@@ -66,5 +67,10 @@ class state
     public function get_status(): string
     {
         return $this->status;
+    }
+
+    public function get_player_id(): string
+    {
+        return $this->player_id;
     }
 }

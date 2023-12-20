@@ -53,4 +53,9 @@ class content_api implements content_api_adapter_interface
 
         return 0;
     }
+
+    public function get_ids_by_ispring_module_id(int $ispring_module_id): array
+    {
+        return $this->api_interface->get_ids_by_ispring_module_id($ispring_module_id);
+    }
 }

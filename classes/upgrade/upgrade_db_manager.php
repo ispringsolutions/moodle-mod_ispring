@@ -65,6 +65,10 @@ final class upgrade_db_manager
         {
             $this->upgrade_to_2023090733();
         }
+        if ($old_version < 2023120302)
+        {
+            $this->upgrade_to_2023120302();
+        }
     }
 
     private function upgrade_to_2023090720(): void
@@ -324,5 +328,28 @@ final class upgrade_db_manager
         }
 
         upgrade_mod_savepoint(true, 2023090733, 'ispring');
+    }
+
+    private function upgrade_to_2023120302(): void
+    {
+        $dbman = $this->db_manager;
+
+        $table = new xmldb_table('ispring_session');
+        $field = new xmldb_field(
+            'player_id',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'detailed_report'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2023120302, 'ispring');
     }
 }

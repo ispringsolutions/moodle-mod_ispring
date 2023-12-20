@@ -23,13 +23,20 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\session\app\adapter;
+namespace mod_ispring\common\infrastructure;
 
-interface content_api_interface
+use mod_ispring\content\api\content_api_interface;
+
+class context_utils
 {
-    public function get_ispring_module_id_by_content_id(int $id): int;
-
-    public function get_newest_content_id(int $ispring_module_id): int;
-
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public static function get_module_context(content_api_interface $content_api, int $content_id): \context_module
+    {
+        $content = $content_api->get_by_id($content_id);
+        if (!$content)
+        {
+            throw new \moodle_exception('contentnotfound', 'ispring');
+        }
+        [, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
+        return \context_module::instance($cm->id);
+    }
 }

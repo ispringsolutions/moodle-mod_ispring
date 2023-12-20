@@ -73,4 +73,19 @@ interface session_query_service_interface
      * @return bool
      */
     public function exist(int $session_id): bool;
+
+    /**
+     * Returns true if passing requirements were updated
+     * @param array $content_ids
+     * @return bool
+     */
+    public function passing_requirements_were_updated(array $content_ids): bool;
+
+    /**
+     * Returns true if passing requirements were updated for given user
+     * @param array $content_ids
+     * @param int $user_id
+     * @return bool
+     */
+    public function passing_requirements_were_updated_for_user(array $content_ids, int $user_id): bool;
 }

@@ -150,7 +150,161 @@ final class session_query_service_test extends \advanced_testcase
         $this->assert_grade_equals(2, 60, 100, $grades[2]);
     }
 
-    private function create_mock_sessions(int $content_id, int $user_id, array $grades): array
+    public function test_passing_requirements_were_updated_returns_false_on_empty_content_ids(): void
+    {
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([]));
+    }
+
+    public function test_passing_requirements_were_updated_returns_false_on_empty_data(): void
+    {
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([1, 2]));
+    }
+
+    public function test_passing_requirements_were_updated_returns_false_on_same_content_with_same_requirements(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(2, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2]));
+    }
+
+    public function test_passing_requirements_were_updated_returns_false_on_different_contents_with_same_requirements(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(4, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2, 4]));
+    }
+
+    public function test_passing_requirements_were_updated_returns_false_on_external_contents(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(4, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([1, 3, 5]));
+    }
+
+    public function test_passing_requirements_were_updated_returns_true_on_sequentially_changed_contents(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(3, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 40, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(4, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 40, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(5, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 40, 'min_score' => 20]
+        );
+
+        $this->create_mock_sessions(6, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([2, 3]));
+        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([4, 5]));
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2, 6]));
+        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([2, 4, 6]));
+    }
+
+    public function test_passing_requirements_were_updated_for_user_returns_false_on_empty_content_ids(): void
+    {
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([], 0));
+    }
+
+    public function test_passing_requirements_were_updated_for_user_returns_false_on_non_existing_content_ids(): void
+    {
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([1, 2, 3], 0));
+    }
+
+    public function test_passing_requirements_were_updated_for_user_returns_false_on_existing_content_ids(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(2, 4,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        // Method returns False, if student have passed test already
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 4));
+
+        // Method returns False, if student have not passed test at all
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 5));
+    }
+
+    public function test_passing_requirements_were_updated_for_user_returns_false_on_changed_content_and_non_passing_test_at_all(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(3, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 20]
+        );
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 3));
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 5));
+    }
+
+    public function test_passing_requirements_were_updated_for_user_returns_false_on_changed_content_and_passing_first_test_version(): void
+    {
+        $this->create_mock_sessions(2, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+        $this->create_mock_sessions(2, 5,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 0]
+        );
+
+        $this->create_mock_sessions(3, 3,
+            [['score' => 18, 'end_time' => 100]],
+            ['max_score' => 20, 'min_score' => 20]
+        );
+
+        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 3));
+        $this->assertTrue($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 5));
+    }
+
+    private function create_mock_sessions(int $content_id, int $user_id, array $grades, ?array $passing_requirements = null): array
     {
         global $DB;
         $this->resetAfterTest(true);
@@ -164,10 +318,11 @@ final class session_query_service_test extends \advanced_testcase
         $session->duration = 10;
         $session->persist_state = '_state';
         $session->persist_state_id = '_id';
-        $session->max_score = 100;
-        $session->min_score = 20;
+        $session->max_score = $passing_requirements ? $passing_requirements['max_score'] : 100;
+        $session->min_score = $passing_requirements ? $passing_requirements['min_score'] : 20;
         $session->passing_score = 60;
         $session->detailed_report = '_report';
+        $session->player_id = '1234';
 
         $ids = [];
         foreach ($grades as $grade)
@@ -221,6 +376,7 @@ final class session_query_service_test extends \advanced_testcase
         $this->assertEquals($record->min_score, $model->get_min_score());
         $this->assertEquals($record->passing_score, $model->get_passing_score());
         $this->assertEquals($record->detailed_report, $model->get_detailed_report());
+        $this->assertEquals($record->player_id, $model->get_player_id());
     }
 
     private function assert_grade_equals(int $user_id, float $score, ?int $date_graded, \stdClass $grade): void

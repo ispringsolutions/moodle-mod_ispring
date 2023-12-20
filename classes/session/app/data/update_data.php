@@ -32,6 +32,7 @@ class update_data
         private readonly string $persist_state_id,
         private readonly string $persist_state,
         private readonly string $status,
+        private readonly string $player_id,
     )
     {
     }
@@ -66,5 +67,10 @@ class update_data
     public function get_status(): string
     {
         return $this->status;
+    }
+
+    public function get_player_id(): string
+    {
+        return $this->player_id;
     }
 }

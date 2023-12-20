@@ -109,6 +109,7 @@ class session_repository implements session_repository_interface
         $result->min_score = $session->get_min_score();
         $result->passing_score = $session->get_passing_score();
         $result->detailed_report = $session->get_detailed_report();
+        $result->player_id = $session->get_player_id();
 
         return $result;
     }

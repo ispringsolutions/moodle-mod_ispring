@@ -23,13 +23,23 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\session\app\adapter;
+namespace mod_ispring\common\infrastructure\transaction;
 
-interface content_api_interface
+class transaction_utils
 {
-    public function get_ispring_module_id_by_content_id(int $id): int;
-
-    public function get_newest_content_id(int $ispring_module_id): int;
-
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public static function do_in_transaction(string $transaction_class, callable $fn): mixed
+    {
+        $transaction = new $transaction_class();
+        try
+        {
+            $result = $fn($transaction);
+            $transaction->commit();
+            return $result;
+        }
+        catch (\Throwable $e)
+        {
+            $transaction->rollback($e);
+            throw $e;
+        }
+    }
 }

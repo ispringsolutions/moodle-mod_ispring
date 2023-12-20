@@ -23,11 +23,15 @@
 
 import {call} from 'core/ajax';
 
+const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
+
 class Api {
-    constructor(sessionId, contentId, returnUrl) {
+    constructor(sessionId, contentId, returnUrl, boxErrorId, iframeId) {
         this._sessionId = sessionId;
         this._contentId = contentId;
         this._returnUrl = returnUrl;
+        this._boxErrorId = boxErrorId;
+        this._iframeId = iframeId;
     }
 
     startSession(state) {
@@ -53,7 +57,8 @@ class Api {
                 'state': JSON.stringify(state)
             }
         }])[0]
-            .then(() => {
+            .then((response) => {
+                showErrorBoxIfNeeded(response, this._boxErrorId, this._iframeId);
             })
             .catch(() => {
             });
@@ -67,7 +72,8 @@ class Api {
                 'state': JSON.stringify(state)
             }
         }])[0]
-            .then(() => {
+            .then((response) => {
+                showErrorBoxIfNeeded(response, this._boxErrorId, this._iframeId);
             })
             .catch(() => {
             });
@@ -75,6 +81,24 @@ class Api {
 
     terminate() {
         window.location.replace(this._returnUrl);
+    }
+}
+
+/**
+ * @param {array} response
+ * @param {string} boxId
+ * @param {string} iframeId
+ */
+function showErrorBoxIfNeeded(response, boxId, iframeId) {
+    if ('warning' in response && response['warning'].length > 0)
+    {
+        const warning = response['warning'][0];
+        if (warning['warningcode'] === INVALID_PLAYER_ID_CODE)
+        {
+            document.getElementById(boxId).style.display = 'block';
+            document.getElementById(boxId).innerHTML = warning['message'];
+            document.getElementById(iframeId).parentElement.style.display = 'none';
+        }
     }
 }
 
@@ -92,8 +116,8 @@ function setPlayerData(persistStateId, persistState) {
     }
 }
 
-export const init = (contentId, playerUrl, iframeId, returnUrl) => {
-    window['ispring_moodle_connector'] = new Api(0, contentId, returnUrl);
+export const init = (contentId, playerUrl, iframeId, returnUrl, preloaderId, errorBoxId) => {
+    window['ispring_moodle_connector'] = new Api(0, contentId, returnUrl, errorBoxId, iframeId);
     call([{
         methodname: 'mod_ispring_get_player_data',
         args: {
@@ -107,5 +131,6 @@ export const init = (contentId, playerUrl, iframeId, returnUrl) => {
         })
         .then(() => {
             document.getElementById(iframeId).src = playerUrl;
+            document.getElementById(preloaderId).remove();
         });
 };

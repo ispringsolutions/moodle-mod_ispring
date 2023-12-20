@@ -29,15 +29,14 @@ use external_api;
 use external_function_parameters;
 use external_value;
 use mod_ispring\di_container;
-use mod_ispring\mapper\std_mapper;
-use mod_ispring\session\api\input\end_input;
-use mod_ispring\session\api\input\update_input;
-
-require_once($CFG->dirroot . '/mod/ispring/lib.php');
-require_once($CFG->libdir . '/gradelib.php');
+use mod_ispring\session\api\session_api_interface;
+use mod_ispring\session\app\exception\player_conflict_exception;
+use mod_ispring\use_case\end_session_use_case;
 
 class end_session extends external_api
 {
+    private const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
+
     /**
      * @return external_function_parameters
      */
@@ -49,7 +48,7 @@ class end_session extends external_api
         ]);
     }
 
-    public static function execute(int $session_id, string $state): void
+    public static function execute(int $session_id, string $state): array
     {
         global $USER;
         ['session_id' => $session_id, 'state' => $state] = self::validate_parameters(
@@ -60,56 +59,45 @@ class end_session extends external_api
         $parsed_state = state_parser::parse_result_state($state);
 
         $session_api = di_container::get_session_api();
+        $ispring_module_id = self::get_ispring_module_id_by_session_id($session_api, $session_id);
 
-        $session_api->update($session_id, $USER->id, new update_input(
-            $parsed_state->get_state()->get_duration(),
-            $parsed_state->get_state()->get_id(),
-            $parsed_state->get_state()->get_persist_state(),
-            $parsed_state->get_state()->get_status(),
-        ));
+        $use_case = new end_session_use_case(di_container::get_ispring_module_api(), $session_api);
+        try
+        {
+            $use_case->end_session($ispring_module_id, $session_id, $USER->id, $parsed_state);
+        } catch (player_conflict_exception $exception)
+        {
+            return ['warning' => [[
+                'warningcode' => self::INVALID_PLAYER_ID_CODE,
+                'message' => get_string('invalidplayerid', 'ispring'),
+            ]]];
+        }
 
-        $session_api->end($session_id, $USER->id, new end_input(
-            $parsed_state->get_max_score(),
-            $parsed_state->get_min_score(),
-            $parsed_state->get_passing_score(),
-            $parsed_state->get_score(),
-            $parsed_state->get_detailed_report(),
-        ));
+        return ['warning' => []];
+    }
 
+    public static function execute_returns(): \external_single_structure
+    {
+        return new \external_single_structure([
+            'warning' => new \external_warnings(),
+        ]);
+    }
+
+    private static function get_ispring_module_id_by_session_id(
+        session_api_interface $session_api,
+        int $session_id,
+    ): int
+    {
         $session = $session_api->get_by_id($session_id);
         if (!$session)
         {
-            return;
+            throw new \moodle_exception('sessionnotfound', 'ispring');
         }
         $content = di_container::get_content_api()->get_by_id($session->get_content_id());
         if (!$content)
         {
-            return;
+            throw new \moodle_exception('contentnotfound', 'ispring');
         }
-        [$course, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
-
-        $module = di_container::get_ispring_module_api()->get_by_id($content->get_ispring_module_id());
-        if (!$module)
-        {
-            return;
-        }
-
-        $module_instance = std_mapper::ispring_module_output_to_std_class($module);
-        $module_instance->max_score = $session->get_max_score();
-        $module_instance->min_score = $session->get_min_score();
-
-        ispring_update_grades($module_instance, $USER->id);
-
-        $completion = new \completion_info($course);
-        if ($completion->is_enabled($cm) && $session->get_passing_score() <= $session->get_score())
-        {
-            $completion->update_state($cm, COMPLETION_COMPLETE, $USER->id);
-        }
-        grade_regrade_final_grades_if_required($course);
-    }
-
-    public static function execute_returns()
-    {
-        return null;
+        return $content->get_ispring_module_id();
     }
 }
