@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,11 +32,13 @@ use stored_file;
 
 class file_storage implements file_storage_interface
 {
-    private const COMPONENT_NAME = 'mod_ispring';
-    private const FILEAREA = 'content';
+    public const PACKAGE_FILEAREA = 'package';
+    public const COMPONENT_NAME = 'mod_ispring';
+    public const PACKAGE_ITEM_ID = 0;
+    private const CONTENT_FILEAREA = 'content';
     private const USER_COMPONENT_NAME = 'user';
     private const USER_FILEAREA = 'draft';
-    private readonly \file_storage $file_storage;
+    private \file_storage $file_storage;
 
     public function __construct()
     {
@@ -47,19 +49,16 @@ class file_storage implements file_storage_interface
         int $target_context_id,
         int $target_item_id,
         int $user_context_id,
-        int $user_item_id,
+        int $user_item_id
     ): void
     {
-        $files = $this->file_storage->get_area_files(
+        $file = $this->get_first_file_in_area(
             $user_context_id,
             self::USER_COMPONENT_NAME,
             self::USER_FILEAREA,
             $user_item_id,
-            'id',
-            false
         );
 
-        $file = reset($files);
         if (!$file)
         {
             throw new \RuntimeException('No zip file');
@@ -71,7 +70,7 @@ class file_storage implements file_storage_interface
                 get_file_packer('application/zip'),
                 $target_context_id,
                 self::COMPONENT_NAME,
-                self::FILEAREA,
+                self::CONTENT_FILEAREA,
                 $target_item_id,
                 '.'
             );
@@ -80,10 +79,12 @@ class file_storage implements file_storage_interface
             {
                 throw new \RuntimeException('Cannot unzip file');
             }
+
+            $this->save_zip_package($target_context_id, $user_item_id);
         }
         catch (\Throwable $e)
         {
-            $this->clear_ispring_content_area($target_context_id, $target_item_id);
+            $this->clear_ispring_areas($target_context_id, $target_item_id);
             throw $e;
         }
     }
@@ -93,7 +94,7 @@ class file_storage implements file_storage_interface
         $file = $this->file_storage->get_file(
             $context_id,
             self::COMPONENT_NAME,
-            self::FILEAREA,
+            self::CONTENT_FILEAREA,
             $item_id,
             '/',
             $filename
@@ -107,15 +108,26 @@ class file_storage implements file_storage_interface
         return $file;
     }
 
-    public function present_file(int $context_id, array $args): void
+    public function present_file(
+        int $context_id,
+        string $filearea,
+        array $args,
+        bool $force_download,
+        array $options = []
+    ): bool
     {
+        if ($filearea != self::PACKAGE_FILEAREA && $filearea != self::CONTENT_FILEAREA)
+        {
+            send_file_not_found();
+        }
+
         $relative_path = implode('/', $args);
         $full_path = '/'
             . implode('/',
                 [
                     $context_id,
                     file_storage::COMPONENT_NAME,
-                    file_storage::FILEAREA,
+                    $filearea,
                     $relative_path
                 ]);
 
@@ -126,6 +138,7 @@ class file_storage implements file_storage_interface
         }
 
         send_stored_file($file);
+        return true;
     }
 
     public function generate_entrypoint_url(int $context_id, int $file_id, string $filepath, string $filename): string
@@ -133,7 +146,7 @@ class file_storage implements file_storage_interface
         return moodle_url::make_pluginfile_url(
             $context_id,
             self::COMPONENT_NAME,
-            self::FILEAREA,
+            self::CONTENT_FILEAREA,
             $file_id,
             $filepath . '/',
             $filename,
@@ -141,18 +154,61 @@ class file_storage implements file_storage_interface
         )->out();
     }
 
-    public function user_draft_area_is_empty(int $user_context_id, int $user_item_id): bool
+    public function content_needs_updating(int $target_context_id, int $user_context_id, int $user_item_id): bool
     {
-        return $this->file_storage->is_area_empty(
+        $user_package = $this->get_first_file_in_area(
             $user_context_id,
             self::USER_COMPONENT_NAME,
             self::USER_FILEAREA,
-            $user_item_id
+            $user_item_id,
         );
+        if (!$user_package)
+        {
+            return false;
+        }
+
+        $current_package = $this->get_first_file_in_area(
+            $target_context_id,
+            self::COMPONENT_NAME,
+            self::PACKAGE_FILEAREA,
+            self::PACKAGE_ITEM_ID,
+        );
+        if (!$current_package)
+        {
+            return true;
+        }
+        return $current_package->get_contenthash() != $user_package->get_contenthash();
     }
 
-    public function clear_ispring_content_area(int $context_id, int|false $item_id = false): bool
+    public function clear_ispring_areas(int $context_id, $item_id = false): bool
     {
-        return $this->file_storage->delete_area_files($context_id, self::COMPONENT_NAME, self::FILEAREA, $item_id);
+        return $this->file_storage->delete_area_files($context_id, self::COMPONENT_NAME, self::CONTENT_FILEAREA, $item_id)
+            && $this->file_storage->delete_area_files($context_id, self::COMPONENT_NAME, self::PACKAGE_FILEAREA, self::PACKAGE_ITEM_ID);
+    }
+
+    private function get_first_file_in_area(
+        int $context_id,
+        string $component,
+        string $filearea,
+        int $item_id
+    )
+    {
+        $files = $this->file_storage->get_area_files($context_id, $component, $filearea, $item_id, 'id', false);
+        return reset($files);
+    }
+
+    private function save_zip_package(int $context_id, int $draft_item_id): void
+    {
+        file_save_draft_area_files(
+            $draft_item_id,
+            $context_id,
+            self::COMPONENT_NAME,
+            self::PACKAGE_FILEAREA,
+            self::PACKAGE_ITEM_ID,
+            [
+                'subdirs' => 0,
+                'maxfiles' => 1
+            ]
+        );
     }
 }

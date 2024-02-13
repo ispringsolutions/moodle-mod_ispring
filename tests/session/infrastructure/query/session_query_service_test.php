@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,8 +32,9 @@ use mod_ispring\session\domain\model\session_state;
 
 final class session_query_service_test extends \advanced_testcase
 {
-    private readonly mixed $ispring_module_stub;
-    private readonly session_query_service $session_query_service;
+    /** @var mixed */
+    private $ispring_module_stub;
+    private session_query_service $session_query_service;
 
     protected function setUp(): void
     {
@@ -61,7 +62,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_highest_grade_when_grade_method_is_set_to_highest(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
 
@@ -72,7 +73,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_highest_grades_for_all_users(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
 
@@ -84,7 +85,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_average_grade_when_grade_method_is_set_to_average(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
 
@@ -95,7 +96,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_average_grades_for_all_users(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
 
@@ -107,7 +108,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_first_grade_when_grade_method_is_set_to_first(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
 
@@ -118,7 +119,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_first_grades_for_all_users(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
 
@@ -130,7 +131,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_last_grade_when_grade_method_is_set_to_last(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
 
@@ -141,7 +142,7 @@ final class session_query_service_test extends \advanced_testcase
     public function test_get_grades_returns_last_grades_for_all_users(): void
     {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST->value);
+        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST);
 
         $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
 

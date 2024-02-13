@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,16 +27,31 @@ namespace mod_ispring\session\api\output;
 
 class session_output
 {
+    private int $content_id;
+    private ?string $persist_state_id;
+    private ?string $persist_state;
+    private ?float $max_score;
+    private ?float $min_score;
+    private ?float $passing_score;
+    private float $score;
+
     public function __construct(
-        private readonly int $content_id,
-        private readonly ?string $persist_state_id,
-        private readonly ?string $persist_state,
-        private readonly ?float $max_score,
-        private readonly ?float $min_score,
-        private readonly ?float $passing_score,
-        private readonly float $score,
+        int $content_id,
+        ?string $persist_state_id,
+        ?string $persist_state,
+        ?float $max_score,
+        ?float $min_score,
+        ?float $passing_score,
+        float $score
     )
     {
+        $this->content_id = $content_id;
+        $this->persist_state_id = $persist_state_id;
+        $this->persist_state = $persist_state;
+        $this->max_score = $max_score;
+        $this->min_score = $min_score;
+        $this->passing_score = $passing_score;
+        $this->score = $score;
     }
 
     /**

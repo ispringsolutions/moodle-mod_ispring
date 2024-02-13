@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -85,7 +85,7 @@ class end_session extends external_api
 
     private static function get_ispring_module_id_by_session_id(
         session_api_interface $session_api,
-        int $session_id,
+        int $session_id
     ): int
     {
         $session = $session_api->get_by_id($session_id);

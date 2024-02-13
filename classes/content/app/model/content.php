@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,15 +27,28 @@ namespace mod_ispring\content\app\model;
 
 class content
 {
+    private int $file_id;
+    private int $ispring_module_id;
+    private int $creation_time;
+    private file_info $content_path;
+    private int $version;
+    private ?file_info $report_path;
+
     public function __construct(
-        private readonly int $file_id,
-        private readonly int $ispring_module_id,
-        private readonly int $creation_time,
-        private readonly file_info $content_path,
-        private readonly int $version,
-        private readonly ?file_info $report_path,
+        int $file_id,
+        int $ispring_module_id,
+        int $creation_time,
+        file_info $content_path,
+        int $version,
+        ?file_info $report_path
     )
     {
+        $this->file_id = $file_id;
+        $this->ispring_module_id = $ispring_module_id;
+        $this->creation_time = $creation_time;
+        $this->content_path = $content_path;
+        $this->version = $version;
+        $this->report_path = $report_path;
     }
 
     /**

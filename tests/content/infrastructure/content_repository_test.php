@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ use mod_ispring\content\app\model\file_info;
 
 final class content_repository_test extends \advanced_testcase
 {
-    private readonly content_repository $content_repository;
+    private content_repository $content_repository;
 
     protected function setUp(): void
     {

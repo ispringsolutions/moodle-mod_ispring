@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,12 +36,19 @@ use mod_ispring\session\app\service\session_service;
 
 class session_api implements session_api_interface
 {
+    private session_service $session_service;
+    private session_query_service_interface $session_query_service;
+    private content_api_interface $content_api;
+
     public function __construct(
-        private readonly session_service $session_service,
-        private readonly session_query_service_interface $session_query_service,
-        private readonly content_api_interface $content_api,
+        session_service $session_service,
+        session_query_service_interface $session_query_service,
+        content_api_interface $content_api
     )
     {
+        $this->session_service = $session_service;
+        $this->session_query_service = $session_query_service;
+        $this->content_api = $content_api;
     }
 
     public function add(int $content_id, int $user_id, string $status, string $player_id, bool $session_restored): int

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,11 +27,16 @@ namespace mod_ispring\content\app\model;
 
 class file_info
 {
+    private string $path;
+    private string $filename;
+
     public function __construct(
-        private readonly string $path,
-        private readonly string $filename,
+        string $path,
+        string $filename
     )
     {
+        $this->path = $path;
+        $this->filename = $filename;
     }
 
     /**

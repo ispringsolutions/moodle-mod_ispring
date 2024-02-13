@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,10 +35,13 @@ use mod_ispring\session\domain\model\session_state;
 
 class session extends base_entity
 {
+    private string $page_url;
+
     public function __construct(
-        private readonly string $page_url,
+        string $page_url
     )
     {
+        $this->page_url = $page_url;
     }
 
     protected function get_default_table_aliases(): array
@@ -87,16 +90,14 @@ class session extends base_entity
             ->set_is_sortable(true)
             ->add_field("{$alias}.status")
             ->add_callback(static function(string $status): string {
-                return get_string(
-                    match ($status) {
-                        session_state::INCOMPLETE => 'statusinprogress',
-                        session_state::COMPLETE => 'statuscomplete',
-                        session_state::PASSED => 'statuspassed',
-                        session_state::FAILED => 'statusfailed',
-                        default => 'statusunknown',
-                    },
-                    'ispring',
-                );
+                switch ($status)
+                {
+                    case session_state::INCOMPLETE: return get_string('statusinprogress', 'ispring');
+                    case session_state::COMPLETE: return get_string('statuscomplete', 'ispring');
+                    case session_state::PASSED: return get_string('statuspassed', 'ispring');
+                    case session_state::FAILED: return get_string('statusfailed', 'ispring');
+                    default: return get_string('statusunknown', 'ispring');
+                }
             });
 
         $columns[] = (new column(

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,17 +33,33 @@ use mod_ispring\session\api\session_api_interface;
 
 class view_page extends base_page
 {
+    private ispring_module_output $ispring_module;
+    private session_api_interface $session_api;
+    private int $cm_id;
+    private int $user_id;
+    private bool $passing_requirements_were_updated;
+    private bool $module_is_available;
+
     public function __construct(
-        private readonly ispring_module_output $ispring_module,
-        private readonly session_api_interface $session_api,
-        private readonly int $cm_id,
-        private readonly int $user_id,
-        private readonly bool $passing_requirements_were_updated,
+        ispring_module_output $ispring_module,
+        session_api_interface $session_api,
+        int $cm_id,
+        int $user_id,
+        bool $passing_requirements_were_updated,
+        bool $module_is_available,
         string $url,
         array $args = null
     )
     {
         parent::__construct($url, $args);
+
+        $this->ispring_module = $ispring_module;
+        $this->session_api = $session_api;
+        $this->cm_id = $cm_id;
+        $this->user_id = $user_id;
+        $this->passing_requirements_were_updated = $passing_requirements_were_updated;
+        $this->module_is_available = $module_is_available;
+
         $this->setup_page();
     }
 
@@ -90,7 +106,7 @@ class view_page extends base_page
 
         return $this->get_output()->render_from_template('mod_ispring/view_page', [
             'play_button_url' => new \moodle_url('/mod/ispring/play.php', ['id' => $this->cm_id]),
-            'play_button_text' => $play_button_text,
+            'play_button_text' => $this->module_is_available ? $play_button_text : null,
             'module_info_text' => $module_info_text,
             'report' => $module_has_sessions ? $report->output() : null,
             'report_title' => $module_has_sessions ? get_string('studentsessionsreporttitle', 'ispring') : null,
@@ -105,12 +121,19 @@ class view_page extends base_page
 
     private static function get_grading_option_translation(int $grade_method): string
     {
-        return match ($grade_method) {
-            grading_options::HIGHEST->value => get_string('highest', 'ispring'),
-            grading_options::AVERAGE->value => get_string('average', 'ispring'),
-            grading_options::FIRST->value => get_string('first', 'ispring'),
-            grading_options::LAST->value => get_string('last', 'ispring'),
-            default => '',
-        };
+        switch ($grade_method)
+        {
+            case grading_options::HIGHEST:
+                return get_string('highest', 'ispring');
+            case grading_options::AVERAGE:
+                return get_string('average', 'ispring');
+            case grading_options::FIRST:
+                return get_string('first', 'ispring');
+            case grading_options::LAST:
+                return get_string('last', 'ispring');
+            default:
+                debugging('Unexpected grading option');
+                return '';
+        }
     }
 }

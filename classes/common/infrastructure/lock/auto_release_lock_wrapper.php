@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,10 +30,13 @@ use mod_ispring\common\app\lock\lock_interface;
 
 class auto_release_lock_wrapper implements lock_interface
 {
+    private lock $lock;
+
     public function __construct(
-        private readonly lock $lock,
+        lock $lock
     )
     {
+        $this->lock = $lock;
     }
 
     public function __destruct()
@@ -42,7 +45,7 @@ class auto_release_lock_wrapper implements lock_interface
         {
             $this->release();
         }
-        catch (\Throwable)
+        catch (\Throwable $e)
         {
         }
     }

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -46,7 +46,7 @@ if (!$content)
     throw new \moodle_exception('contentnotfound', 'ispring');
 }
 
-list($course, $cm) = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
+[$course, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
 
 require_login($course->id, true, $cm);
 

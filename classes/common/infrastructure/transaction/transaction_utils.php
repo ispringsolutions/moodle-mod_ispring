@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ namespace mod_ispring\common\infrastructure\transaction;
 
 class transaction_utils
 {
-    public static function do_in_transaction(string $transaction_class, callable $fn): mixed
+    public static function do_in_transaction(string $transaction_class, callable $fn)
     {
         $transaction = new $transaction_class();
         try

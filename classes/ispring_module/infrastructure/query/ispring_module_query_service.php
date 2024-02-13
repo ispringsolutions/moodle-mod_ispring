@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ use mod_ispring\ispring_module\app\query\model\ispring_module_model;
 
 class ispring_module_query_service implements ispring_module_query_service_interface
 {
-    private mixed $database;
+    private \moodle_database $database;
 
     public function __construct()
     {
@@ -78,9 +78,11 @@ class ispring_module_query_service implements ispring_module_query_service_inter
                 $ispring->grade,
                 $ispring->grademethod,
                 $description,
+                $ispring->timeopen,
+                $ispring->timeclose,
             );
         }
-        catch (\Exception)
+        catch (\Exception $e)
         {
             return null;
         }

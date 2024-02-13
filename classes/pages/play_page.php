@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,15 +33,23 @@ class play_page extends base_page
     private const PRELOADER_ID = 'mod-ispring-preloader';
     private const ERROR_BOX_ID = 'mod-ispring-error-box';
 
+    private int $content_id;
+    private string $content_url;
+    private string $return_url;
+
     public function __construct(
-        private readonly int $content_id,
-        private readonly string $content_url,
-        private readonly string $return_url,
+        int $content_id,
+        string $content_url,
+        string $return_url,
         string $url,
         array $args = null
     )
     {
         parent::__construct($url, $args);
+
+        $this->content_id = $content_id;
+        $this->content_url = $content_url;
+        $this->return_url = $return_url;
     }
 
     public function get_content(): string

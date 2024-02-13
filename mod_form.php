@@ -17,12 +17,13 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use mod_ispring\ispring_module\domain\model\grading_options;
+use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
@@ -65,13 +66,19 @@ class mod_ispring_mod_form extends moodleform_mod
         }
 
         // -------------------------------------------------------------------------------
+        // Availability.
+        $mform->addElement('header', 'availability', get_string('availability'));
+
+        $mform->addElement('date_time_selector', 'timeopen', get_string('timeopen', 'ispring'), ['optional' => true]);
+        $mform->addElement('date_time_selector', 'timeclose', get_string('timeclose', 'ispring'), ['optional' => true]);
+
+        // -------------------------------------------------------------------------------
         // Grade settings.
         $this->standard_grading_coursemodule_elements();
 
         $mform->removeElement('grade');
         $mform->removeElement('gradepass');
 
-        // Grading method.
         $mform->addElement(
             'select',
             'grademethod',
@@ -91,13 +98,43 @@ class mod_ispring_mod_form extends moodleform_mod
         $mform->removeElement('completionpassgrade');
     }
 
+    public function data_preprocessing(&$default_values): void
+    {
+        $default_values['timeopen'] = !empty($default_values['timeopen']) ? $default_values['timeopen'] : 0;
+        $default_values['timeclose'] = !empty($default_values['timeclose']) ? $default_values['timeclose'] : 0;
+
+        // prepare already uploaded file
+        $draft_item_id = file_get_submitted_draft_itemid('userfile');
+
+        file_prepare_draft_area(
+            $draft_item_id,
+            $this->context->id,
+            ispring_file_storage::COMPONENT_NAME,
+            ispring_file_storage::PACKAGE_FILEAREA,
+            ispring_file_storage::PACKAGE_ITEM_ID,
+            ['subdirs' => 0, 'maxfiles' => 1, 'maxbytes' => 0]
+        );
+        $default_values['userfile'] = $draft_item_id;
+    }
+
+    public function validation($data, $files): array
+    {
+        $errors = parent::validation($data, $files);
+
+        if ($data['timeopen'] && $data['timeclose'] && $data['timeopen'] > $data['timeclose']) {
+            $errors['timeclose'] = get_string('closebeforeopen', 'ispring');
+        }
+
+        return $errors;
+    }
+
     private static function get_grading_options_translations(): array
     {
         return [
-            grading_options::HIGHEST->value => get_string('highest', 'ispring'),
-            grading_options::AVERAGE->value => get_string('average', 'ispring'),
-            grading_options::FIRST->value => get_string('first', 'ispring'),
-            grading_options::LAST->value => get_string('last', 'ispring'),
+            grading_options::HIGHEST => get_string('highest', 'ispring'),
+            grading_options::AVERAGE => get_string('average', 'ispring'),
+            grading_options::FIRST => get_string('first', 'ispring'),
+            grading_options::LAST => get_string('last', 'ispring'),
         ];
     }
 }

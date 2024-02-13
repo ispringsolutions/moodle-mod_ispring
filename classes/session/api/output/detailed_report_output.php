@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,12 +27,19 @@ namespace mod_ispring\session\api\output;
 
 class detailed_report_output
 {
+    private int $user_id;
+    private int $content_id;
+    private ?string $detailed_report;
+
     public function __construct(
-        private readonly int $user_id,
-        private readonly int $content_id,
-        private readonly ?string $detailed_report,
+        int $user_id,
+        int $content_id,
+        ?string $detailed_report
     )
     {
+        $this->user_id = $user_id;
+        $this->content_id = $content_id;
+        $this->detailed_report = $detailed_report;
     }
 
     /**

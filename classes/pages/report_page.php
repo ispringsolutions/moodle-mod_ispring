@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,14 +33,20 @@ class report_page extends base_page
     private const EN_LINK_DOCUMENTATION = 'https://www.ispringsolutions.com/go/moodle-documentation';
     private const RU_LINK_DOCUMENTATION = 'https://www.ispring.ru/go/moodle-documentation';
 
+    private int $ispring_id;
+    private bool $passing_requirements_were_updated;
+
     public function __construct(
-        private readonly int $ispring_id,
-        private readonly bool $passing_requirements_were_updated,
+        int $ispring_id,
+        bool $passing_requirements_were_updated,
         string $url,
-        array $args = null,
+        array $args = null
     )
     {
         parent::__construct($url, $args);
+
+        $this->ispring_id = $ispring_id;
+        $this->passing_requirements_were_updated = $passing_requirements_were_updated;
     }
 
     public function get_content(): string

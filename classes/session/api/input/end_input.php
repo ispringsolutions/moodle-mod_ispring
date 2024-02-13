@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +27,25 @@ namespace mod_ispring\session\api\input;
 
 class end_input
 {
+    private ?float $max_score;
+    private ?float $min_score;
+    private ?float $passing_score;
+    private ?float $score;
+    private ?string $detailed_report;
+
     public function __construct(
-        private readonly ?float $max_score,
-        private readonly ?float $min_score,
-        private readonly ?float $passing_score,
-        private readonly ?float $score,
-        private readonly ?string $detailed_report,
+        ?float $max_score,
+        ?float $min_score,
+        ?float $passing_score,
+        ?float $score,
+        ?string $detailed_report
     )
     {
+        $this->max_score = $max_score;
+        $this->min_score = $min_score;
+        $this->passing_score = $passing_score;
+        $this->score = $score;
+        $this->detailed_report = $detailed_report;
     }
 
     /**

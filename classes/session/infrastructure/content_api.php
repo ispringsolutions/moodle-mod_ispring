@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,10 +30,13 @@ use mod_ispring\session\app\adapter\content_api_interface as content_api_adapter
 
 class content_api implements content_api_adapter_interface
 {
+    private content_api_interface $api_interface;
+
     public function __construct(
-        private readonly content_api_interface $api_interface,
+        content_api_interface $api_interface
     )
     {
+        $this->api_interface = $api_interface;
     }
 
     public function get_ispring_module_id_by_content_id(int $id): int

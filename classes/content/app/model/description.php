@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,15 +29,10 @@ class description
 {
     public const FILENAME = 'description.json';
 
-    private readonly string $content_name;
-    private readonly string $description;
-    private readonly description_params $description_params;
+    private string $content_name;
+    private string $description;
+    private description_params $description_params;
 
-    /**
-     * @param string $content_name
-     * @param string $description
-     * @param description_params $description_params
-     */
     public function __construct(string $content_name, string $description, description_params $description_params)
     {
         $this->content_name = $content_name;

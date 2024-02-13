@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,11 +27,16 @@ namespace mod_ispring\ispring_module\api\output;
 
 final class description_output
 {
+    private string $text;
+    private int $format;
+
     public function __construct(
-        private readonly string $text,
-        private readonly int $format,
+        string $text,
+        int $format
     )
     {
+        $this->text = $text;
+        $this->format = $format;
     }
 
     /**

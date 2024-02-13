@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,26 +38,26 @@ use mod_ispring\testcase\user_file_creator;
 
 final class content_service_test extends \advanced_testcase
 {
-    private readonly mixed $file_storage_mock;
-    private readonly mixed $content_repository_mock;
-    private readonly mixed $ispring_module_api_stub;
-    private readonly mixed $content_query_service_stub;
-    private readonly content_service $content_service;
+    /** @var mixed */
+    private $file_storage_mock;
+    /** @var mixed */
+    private $content_repository_mock;
+    private content_service $content_service;
 
     protected function setUp(): void
     {
         $this->file_storage_mock = $this->createMock(file_storage_interface::class);
         $this->content_repository_mock = $this->createMock(content_repository_interface::class);
-        $this->ispring_module_api_stub = $this->createStub(ispring_module_api_interface::class);
-        $this->content_query_service_stub = $this->createStub(content_query_service_interface::class);
+        $ispring_module_api_stub = $this->createStub(ispring_module_api_interface::class);
+        $content_query_service_stub = $this->createStub(content_query_service_interface::class);
 
-        $this->ispring_module_api_stub->method('exists')->willReturn(true);
+        $ispring_module_api_stub->method('exists')->willReturn(true);
 
         $this->content_service = new content_service(
             $this->file_storage_mock,
             $this->content_repository_mock,
-            $this->ispring_module_api_stub,
-            $this->content_query_service_stub,
+            $ispring_module_api_stub,
+            $content_query_service_stub,
         );
     }
 
@@ -65,7 +65,7 @@ final class content_service_test extends \advanced_testcase
     {
         $content = $this->create_stub_content();
 
-        $this->file_storage_mock->expects($this->exactly(0))->method('clear_ispring_content_area');
+        $this->file_storage_mock->expects($this->exactly(0))->method('clear_ispring_areas');
         $this->file_storage_mock->expects($this->once())
             ->method('unzip_package')
             ->with(
@@ -91,12 +91,12 @@ final class content_service_test extends \advanced_testcase
         $this->content_repository_mock->expects($this->once())
             ->method('add')
             ->with($this->equalTo(new content(
-                file_id: $content->get_file_id(),
-                ispring_module_id: $content->get_ispring_module_id(),
-                creation_time: 42,
-                content_path: new file_info('/.', 'index.html'),
-                version: 1,
-                report_path: null,
+                $content->get_file_id(),
+                $content->get_ispring_module_id(),
+                42,
+                new file_info('/.', 'index.html'),
+                1,
+                null,
             )))
             ->willReturn(3);
 
@@ -113,7 +113,7 @@ final class content_service_test extends \advanced_testcase
             ->method('get_description_file')
             ->willThrowException(new \RuntimeException('bad_description'));
         $this->file_storage_mock->expects($this->once())
-            ->method('clear_ispring_content_area')
+            ->method('clear_ispring_areas')
             ->with(
                 $this->identicalTo($content->get_context_id()),
                 $this->identicalTo($content->get_file_id()),
@@ -133,7 +133,7 @@ final class content_service_test extends \advanced_testcase
                 user_file_creator::create_from_string(description::FILENAME, '{}'),
             );
         $this->file_storage_mock->expects($this->once())
-            ->method('clear_ispring_content_area')
+            ->method('clear_ispring_areas')
             ->with(
                 $this->identicalTo($content->get_context_id()),
                 $this->identicalTo($content->get_file_id()),

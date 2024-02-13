@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,12 +30,16 @@ use mod_ispring\report\course_modules_report;
 
 class index_page extends base_page
 {
+    private int $moodle_course_id;
+
     public function __construct(
-        private readonly int $moodle_course_id,
+        int $moodle_course_id,
         string $url,
         array $args = null)
     {
         parent::__construct($url, $args);
+
+        $this->moodle_course_id = $moodle_course_id;
     }
 
     public function get_content(): string

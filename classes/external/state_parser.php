@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -100,7 +100,7 @@ class state_parser
         {
             return json_decode($json);
         }
-        catch (\Throwable)
+        catch (\Throwable $e)
         {
             throw new \invalid_parameter_exception("Wrong data format");
         }

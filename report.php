@@ -18,13 +18,14 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 use mod_ispring\argparser\argparser;
+use mod_ispring\common\app\available\availability_checker;
 use mod_ispring\di_container;
 use mod_ispring\pages\report_page;
 
@@ -39,6 +40,12 @@ $module_context = context_module::instance($argparser->get_cm()->id);
 require_capability('mod/ispring:viewallreports', $module_context);
 
 $ispring_module_id = $argparser->get_ispring_module()->get_id();
+
+if (!availability_checker::module_available($ispring_module_id, $module_context))
+{
+    throw new \moodle_exception('unavailabletime', 'ispring');
+}
+
 $passing_requirements_were_updated = di_container::get_session_api()->passing_requirements_were_updated($ispring_module_id);
 
 $page = new report_page(

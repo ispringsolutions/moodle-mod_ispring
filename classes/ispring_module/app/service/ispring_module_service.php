@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,10 +31,13 @@ use mod_ispring\ispring_module\domain\model\grading_options;
 
 class ispring_module_service
 {
+    private ispring_module_repository_interface $ispring_module_repository;
+
     public function __construct(
-        private readonly ispring_module_repository_interface $ispring_module_repository,
+        ispring_module_repository_interface $ispring_module_repository
     )
     {
+        $this->ispring_module_repository = $ispring_module_repository;
     }
 
     public function create(ispring_module_data $data): int

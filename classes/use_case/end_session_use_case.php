@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,11 +36,16 @@ use mod_ispring\session\api\session_api_interface;
 
 class end_session_use_case
 {
+    private ispring_module_api_interface $ispring_module_api;
+    private session_api_interface $session_api;
+
     public function __construct(
-        private readonly ispring_module_api_interface $ispring_module_api,
-        private readonly session_api_interface $session_api,
+        ispring_module_api_interface $ispring_module_api,
+        session_api_interface $session_api
     )
     {
+        $this->ispring_module_api = $ispring_module_api;
+        $this->session_api = $session_api;
     }
 
     public function end_session(int $ispring_module_id, int $session_id, int $user_id, result_state $result_state): void

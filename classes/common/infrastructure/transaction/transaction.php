@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ class transaction implements transaction_client_interface
 {
     private array $rollback_stack = [];
 
-    public function execute(callable $fn, callable $undo_fn): mixed
+    public function execute(callable $fn, callable $undo_fn)
     {
         $result = $fn();
         array_push($this->rollback_stack, fn() => $undo_fn($result));

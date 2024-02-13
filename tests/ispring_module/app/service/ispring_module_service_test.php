@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,8 +31,9 @@ use mod_ispring\ispring_module\domain\model\grading_options;
 
 final class ispring_module_service_test extends \basic_testcase
 {
-    private readonly mixed $ispring_module_repository_mock;
-    private readonly ispring_module_service $ispring_module_service;
+    /** @var mixed */
+    private $ispring_module_repository_mock;
+    private ispring_module_service $ispring_module_service;
 
     protected function setUp(): void
     {
@@ -43,7 +44,14 @@ final class ispring_module_service_test extends \basic_testcase
 
     public function test_create_adds_module_to_repository(): void
     {
-        $ispring_module = new ispring_module_data('test_create', 2, grading_options::FIRST->value, null);
+        $ispring_module = new ispring_module_data(
+            'test_create',
+            2,
+            grading_options::FIRST,
+            null,
+            time(),
+            time()
+        );
 
         $this->ispring_module_repository_mock->expects($this->exactly(0))->method('update');
         $this->ispring_module_repository_mock->expects($this->exactly(0))->method('remove');
@@ -61,7 +69,7 @@ final class ispring_module_service_test extends \basic_testcase
     {
         $this->expectException(\RuntimeException::class);
         $this->ispring_module_service->create(
-            new ispring_module_data('test_create', 2, 0, null),
+            new ispring_module_data('test_create', 2, 0, null, time(), time()),
         );
     }
 
