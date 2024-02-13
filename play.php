@@ -18,12 +18,13 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use mod_ispring\argparser\argparser;
+use mod_ispring\common\app\available\availability_checker;
 use mod_ispring\di_container;
 use mod_ispring\pages\play_page;
 
@@ -45,6 +46,13 @@ $entrypoint_info = $content_api->get_latest_version_entrypoint_info(
 if (!$entrypoint_info)
 {
     throw new \invalid_state_exception('Error, ispring cm does not contain content');
+}
+
+$module_context = context_module::instance($argparser->get_cm()->id);
+
+if (!availability_checker::module_available($ispring->get_id(), $module_context))
+{
+    throw new \moodle_exception('unavailabletime', 'ispring');
 }
 
 $page = new play_page(

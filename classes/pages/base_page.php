@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,8 +27,10 @@ namespace mod_ispring\pages;
 
 abstract class base_page
 {
-    private mixed $page;
-    private mixed $output;
+    /** @var mixed */
+    private $page;
+    /** @var mixed */
+    private $output;
 
     public function __construct(string $url, array $args = null)
     {
@@ -87,12 +89,18 @@ abstract class base_page
 
     abstract public function get_content(): string;
 
-    protected function get_page(): mixed
+    /**
+     * @return mixed
+     */
+    protected function get_page()
     {
         return $this->page;
     }
 
-    protected function get_output(): mixed
+    /**
+     * @return mixed
+     */
+    protected function get_output()
     {
         return $this->output;
     }

@@ -17,15 +17,18 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use mod_ispring\di_container;
+use mod_ispring\event\event_types;
+use mod_ispring\event\open_close_event_controller;
 use mod_ispring\mapper\std_mapper;
 use mod_ispring\use_case\create_or_update_ispring_module_use_case;
 use mod_ispring\use_case\delete_ispring_module_use_case;
+use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -86,6 +89,9 @@ function ispring_add_instance($new_ispring, $mform = null): int
         );
     }
 
+    $new_ispring->instance = $ispring_module_id;
+    open_close_event_controller::set_events($new_ispring);
+
     return $ispring_module_id;
 }
 
@@ -97,14 +103,97 @@ function ispring_add_instance($new_ispring, $mform = null): int
  * @param stdClass $context context object
  * @param string $filearea file area
  * @param array $args extra arguments
- * @param bool $forcedownload whether force download
+ * @param bool $force_download whether force download
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - just send the file
  */
-function ispring_pluginfile(stdClass $course, stdClass $cm, stdClass $context, string $filearea, array $args, bool $forcedownload, array $options = []): bool
+function ispring_pluginfile(
+    stdClass $course,
+    stdClass $cm,
+    stdClass $context,
+    string $filearea,
+    array $args,
+    bool $force_download,
+    array $options = []
+): bool
 {
+    require_login($course, true, $cm);
+
     $content_api = di_container::get_content_api();
-    $content_api->present_file($context->id, $args);
+    return $content_api->present_file($context->id, $filearea, $args, $force_download, $options);
+}
+
+/**
+ * Lists all file areas
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @return array
+ */
+function ispring_get_file_areas(stdClass $course, stdClass $cm, stdClass $context): array
+{
+    return [
+        'package' => get_string('areapackage', 'ispring'),
+    ];
+}
+
+/**
+ * File browsing support for ispring module.
+ *
+ * @param file_browser $browser
+ * @param array $areas
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @param string $filearea
+ * @param int|null $item_id
+ * @param string|null $filepath
+ * @param string|null $filename
+ * @return file_info|null
+ */
+function ispring_get_file_info(
+    file_browser $browser,
+    array $areas,
+    stdClass $course,
+    stdClass $cm,
+    stdClass $context,
+    string $filearea,
+    ?int $item_id,
+    ?string $filepath,
+    ?string $filename
+): ?file_info
+{
+    global $CFG;
+
+    // show only packages
+    if ($filearea !== ispring_file_storage::PACKAGE_FILEAREA)
+    {
+        return null;
+    }
+
+    $fs = get_file_storage();
+    $filepath = $filepath ?? '/';
+    $filename = $filename ?? '.';
+    $item_id = $item_id ?? 0;
+
+    if (!$stored_file = $fs->get_file($context->id, ispring_file_storage::COMPONENT_NAME, $filearea, $item_id, $filepath, $filename))
+    {
+        return null;
+    }
+
+    $url_base = $CFG->wwwroot . '/pluginfile.php';
+    return new file_info_stored(
+        $browser,
+        $context,
+        $stored_file,
+        $url_base,
+        $areas[$filearea],
+        false,
+        true,
+        false,
+        false
+    );
 }
 
 /**
@@ -139,8 +228,10 @@ function ispring_update_instance(stdClass $new_ispring): bool
         $new_ispring->coursemodule,
         'ispring',
         $ispring_instance,
-        $new_ispring->completionexpected,
+        $new_ispring->completionexpected ? $new_ispring->completionexpected : null,
     );
+
+    open_close_event_controller::set_events($new_ispring);
 
     return true;
 }
@@ -159,7 +250,7 @@ function ispring_delete_instance($id): bool
 
     if ($use_case->delete())
     {
-        $events = $DB->get_records('event', array('modulename' => 'ispring', 'instance' => $module->get_id()));
+        $events = $DB->get_records('event', ['modulename' => 'ispring', 'instance' => $module->get_id()]);
         foreach ($events as $event) {
             $event = calendar_event::load($event);
             $event->delete();
@@ -203,7 +294,7 @@ function ispring_extend_settings_navigation(settings_navigation $settings, navig
  * @return void
  * @throws coding_exception
  */
-function ispring_grade_item_update(stdClass $module_instance, mixed $grades = null): void
+function ispring_grade_item_update(stdClass $module_instance, $grades = null): void
 {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
@@ -301,7 +392,7 @@ function ispring_get_user_grades(stdClass $module_instance, int $user_id): ?arra
 function mod_ispring_core_calendar_provide_event_action(
     calendar_event $event,
     \core_calendar\action_factory $factory,
-    int $user_id = null,
+    int $user_id = null
 ): ?\core_calendar\local\event\entities\action_interface
 {
     $mod_info = get_fast_modinfo($event->courseid);
@@ -318,4 +409,78 @@ function mod_ispring_core_calendar_provide_event_action(
         1,
         true,
     );
+}
+
+/**
+ * Create cached info for ispring course module.
+ *
+ * @param stdClass $course_module The course_module object (record).
+ * @return cached_cm_info|bool An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function ispring_get_coursemodule_info(stdClass $course_module)
+{
+    if (!$module = di_container::get_ispring_module_api()->get_by_id($course_module->instance))
+    {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $module->get_name();
+    $time_open = $module->get_time_open();
+    $time_close = $module->get_time_close();
+
+    if ($time_open)
+    {
+        $result->customdata['timeopen'] = $time_open;
+    }
+    if ($time_close)
+    {
+        $result->customdata['timeclose'] = $time_close;
+    }
+
+    return $result;
+}
+
+/**
+ * This function calculates the minimum and maximum cutoff values for the timestart of
+ * the given event.
+ *
+ * It will return an array with two values, the first being the minimum cutoff value and
+ * the second being the maximum cutoff value. Either or both values can be null, which
+ * indicates there is no minimum or maximum, respectively.
+ *
+ * If a cutoff is required then the function must return an array containing the cutoff
+ * timestamp and error string to display to the user if the cutoff value is violated.
+ *
+ * A minimum and maximum cutoff return value will look like:
+ * [
+ *     [1505704373, 'The date must be after this date'],
+ *     [1506741172, 'The date must be before this date']
+ * ]
+ *
+ * @param calendar_event $event The calendar event to get the time range for
+ * @param stdClass $module The module instance to get the range from
+ * @return array
+ */
+function mod_ispring_core_calendar_get_valid_event_timestart_range(calendar_event $event, stdClass $module): array
+{
+    $min_date = null;
+    $max_date = null;
+
+    if ($event->eventtype == event_types::OPEN && !empty($module->timeclose))
+    {
+        $min_date = [
+            $module->timeclose,
+            get_string('openafterclose', 'ispring'),
+        ];
+    } else if ($event->eventtype == event_types::CLOSE && !empty($module->timeopen))
+    {
+        $max_date = [
+            $module->timeopen,
+            get_string('closebeforeopen', 'ispring'),
+        ];
+    }
+
+    return [$min_date, $max_date];
 }

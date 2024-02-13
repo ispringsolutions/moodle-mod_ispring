@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ require_once(__DIR__ . '/../../testcase/ispring_testcase.php');
 
 final class ispring_module_repository_test extends \mod_ispring\testcase\ispring_testcase
 {
-    private readonly ispring_module_repository $ispring_repository;
+    private ispring_module_repository $ispring_repository;
 
     protected function setUp(): void
     {
@@ -46,8 +46,10 @@ final class ispring_module_repository_test extends \mod_ispring\testcase\ispring
         $ispring_module = new ispring_module_data(
             'test_add',
             $moodle_course_id,
-            grading_options::AVERAGE->value,
+            grading_options::AVERAGE,
             new description('test_add_description', FORMAT_PLAIN),
+            time(),
+            time() + 3,
         );
 
         $id = $this->ispring_repository->add($ispring_module);
@@ -61,8 +63,10 @@ final class ispring_module_repository_test extends \mod_ispring\testcase\ispring
         $ispring_module = new ispring_module_data(
             'test_add',
             $moodle_course_id,
-            grading_options::AVERAGE->value,
+            grading_options::AVERAGE,
             null,
+            time(),
+            time() + 3,
         );
 
         $id = $this->ispring_repository->add($ispring_module);
@@ -76,8 +80,10 @@ final class ispring_module_repository_test extends \mod_ispring\testcase\ispring
         $ispring_module = new ispring_module_data(
             'test_update',
             $ispring_instance->course,
-            grading_options::AVERAGE->value,
+            grading_options::AVERAGE,
             new description('test_update_description', FORMAT_PLAIN),
+            time(),
+            time() + 3,
         );
 
         $this->assertTrue($this->ispring_repository->update($ispring_instance->id, $ispring_module));

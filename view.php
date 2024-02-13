@@ -18,12 +18,13 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use mod_ispring\argparser\argparser;
+use mod_ispring\common\app\available\availability_checker;
 use mod_ispring\di_container;
 use mod_ispring\event\course_module_viewed;
 use mod_ispring\pages\view_page;
@@ -53,6 +54,7 @@ $page = new view_page(
     $cm_id,
     $USER->id,
     $passing_requirements_were_updated,
+    availability_checker::module_available($ispring->get_id(), $module_context),
     '/mod/ispring/view.php',
     ['id' => $cm_id],
 );

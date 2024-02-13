@@ -18,23 +18,27 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_ispring\ispring_module\domain\model;
 
-enum grading_options: int
+class grading_options
 {
-    case HIGHEST = 1;
-    case AVERAGE = 2;
-    case FIRST = 3;
-    case LAST = 4;
+    public const HIGHEST = 1;
+    public const AVERAGE = 2;
+    public const FIRST = 3;
+    public const LAST = 4;
 
     public static function is_grade_option(int $grade_method): bool
     {
-        $cases = grading_options::cases();
-        return in_array($grade_method, array_values(array_column($cases, 'value')));
+        return in_array($grade_method, [
+            self::HIGHEST,
+            self::AVERAGE,
+            self::FIRST,
+            self::LAST,
+        ]);
     }
 }

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +35,8 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
             'introformat',
             'grade',
             'grademethod',
-            'gradepass'
+            'timeopen',
+            'timeclose'
         ]);
 
         $content = new backup_nested_element('ispring_content', ['id'], [

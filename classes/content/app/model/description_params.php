@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,12 +27,19 @@ namespace mod_ispring\content\app\model;
 
 class description_params
 {
+    private string $entrypoint;
+    private int $creation_time;
+    private ?string $report_entrypoint;
+
     public function __construct(
-        private readonly string $entrypoint,
-        private readonly int $creation_time,
-        private readonly ?string $report_entrypoint,
+        string $entrypoint,
+        int $creation_time,
+        ?string $report_entrypoint
     )
     {
+        $this->entrypoint = $entrypoint;
+        $this->creation_time = $creation_time;
+        $this->report_entrypoint = $report_entrypoint;
     }
 
     /**

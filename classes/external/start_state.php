@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,12 +27,19 @@ namespace mod_ispring\external;
 
 class start_state
 {
+    private string $status;
+    private string $player_id;
+    private bool $session_restored;
+
     public function __construct(
-        private readonly string $status,
-        private readonly string $player_id,
-        private readonly bool $session_restored,
+        string $status,
+        string $player_id,
+        bool $session_restored
     )
     {
+        $this->status = $status;
+        $this->player_id = $player_id;
+        $this->session_restored = $session_restored;
     }
 
     /**

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -51,6 +51,7 @@ interface ispring_module_api_interface
 
     /**
      * Get activity module record by id
+     *
      * @param int $id
      * @return ispring_module_output|null
      */
@@ -58,8 +59,17 @@ interface ispring_module_api_interface
 
     /**
      * Check activity module record existence
+     *
      * @param int $id
      * @return bool
      */
     public function exists(int $id): bool;
+
+    /**
+     * Check module availability
+     *
+     * @param int $module_id
+     * @return bool
+     */
+    public function is_available(int $module_id): bool;
 }

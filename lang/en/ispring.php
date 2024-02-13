@@ -18,17 +18,21 @@
  * Plugin strings are defined here.
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['areapackage'] = 'Package file';
 $string['attempt'] = 'Attempt';
 $string['average'] = 'Average grade';
 $string['back'] = 'Back';
 $string['begintime'] = 'Started';
+$string['calendarend'] = '{$a} closes';
+$string['calendarstart'] = '{$a} opens';
+$string['closebeforeopen'] = 'You have specified a close date before the open date.';
 $string['contentnotfound'] = 'iSpring Module content not found';
 $string['coursemoduleslisttitle'] = '{$a}: iSpring Modules';
 $string['detailedreport'] = 'Detailed report';
@@ -65,6 +69,7 @@ $string['modulename_help'] = 'Upload quizzes created in iSpring QuizMaker and tr
 Keep track of students\' quiz performances through comprehensive quiz summary reports and detailed insights for each attempt. Save all data related to attempts and versions. Easily navigate through reports using version and status filters for quick access and download reports to identify learning challenges.';
 $string['modulename_link'] = 'https://www.ispringsolutions.com/go/moodle-documentation';
 $string['myoverviewactionlink'] = 'Attempt';
+$string['openafterclose'] = 'You have specified an open date after the close date';
 $string['passingrequirementshavebeenupdatedstudenttext'] = 'Passing requirements for this quiz have been updated. Your score in Gradebook has been recalculated. This doesn\'t affect your quiz results in reports.';
 $string['passingrequirementshavebeenupdatedteachertext'] = 'Passing requirements for this quiz have been updated. This doesn\'t affect student scores in reports. Their results in Gradebook have been recalculated. <a href="{$a}">Learn more about score recalculation</a>';
 $string['playbutton'] = 'Start quiz';
@@ -85,6 +90,9 @@ $string['statusinprogress'] = 'In progress';
 $string['statuspassed'] = 'Passed';
 $string['statusunknown'] = 'Unknown';
 $string['studentsessionsreporttitle'] = 'Overview';
+$string['timeclose'] = 'Closed at';
+$string['timeopen'] = 'Opened at';
+$string['unavailabletime'] = 'Module is not available now.';
 $string['uploadcoursefile'] = 'Select a file to upload';
 $string['version'] = 'Version';
 $string['viewpageinfotext'] = 'Grading method: {$a->grading_method}';

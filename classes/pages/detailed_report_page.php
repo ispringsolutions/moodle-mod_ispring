@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,16 +30,27 @@ class detailed_report_page extends base_page
     private const PLAYER_ID = 'mod-ispring-report-player';
     private const PRELOADER_ID = 'mod-ispring-preloader';
 
+    private int $session_id;
+    private string $report_url;
+    private string $back_url;
+    private int $user_id;
+
+
     public function __construct(
-        private readonly int $session_id,
-        private readonly string $report_url,
-        private readonly string $back_url,
-        private readonly int $user_id,
+        int $session_id,
+        string $report_url,
+        string $back_url,
+        int $user_id,
         string $url,
         array $args = null
     )
     {
         parent::__construct($url, $args);
+
+        $this->session_id = $session_id;
+        $this->report_url = $report_url;
+        $this->back_url = $back_url;
+        $this->user_id = $user_id;
 
         $this->define_properties();
     }

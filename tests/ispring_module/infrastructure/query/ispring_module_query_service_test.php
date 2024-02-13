@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ require_once(__DIR__ . '/../../../testcase/ispring_testcase.php');
 
 final class ispring_module_query_service_test extends \mod_ispring\testcase\ispring_testcase
 {
-    private readonly ispring_module_query_service $ispring_query_service;
+    private ispring_module_query_service $ispring_query_service;
 
     protected function setUp(): void
     {

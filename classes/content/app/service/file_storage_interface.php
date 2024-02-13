@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,7 +42,7 @@ interface file_storage_interface
         int $target_context_id,
         int $target_item_id,
         int $user_context_id,
-        int $user_item_id,
+        int $user_item_id
     ): void;
 
     /**
@@ -57,10 +57,19 @@ interface file_storage_interface
     /**
      * Prepare file-content for user to play or view
      * @param int $context_id
+     * @param string $filearea
      * @param array $args
-     * @return void
+     * @param bool $force_download
+     * @param array $options
+     * @return bool
      */
-    public function present_file(int $context_id, array $args): void;
+    public function present_file(
+        int $context_id,
+        string $filearea,
+        array $args,
+        bool $force_download,
+        array $options = []
+    ): bool;
 
     /**
      * Generate moodle url for specified file
@@ -73,21 +82,21 @@ interface file_storage_interface
     public function generate_entrypoint_url(int $context_id, int $file_id, string $filepath, string $filename): string;
 
     /**
-     * Check whether there are any files in user draft area matching the given context and item ids
-     * If specified file area contains only directories, the function returns false
+     * Check whether module content needs to be updated
      *
+     * @param int $target_context_id
      * @param int $user_context_id
      * @param int $user_item_id
      * @return bool
      */
-    public function user_draft_area_is_empty(int $user_context_id, int $user_item_id): bool;
+    public function content_needs_updating(int $target_context_id, int $user_context_id, int $user_item_id): bool;
 
     /**
-     * Remove all files matching given context and item ids from ispring content area
+     * Remove all files matching given context and item ids from ispring areas
      *
      * @param int $context_id
      * @param int|false $item_id If not specified, files with any item_id are removed
      * @return bool true
      */
-    public function clear_ispring_content_area(int $context_id, int|false $item_id = false): bool;
+    public function clear_ispring_areas(int $context_id, $item_id = false): bool;
 }

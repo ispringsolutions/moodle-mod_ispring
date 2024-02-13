@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,11 +33,16 @@ use mod_ispring\ispring_module\app\service\ispring_module_service;
 
 class ispring_module_api implements ispring_module_api_interface
 {
+    private ispring_module_service $ispring_service;
+    private ispring_module_query_service_interface $ispring_query_service;
+
     public function __construct(
-        private readonly ispring_module_service $ispring_service,
-        private readonly ispring_module_query_service_interface $ispring_query_service,
+        ispring_module_service $ispring_service,
+        ispring_module_query_service_interface $ispring_query_service
     )
     {
+        $this->ispring_service = $ispring_service;
+        $this->ispring_query_service = $ispring_query_service;
     }
 
     public function create(create_or_update_ispring_module_input $create_ispring_input): int
@@ -69,5 +74,21 @@ class ispring_module_api implements ispring_module_api_interface
     {
         $data = $this->ispring_query_service->get_by_id($id);
         return $data ? ispring_module_mapper::get_output($data) : null;
+    }
+
+    public function is_available(int $module_id): bool
+    {
+        $data = $this->ispring_query_service->get_by_id($module_id);
+
+        if (!$data)
+        {
+            return false;
+        }
+
+        $now = time();
+        $after_open = $data->get_time_open() ? $data->get_time_open() <= $now : true;
+        $before_close = $data->get_time_close() ? $data->get_time_close() > $now : true;
+
+        return $after_open && $before_close;
     }
 }

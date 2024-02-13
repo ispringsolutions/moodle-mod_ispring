@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,8 +31,8 @@ use mod_ispring\testcase\user_file_creator;
 
 final class file_storage_test extends \advanced_testcase
 {
-    private readonly \file_storage $moodle_fs;
-    private readonly file_storage $file_storage;
+    private \file_storage $moodle_fs;
+    private file_storage $file_storage;
 
     protected function setUp(): void
     {
@@ -114,35 +114,70 @@ final class file_storage_test extends \advanced_testcase
         }
     }
 
-    public function test_user_draft_area_is_empty_returns_true_if_filearea_contains_only_root_dir(): void
+    public function test_content_needs_updating_returns_false_if_both_fileareas_are_empty(): void
     {
+        $target_context = \context_system::instance();
         $user_context = $this->prepare_user_context();
 
-        $this->assertTrue($this->file_storage->user_draft_area_is_empty(
+        $this->assertFalse($this->file_storage->content_needs_updating(
+            $target_context->id,
             $user_context->id,
             file_get_unused_draft_itemid(),
         ));
     }
 
-    public function test_user_draft_area_is_empty_returns_true_if_filearea_contains_only_dirs(): void
-    {
-        $user_context = $this->prepare_user_context();
-        $user_item_id = file_get_unused_draft_itemid();
-        $this->moodle_fs->create_directory($user_context->id, 'user', 'draft', $user_item_id, '/empty/');
-
-        $this->assertTrue($this->file_storage->user_draft_area_is_empty(
-            $user_context->id,
-            $user_item_id,
-        ));
-    }
-
-    public function test_user_draft_area_is_empty_returns_false_if_filearea_contains_files(): void
+    public function test_content_needs_updating_returns_true_if_package_filearea_is_empty(): void
     {
         $this->resetAfterTest();
         $this->setAdminUser();
+        $target_context = \context_system::instance();
         $file = user_file_creator::create_from_string('empty', '');
 
-        $this->assertFalse($this->file_storage->user_draft_area_is_empty(
+        $this->assertTrue($this->file_storage->content_needs_updating(
+            $target_context->id,
+            $file->get_contextid(),
+            $file->get_itemid(),
+        ));
+    }
+
+    public function test_content_needs_updating_returns_false_if_user_filearea_is_empty(): void
+    {
+        $target_context = \context_system::instance();
+        $user_context = $this->prepare_user_context();
+        $this->create_file_in_ispring_package_area($target_context->id);
+
+        $this->assertFalse($this->file_storage->content_needs_updating(
+            $target_context->id,
+            $user_context->id,
+            file_get_unused_draft_itemid(),
+        ));
+    }
+
+    public function test_content_needs_updating_returns_false_if_user_file_and_current_package_are_the_same(): void
+    {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $target_context = \context_system::instance();
+        $this->create_file_in_ispring_package_area($target_context->id);
+        $file = user_file_creator::create_from_path(__DIR__ . '/../../packages/stub.zip');
+
+        $this->assertFalse($this->file_storage->content_needs_updating(
+            $target_context->id,
+            $file->get_contextid(),
+            $file->get_itemid(),
+        ));
+    }
+
+    public function test_content_needs_updating_returns_true_if_user_file_and_current_package_are_different(): void
+    {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $target_context = \context_system::instance();
+        $this->create_file_in_ispring_package_area($target_context->id);
+        $file = user_file_creator::create_from_string('empty', '');
+
+        $this->assertTrue($this->file_storage->content_needs_updating(
+            $target_context->id,
             $file->get_contextid(),
             $file->get_itemid(),
         ));
@@ -156,7 +191,7 @@ final class file_storage_test extends \advanced_testcase
         self::create_file_in_ispring_content_area($context_id, 2);
         self::create_file_in_ispring_content_area($user_context_id, 1);
 
-        $this->file_storage->clear_ispring_content_area($context_id, 1);
+        $this->file_storage->clear_ispring_areas($context_id, 1);
 
         $this->assertTrue($this->moodle_fs->is_area_empty($context_id, 'mod_ispring', 'content', 1));
         $this->assertFalse($this->moodle_fs->is_area_empty($context_id, 'mod_ispring', 'content', 2));
@@ -171,7 +206,7 @@ final class file_storage_test extends \advanced_testcase
         self::create_file_in_ispring_content_area($context_id, 2);
         self::create_file_in_ispring_content_area($user_context_id, 1);
 
-        $this->file_storage->clear_ispring_content_area($context_id);
+        $this->file_storage->clear_ispring_areas($context_id);
 
         $this->assertTrue($this->moodle_fs->is_area_empty($context_id, 'mod_ispring', 'content', 1));
         $this->assertTrue($this->moodle_fs->is_area_empty($context_id, 'mod_ispring', 'content', 2));
@@ -207,13 +242,28 @@ final class file_storage_test extends \advanced_testcase
         $this->moodle_fs->create_file_from_string(
             [
                 'contextid' => $context_id,
-                'component' => 'mod_ispring',
+                'component' => file_storage::COMPONENT_NAME,
                 'filearea' => 'content',
                 'itemid' => $item_id,
                 'filename' => 'empty',
                 'filepath' => '/',
             ],
             '',
+        );
+    }
+
+    private function create_file_in_ispring_package_area(int $context_id): void
+    {
+        $this->moodle_fs->create_file_from_pathname(
+            [
+                'contextid' => $context_id,
+                'component' => file_storage::COMPONENT_NAME,
+                'filearea' => file_storage::PACKAGE_FILEAREA,
+                'itemid' => file_storage::PACKAGE_ITEM_ID,
+                'filename' => 'empty',
+                'filepath' => '/',
+            ],
+            __DIR__ . '/../../packages/stub.zip',
         );
     }
 }

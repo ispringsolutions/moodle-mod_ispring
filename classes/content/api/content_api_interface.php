@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -48,10 +48,19 @@ interface content_api_interface
     /**
      * Prepare files to send to user
      * @param int $context_id
+     * @param string $filearea
      * @param array $args
+     * @param bool $force_download
+     * @param array $options
      * @return void
      */
-    public function present_file(int $context_id, array $args): void;
+    public function present_file(
+        int $context_id,
+        string $filearea,
+        array $args,
+        bool $force_download,
+        array $options = []
+    ): bool;
 
     /**
      * Get url for the new ispring content entry point

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,11 +34,16 @@ use mod_ispring\ispring_module\api\ispring_module_api_interface;
 
 final class create_or_update_ispring_module_use_case
 {
+    private ispring_module_api_interface $ispring_module_api;
+    private content_api_interface $content_api;
+
     public function __construct(
-        private readonly ispring_module_api_interface $ispring_module_api,
-        private readonly content_api_interface $content_api,
+        ispring_module_api_interface $ispring_module_api,
+        content_api_interface $content_api
     )
     {
+        $this->ispring_module_api = $ispring_module_api;
+        $this->content_api = $content_api;
     }
 
     public function create(\stdClass $new_ispring, int $module_context_id, int $user_context_id): int
@@ -55,6 +60,8 @@ final class create_or_update_ispring_module_use_case
                         $new_ispring->intro,
                         $new_ispring->introformat,
                     ),
+                    $new_ispring->timeopen,
+                    $new_ispring->timeclose,
                 )),
                 fn(int $id) => $this->ispring_module_api->delete($id),
             );
@@ -94,6 +101,8 @@ final class create_or_update_ispring_module_use_case
                         $new_ispring->intro,
                         $new_ispring->introformat,
                     ),
+                    $new_ispring->timeopen,
+                    $new_ispring->timeclose,
                 ),
             );
 

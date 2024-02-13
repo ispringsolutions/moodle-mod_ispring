@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,17 +27,11 @@ namespace mod_ispring\content\api\input;
 
 class content_input
 {
-    private readonly int $file_id;
-    private readonly int $ispring_module_id;
-    private readonly int $context_id;
-    private readonly int $user_context_id;
+    private int $file_id;
+    private int $ispring_module_id;
+    private int $context_id;
+    private int $user_context_id;
 
-    /**
-     * @param int $file_id
-     * @param int $ispring_module_id
-     * @param int $context_id
-     * @param int $user_context_id
-     */
     public function __construct(int $file_id, int $ispring_module_id, int $context_id, int $user_context_id)
     {
         $this->file_id = $file_id;

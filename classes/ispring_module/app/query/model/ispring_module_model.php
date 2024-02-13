@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,15 +29,34 @@ use mod_ispring\ispring_module\app\model\description;
 
 class ispring_module_model
 {
+    private int $id;
+    private string $name;
+    private int $moodle_course_id;
+    private int $grade;
+    private int $grade_method;
+    private ?description $description;
+    private int $time_open;
+    private int $time_close;
+
     public function __construct(
-        private readonly int $id,
-        private readonly string $name,
-        private readonly int $moodle_course_id,
-        private readonly int $grade,
-        private readonly int $grade_method,
-        private readonly ?description $description,
+        int $id,
+        string $name,
+        int $moodle_course_id,
+        int $grade,
+        int $grade_method,
+        ?description $description,
+        int $time_open,
+        int $time_close
     )
     {
+        $this->id = $id;
+        $this->name = $name;
+        $this->moodle_course_id = $moodle_course_id;
+        $this->grade = $grade;
+        $this->grade_method = $grade_method;
+        $this->description = $description;
+        $this->time_open = $time_open;
+        $this->time_close = $time_close;
     }
 
     /**
@@ -86,5 +105,15 @@ class ispring_module_model
     public function get_description(): ?description
     {
         return $this->description;
+    }
+
+    public function get_time_open(): int
+    {
+        return $this->time_open;
+    }
+
+    public function get_time_close(): int
+    {
+        return $this->time_close;
     }
 }

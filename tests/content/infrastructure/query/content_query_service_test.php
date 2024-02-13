@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ use mod_ispring\content\app\query\model\content;
 
 final class content_query_service_test extends \advanced_testcase
 {
-    private readonly content_query_service $content_query_service;
+    private content_query_service $content_query_service;
 
     protected function setUp(): void
     {

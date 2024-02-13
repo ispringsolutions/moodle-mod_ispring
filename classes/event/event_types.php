@@ -1,3 +1,5 @@
+<?php
+
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,39 +17,16 @@
 
 /**
  *
- * @class       mod_ispring/api
+ * @package     mod_ispring
  * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {call} from 'core/ajax';
+namespace mod_ispring\event;
 
-class Api {
-    constructor(reportData, languageCode) {
-        this._reportData = reportData;
-        this._languageCode = languageCode;
-    }
-
-    state() {
-        return this._reportData;
-    }
-
-    currentLanguage() {
-        return this._languageCode;
-    }
+class event_types
+{
+    public const OPEN = 'open';
+    public const CLOSE = 'close';
 }
-
-export const init = (sessionId, languageCode, iframeId, reportUrl, preloaderId) => {
-    call([{
-        methodname: 'mod_ispring_get_report_data',
-        args: {
-            'session_id': sessionId
-        }
-    }])[0]
-        .then((result) => {
-            window['ispring_report_connector'] = new Api(result['report_data'], languageCode);
-            document.getElementById(iframeId).src = reportUrl;
-            document.getElementById(preloaderId).remove();
-        });
-};

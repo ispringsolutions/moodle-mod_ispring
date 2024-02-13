@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ namespace mod_ispring\common\infrastructure\transaction;
 
 final class transaction_test extends \basic_testcase
 {
-    private readonly transaction $transaction;
+    private transaction $transaction;
 
     protected function setUp(): void
     {
@@ -42,7 +42,9 @@ final class transaction_test extends \basic_testcase
             function() use(&$fn_was_executed) {
                 $fn_was_executed = true;
             },
-            fn() => throw new \LogicException('Unexpected call to $undo_fn'),
+            function() {
+                throw new \LogicException('Unexpected call to $undo_fn');
+            },
         );
 
         $this->assertTrue($fn_was_executed);
@@ -52,7 +54,9 @@ final class transaction_test extends \basic_testcase
     {
         $result = $this->transaction->execute(
             fn() => 'test_return_value',
-            fn() => throw new \LogicException('Unexpected call to $undo_fn'),
+            function() {
+                throw new \LogicException('Unexpected call to $undo_fn');
+            },
         );
 
         $this->assertEquals('test_return_value', $result);
@@ -63,8 +67,12 @@ final class transaction_test extends \basic_testcase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('test_error');
         $this->transaction->execute(
-            fn() => throw new \RuntimeException('test_error'),
-            fn() => throw new \LogicException('Unexpected call to $undo_fn'),
+            function() {
+                throw new \RuntimeException('test_error');
+            },
+            function() {
+                throw new \LogicException('Unexpected call to $undo_fn');
+            },
         );
     }
 

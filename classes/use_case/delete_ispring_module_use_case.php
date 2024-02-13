@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,11 +32,16 @@ use mod_ispring\ispring_module\api\output\ispring_module_output;
 
 class delete_ispring_module_use_case
 {
+    private ispring_module_api_interface $ispring_module_api;
+    private ispring_module_output $module;
+
     public function __construct(
-        private readonly ispring_module_api_interface $ispring_module_api,
-        private readonly ispring_module_output $module
+        ispring_module_api_interface $ispring_module_api,
+        ispring_module_output $module
     )
     {
+        $this->ispring_module_api = $ispring_module_api;
+        $this->module = $module;
     }
 
     public function delete(): bool

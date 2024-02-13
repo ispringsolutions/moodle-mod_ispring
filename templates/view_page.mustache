@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2023 iSpring Solutions Inc.
+    Copyright (C) 2024 iSpring Solutions Inc.
 
     This file is part of Moodle - https://moodle.org/
 
@@ -34,11 +34,15 @@
 {{#warning}}
     {{{warning}}}
 {{/warning}}
-<div class="tertiary-navigation">
-    <div>
-        <a class="btn btn-primary" href="{{play_button_url}}">{{play_button_text}}</a>
+
+{{#play_button_text}}
+    <div class="tertiary-navigation">
+        <div>
+            <a class="btn btn-primary" href="{{play_button_url}}">{{play_button_text}}</a>
+        </div>
     </div>
-</div>
+{{/play_button_text}}
+
 <p class="py-3">{{module_info_text}}</p>
 {{#report}}
     <h3 class="my-3">{{report_title}}</h3>

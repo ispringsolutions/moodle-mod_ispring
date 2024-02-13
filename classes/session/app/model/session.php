@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,24 +27,55 @@ namespace mod_ispring\session\app\model;
 
 class session
 {
+    private int $content_id;
+    private float $score;
+    private string $status;
+    private int $begin_time;
+    private ?int $end_time;
+    private ?int $duration;
+    private int $user_id;
+    private int $attempt;
+    private ?string $persist_state_id;
+    private ?string $persist_state;
+    private ?float $max_score;
+    private float $min_score;
+    private ?float $passing_score;
+    private ?string $detailed_report;
+    private string $player_id;
+
     public function __construct(
-        private readonly int $content_id,
-        private readonly float $score,
-        private readonly string $status,
-        private readonly int $begin_time,
-        private readonly ?int $end_time,
-        private readonly ?int $duration,
-        private readonly int $user_id,
-        private readonly int $attempt,
-        private readonly ?string $persist_state_id,
-        private readonly ?string $persist_state,
-        private readonly ?float $max_score,
-        private readonly float $min_score,
-        private readonly ?float $passing_score,
-        private readonly ?string $detailed_report,
-        private readonly string $player_id,
+        int $content_id,
+        float $score,
+        string $status,
+        int $begin_time,
+        ?int $end_time,
+        ?int $duration,
+        int $user_id,
+        int $attempt,
+        ?string $persist_state_id,
+        ?string $persist_state,
+        ?float $max_score,
+        float $min_score,
+        ?float $passing_score,
+        ?string $detailed_report,
+        string $player_id
     )
     {
+        $this->content_id = $content_id;
+        $this->score = $score;
+        $this->status = $status;
+        $this->begin_time = $begin_time;
+        $this->end_time = $end_time;
+        $this->duration = $duration;
+        $this->user_id = $user_id;
+        $this->attempt = $attempt;
+        $this->persist_state_id = $persist_state_id;
+        $this->persist_state = $persist_state;
+        $this->max_score = $max_score;
+        $this->min_score = $min_score;
+        $this->passing_score = $passing_score;
+        $this->detailed_report = $detailed_report;
+        $this->player_id = $player_id;
     }
 
     /**

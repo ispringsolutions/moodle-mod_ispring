@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +27,25 @@ namespace mod_ispring\session\api\input;
 
 class update_input
 {
+    private int $duration;
+    private string $persist_state_id;
+    private string $persist_state;
+    private string $status;
+    private string $player_id;
+
     public function __construct(
-        private readonly int $duration,
-        private readonly string $persist_state_id,
-        private readonly string $persist_state,
-        private readonly string $status,
-        private readonly string $player_id,
+        int $duration,
+        string $persist_state_id,
+        string $persist_state,
+        string $status,
+        string $player_id
     )
     {
+        $this->duration = $duration;
+        $this->persist_state_id = $persist_state_id;
+        $this->persist_state = $persist_state;
+        $this->status = $status;
+        $this->player_id = $player_id;
     }
 
     /**

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,15 +31,14 @@ use mod_ispring\session\infrastructure\query\session_query_service;
 
 class session_repository_test extends \advanced_testcase
 {
-    private readonly mixed $ispring_module_stub;
-    private readonly session_repository $session_repository;
-    private readonly session_query_service $session_query_service;
+    private session_repository $session_repository;
+    private session_query_service $session_query_service;
 
     protected function setUp(): void
     {
-        $this->ispring_module_stub = $this->createStub(ispring_module_api_interface::class);
+        $ispring_module_stub = $this->createStub(ispring_module_api_interface::class);
         $this->session_repository = new session_repository();
-        $this->session_query_service = new session_query_service($this->ispring_module_stub);
+        $this->session_query_service = new session_query_service($ispring_module_stub);
     }
 
     public function test_delete_by_content_id_removes_single_session_with_given_content_id(): void

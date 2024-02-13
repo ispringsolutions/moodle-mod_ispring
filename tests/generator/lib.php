@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,9 @@ class mod_ispring_generator extends testing_module_generator
     public function create_instance($record = null, array $options = null)
     {
         $record = (array)$record + [
-            'grademethod' => grading_options::HIGHEST->value,
+            'grademethod' => grading_options::HIGHEST,
+            'timeopen' => 0,
+            'timeclose' => 3,
         ];
 
         if (!isset($record['userfile']))

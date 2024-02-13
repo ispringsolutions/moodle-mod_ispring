@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ use xmldb_table;
 
 final class upgrade_db_manager
 {
-    private readonly \database_manager $db_manager;
+    private \database_manager $db_manager;
 
     public function __construct()
     {
@@ -68,6 +68,10 @@ final class upgrade_db_manager
         if ($old_version < 2023120302)
         {
             $this->upgrade_to_2023120302();
+        }
+        if ($old_version < 2024012203)
+        {
+            $this->upgrade_to_2024012203();
         }
     }
 
@@ -351,5 +355,48 @@ final class upgrade_db_manager
         }
 
         upgrade_mod_savepoint(true, 2023120302, 'ispring');
+    }
+
+    private function upgrade_to_2024012203(): void
+    {
+        $dbman = $this->db_manager;
+
+        $table = new xmldb_table('ispring');
+        $field = new xmldb_field(
+            'timeopen',
+            XMLDB_TYPE_INTEGER,
+            10,
+            null,
+            XMLDB_NOTNULL,
+            null,
+            0,
+            'gradepass'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field(
+            'timeclose',
+            XMLDB_TYPE_INTEGER,
+            10,
+            null,
+            XMLDB_NOTNULL,
+            null,
+            0,
+            'timeopen'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('gradepass');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2024012203, 'ispring');
     }
 }

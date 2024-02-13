@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,6 +42,8 @@ class ispring_module_mapper
             $ispring_input->get_moodle_course_id(),
             $ispring_input->get_grade_method(),
             self::get_description($ispring_input->get_description()),
+            $ispring_input->get_time_open(),
+            $ispring_input->get_time_close(),
         );
     }
 
@@ -54,6 +56,8 @@ class ispring_module_mapper
             $data->get_grade(),
             $data->get_grade_method(),
             self::get_description_output($data->get_description()),
+            $data->get_time_open(),
+            $data->get_time_close(),
         );
     }
 

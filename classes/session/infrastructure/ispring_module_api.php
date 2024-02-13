@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ use mod_ispring\session\app\adapter\ispring_module_api_interface as api_adapter_
 
 class ispring_module_api implements api_adapter_interface
 {
-    private readonly ispring_module_api_interface $api;
+    private ispring_module_api_interface $api;
 
     public function __construct(ispring_module_api_interface $api)
     {

@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,12 +35,19 @@ use mod_ispring\content\app\service\file_storage_interface;
 
 class content_api implements content_api_interface
 {
+    private content_service $content_service;
+    private content_query_service_interface $content_query_service;
+    private file_storage_interface $file_storage;
+
     public function __construct(
-        private readonly content_service $content_service,
-        private readonly content_query_service_interface $content_query_service,
-        private readonly file_storage_interface $file_storage,
+        content_service $content_service,
+        content_query_service_interface $content_query_service,
+        file_storage_interface $file_storage
     )
     {
+        $this->content_service = $content_service;
+        $this->content_query_service = $content_query_service;
+        $this->file_storage = $file_storage;
     }
 
     public function add_content(content_input $content_input): int
@@ -55,9 +62,15 @@ class content_api implements content_api_interface
         $this->content_service->remove($module_context_id, $content_id);
     }
 
-    public function present_file(int $context_id, array $args): void
+    public function present_file(
+        int $context_id,
+        string $filearea,
+        array $args,
+        bool $force_download,
+        array $options = []
+    ): bool
     {
-        $this->content_service->present_file($context_id, $args);
+        return $this->content_service->present_file($context_id, $filearea, $args, $force_download, $options);
     }
 
     public function get_latest_version_entrypoint_info(int $context_id, int $ispring_module_id): ?entrypoint_info

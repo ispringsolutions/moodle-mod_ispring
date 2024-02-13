@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,14 +33,16 @@ use mod_ispring\session\domain\model\session_state;
 
 class session_query_service implements session_query_service_interface
 {
-    private readonly \moodle_database $database;
+    private \moodle_database $database;
+    private ispring_module_api_interface $ispring_module_api;
 
     public function __construct(
-        private readonly ispring_module_api_interface $ispring_module_api,
+        ispring_module_api_interface $ispring_module_api
     )
     {
         global $DB;
         $this->database = $DB;
+        $this->ispring_module_api = $ispring_module_api;
     }
 
     public function get_last_by_content_id(int $content_id, int $user_id): ?session
@@ -64,7 +66,7 @@ class session_query_service implements session_query_service_interface
             $session = array_values($sessions)[0];
 
             return $this->get_session($session);
-        } catch (\Exception)
+        } catch (\Exception $e)
         {
             return null;
         }
@@ -92,7 +94,7 @@ class session_query_service implements session_query_service_interface
             return $session !== false
                 ? $this->get_session($session)
                 : null;
-        } catch (\Exception)
+        } catch (\Exception $e)
         {
             return null;
         }
@@ -115,7 +117,7 @@ class session_query_service implements session_query_service_interface
                 1,
             );
             return count($sessions) > 0;
-        } catch (\Exception)
+        } catch (\Exception $e)
         {
             return false;
         }
@@ -132,7 +134,7 @@ class session_query_service implements session_query_service_interface
             }
 
             return $this->get_session($session);
-        } catch (\Exception)
+        } catch (\Exception $e)
         {
             return null;
         }
@@ -142,14 +144,20 @@ class session_query_service implements session_query_service_interface
     {
         $grade_method = $this->ispring_module_api->get_grade_method($ispring_module_id);
 
-        return match ($grade_method)
+        switch ($grade_method)
         {
-            grading_options::HIGHEST->value => $this->get_highest_grade($content_id, $user_id),
-            grading_options::AVERAGE->value => $this->get_average_grade($content_id, $user_id),
-            grading_options::FIRST->value => $this->get_first_grade($content_id, $user_id),
-            grading_options::LAST->value => $this->get_last_grade($content_id, $user_id),
-            default => [],
-        };
+            case grading_options::HIGHEST:
+                return $this->get_highest_grade($content_id, $user_id);
+            case grading_options::AVERAGE:
+                return $this->get_average_grade($content_id, $user_id);
+            case grading_options::FIRST:
+                return $this->get_first_grade($content_id, $user_id);
+            case grading_options::LAST:
+                return $this->get_last_grade($content_id, $user_id);
+            default:
+                debugging('Unexpected grading option');
+                return [];
+        }
     }
 
     public function exist(int $session_id): bool
@@ -368,7 +376,7 @@ class session_query_service implements session_query_service_interface
             }
 
             return $requirement;
-        } catch (\Exception)
+        } catch (\Exception $e)
         {
             return null;
         }

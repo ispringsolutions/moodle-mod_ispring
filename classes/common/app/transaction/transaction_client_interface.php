@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,5 +42,5 @@ interface transaction_client_interface
      * ignored.
      * @return mixed Value returned by `$fn`
      */
-    public function execute(callable $fn, callable $undo_fn): mixed;
+    public function execute(callable $fn, callable $undo_fn);
 }

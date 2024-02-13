@@ -18,7 +18,7 @@
 /**
  *
  * @package     mod_ispring
- * @copyright   2023 iSpring Solutions Inc.
+ * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ use mod_ispring\ispring_module\app\repository\ispring_module_repository_interfac
 
 class ispring_module_repository implements ispring_module_repository_interface
 {
-    private readonly \moodle_database $database;
+    private \moodle_database $database;
 
     public function __construct()
     {
@@ -99,6 +99,9 @@ class ispring_module_repository implements ispring_module_repository_interface
         $result->name = $data->get_name();
         $result->course = $data->get_moodle_course_id();
         $result->grademethod = $data->get_grade_method();
+        $result->timeopen = $data->get_time_open();
+        $result->timeclose = $data->get_time_close();
+
         if ($description = $data->get_description())
         {
             $result->intro = $description->get_text();
