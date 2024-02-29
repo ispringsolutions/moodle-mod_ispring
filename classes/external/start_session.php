@@ -25,6 +25,8 @@
 
 namespace mod_ispring\external;
 
+require_once($CFG->libdir . '/externallib.php');
+
 use external_api;
 use external_function_parameters;
 use external_single_structure;

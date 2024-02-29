@@ -19,16 +19,19 @@
  *
  * @package     mod_ispring
  * @copyright   2024 iSpring Solutions Inc.
- * @copyright   2024 iSpring Solutions Inc.
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_ispring\external;
 
+require_once($CFG->libdir . '/externallib.php');
+
 use external_api;
 use external_function_parameters;
 use external_value;
+use external_single_structure;
+use external_warnings;
 use mod_ispring\di_container;
 use mod_ispring\session\api\input\update_input;
 use mod_ispring\session\app\exception\player_conflict_exception;
@@ -79,10 +82,10 @@ class set_state extends external_api
         return ['warning' => []];
     }
 
-    public static function execute_returns(): \external_single_structure
+    public static function execute_returns(): external_single_structure
     {
-        return new \external_single_structure([
-            'warning' => new \external_warnings(),
+        return new external_single_structure([
+            'warning' => new external_warnings(),
         ]);
     }
 }

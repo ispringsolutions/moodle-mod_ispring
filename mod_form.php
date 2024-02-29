@@ -95,7 +95,11 @@ class mod_ispring_mod_form extends moodleform_mod
 
         // -------------------------------------------------------------------------------
         // Activity completion settings.
-        $mform->removeElement('completionpassgrade');
+        // In Moodle 4.3 The 'completionpassgrade' is a radio element with multiple options, so we should remove all of them.
+        while ($mform->elementExists('completionpassgrade'))
+        {
+            $mform->removeElement('completionpassgrade');
+        }
     }
 
     public function data_preprocessing(&$default_values): void
