@@ -25,6 +25,10 @@
 
 namespace mod_ispring\external;
 
+require_once($CFG->libdir . '/externallib.php');
+
+use external_function_parameters;
+use external_single_structure;
 use external_value;
 use mod_ispring\common\infrastructure\capability_utils;
 use mod_ispring\common\infrastructure\context_utils;
@@ -33,9 +37,9 @@ use mod_ispring\session\api\output\detailed_report_output;
 
 class get_report_data extends \external_api
 {
-    public static function execute_parameters(): \external_function_parameters
+    public static function execute_parameters(): external_function_parameters
     {
-        return new \external_function_parameters([
+        return new external_function_parameters([
             'session_id' => new external_value(PARAM_INT, 'session id'),
         ]);
     }
@@ -62,9 +66,9 @@ class get_report_data extends \external_api
         ];
     }
 
-    public static function execute_returns(): \external_single_structure
+    public static function execute_returns(): external_single_structure
     {
-        return new \external_single_structure([
+        return new external_single_structure([
             'report_data' => new external_value(PARAM_RAW, 'detailed report data'),
         ]);
     }

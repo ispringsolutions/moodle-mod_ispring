@@ -29,7 +29,7 @@ class ispring_testcase extends \advanced_testcase
 {
     final protected function create_course(): int
     {
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         return $course->id;
     }

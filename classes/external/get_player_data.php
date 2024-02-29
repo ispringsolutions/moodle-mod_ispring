@@ -25,15 +25,20 @@
 
 namespace mod_ispring\external;
 
+require_once($CFG->libdir . '/externallib.php');
+
+use external_api;
+use external_function_parameters;
+use external_single_structure;
 use external_value;
 use mod_ispring\common\infrastructure\context_utils;
 use mod_ispring\di_container;
 
-class get_player_data extends \external_api
+class get_player_data extends external_api
 {
-    public static function execute_parameters(): \external_function_parameters
+    public static function execute_parameters(): external_function_parameters
     {
-        return new \external_function_parameters([
+        return new external_function_parameters([
             'content_id' => new external_value(PARAM_INT, 'content id'),
         ]);
     }
@@ -72,9 +77,9 @@ class get_player_data extends \external_api
         ];
     }
 
-    public static function execute_returns(): \external_single_structure
+    public static function execute_returns(): external_single_structure
     {
-        return new \external_single_structure([
+        return new external_single_structure([
             'persist_state_id' => new external_value(PARAM_RAW, 'content persist state id'),
             'persist_state' => new external_value(PARAM_RAW, 'content persist state'),
         ]);
