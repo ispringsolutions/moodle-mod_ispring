@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,93 +24,83 @@
 
 namespace mod_ispring\ispring_module\api\output;
 
-class ispring_module_output
-{
+class ispring_module_output {
     private int $id;
     private string $name;
-    private int $moodle_course_id;
+    private int $moodlecourseid;
     private int $grade;
-    private int $grade_method;
+    private int $grademethod;
     private ?description_output $description;
-    private int $time_open;
-    private int $time_close;
+    private int $timeopen;
+    private int $timeclose;
 
     public function __construct(
         int $id,
         string $name,
-        int $moodle_course_id,
+        int $moodlecourseid,
         int $grade,
-        int $grade_method,
+        int $grademethod,
         ?description_output $description,
-        int $time_open,
-        int $time_close
-    )
-    {
+        int $timeopen,
+        int $timeclose
+    ) {
         $this->id = $id;
         $this->name = $name;
-        $this->moodle_course_id = $moodle_course_id;
+        $this->moodlecourseid = $moodlecourseid;
         $this->grade = $grade;
-        $this->grade_method = $grade_method;
+        $this->grademethod = $grademethod;
         $this->description = $description;
-        $this->time_open = $time_open;
-        $this->time_close = $time_close;
+        $this->timeopen = $timeopen;
+        $this->timeclose = $timeclose;
     }
 
     /**
      * @return int
      */
-    public function get_id(): int
-    {
+    public function get_id(): int {
         return $this->id;
     }
 
     /**
      * @return string
      */
-    public function get_name(): string
-    {
+    public function get_name(): string {
         return $this->name;
     }
 
     /**
      * @return int
      */
-    public function get_moodle_course_id(): int
-    {
-        return $this->moodle_course_id;
+    public function get_moodle_course_id(): int {
+        return $this->moodlecourseid;
     }
 
     /**
      * @return int
      */
-    public function get_grade(): int
-    {
+    public function get_grade(): int {
         return $this->grade;
     }
 
     /**
      * @return int
      */
-    public function get_grade_method(): int
-    {
-        return $this->grade_method;
+    public function get_grade_method(): int {
+        return $this->grademethod;
     }
 
     /**
      * @return description_output|null
      */
-    public function get_description(): ?description_output
-    {
+    public function get_description(): ?description_output {
         return $this->description;
     }
 
-    public function get_time_open(): int
-    {
-        return $this->time_open;
+    public function get_time_open(): int {
+        return $this->timeopen;
     }
 
-    public function get_time_close(): int
-    {
-        return $this->time_close;
+    public function get_time_close(): int {
+        return $this->timeclose;
     }
 }

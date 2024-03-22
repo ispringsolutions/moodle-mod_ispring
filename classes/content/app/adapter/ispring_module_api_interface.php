@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,7 +24,6 @@
 
 namespace mod_ispring\content\app\adapter;
 
-interface ispring_module_api_interface
-{
+interface ispring_module_api_interface {
     public function exists(int $id): bool;
 }

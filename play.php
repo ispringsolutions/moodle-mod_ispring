@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,37 +29,35 @@ use mod_ispring\pages\play_page;
 
 require_once('../../config.php');
 
-$moodle_course_id = optional_param('id', '', PARAM_INT);
-$argparser = new argparser($moodle_course_id, di_container::get_ispring_module_api());
+$courseid = optional_param('id', '', PARAM_INT);
+$argparser = new argparser($courseid, di_container::get_ispring_module_api());
 
 require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 
 $ispring = $argparser->get_ispring_module();
-$content_api = di_container::get_content_api();
+$contentapi = di_container::get_content_api();
 
-$entrypoint_info = $content_api->get_latest_version_entrypoint_info(
+$entrypointinfo = $contentapi->get_latest_version_entrypoint_info(
     context_module::instance($argparser->get_cm()->id)->id,
     $ispring->get_id()
 );
 
-if (!$entrypoint_info)
-{
+if (!$entrypointinfo) {
     throw new \invalid_state_exception('Error, ispring cm does not contain content');
 }
 
-$module_context = context_module::instance($argparser->get_cm()->id);
+$modulecontext = context_module::instance($argparser->get_cm()->id);
 
-if (!availability_checker::module_available($ispring->get_id(), $module_context))
-{
+if (!availability_checker::module_available($ispring->get_id(), $modulecontext)) {
     throw new \moodle_exception('unavailabletime', 'ispring');
 }
 
 $page = new play_page(
-    $entrypoint_info->get_content_id(),
-    $entrypoint_info->get_entrypoint_url(),
-    '/mod/ispring/view.php?id=' . $moodle_course_id,
+    $entrypointinfo->get_content_id(),
+    $entrypointinfo->get_entrypoint_url(),
+    $CFG->wwwroot . '/mod/ispring/view.php?id=' . $courseid,
     '/mod/ispring/play.php',
-    ['id' => $moodle_course_id]
+    ['id' => $courseid]
 );
 
 $page->set_title($ispring->get_name());

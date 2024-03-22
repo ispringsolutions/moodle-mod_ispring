@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,19 +24,14 @@
 
 namespace mod_ispring\common\infrastructure\transaction;
 
-class transaction_utils
-{
-    public static function do_in_transaction(string $transaction_class, callable $fn)
-    {
-        $transaction = new $transaction_class();
-        try
-        {
+class transaction_utils {
+    public static function do_in_transaction(string $transactionclass, callable $fn) {
+        $transaction = new $transactionclass();
+        try {
             $result = $fn($transaction);
             $transaction->commit();
             return $result;
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             $transaction->rollback($e);
             throw $e;
         }

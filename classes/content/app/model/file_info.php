@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,16 +24,14 @@
 
 namespace mod_ispring\content\app\model;
 
-class file_info
-{
+class file_info {
     private string $path;
     private string $filename;
 
     public function __construct(
         string $path,
         string $filename
-    )
-    {
+    ) {
         $this->path = $path;
         $this->filename = $filename;
     }
@@ -42,16 +39,14 @@ class file_info
     /**
      * @return string
      */
-    public function get_path(): string
-    {
+    public function get_path(): string {
         return $this->path;
     }
 
     /**
      * @return string
      */
-    public function get_filename(): string
-    {
+    public function get_filename(): string {
         return $this->filename;
     }
 }

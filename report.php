@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,35 +29,34 @@ use mod_ispring\di_container;
 use mod_ispring\pages\report_page;
 
 require_once('../../config.php');
-$cm_id = optional_param('id', '', PARAM_INT);
+$cmid = optional_param('id', '', PARAM_INT);
 
-$argparser = new argparser($cm_id, di_container::get_ispring_module_api());
+$argparser = new argparser($cmid, di_container::get_ispring_module_api());
 
 require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 
-$module_context = context_module::instance($argparser->get_cm()->id);
-require_capability('mod/ispring:viewallreports', $module_context);
+$modulecontext = context_module::instance($argparser->get_cm()->id);
+require_capability('mod/ispring:viewallreports', $modulecontext);
 
-$ispring_module_id = $argparser->get_ispring_module()->get_id();
+$ispringmoduleid = $argparser->get_ispring_module()->get_id();
 
-if (!availability_checker::module_available($ispring_module_id, $module_context))
-{
+if (!availability_checker::module_available($ispringmoduleid, $modulecontext)) {
     throw new \moodle_exception('unavailabletime', 'ispring');
 }
 
-$passing_requirements_were_updated = di_container::get_session_api()->passing_requirements_were_updated($ispring_module_id);
+$passingrequirementswereupdated = di_container::get_session_api()->passing_requirements_were_updated($ispringmoduleid);
 
 $page = new report_page(
-    $ispring_module_id,
-    $passing_requirements_were_updated,
+    $ispringmoduleid,
+    $passingrequirementswereupdated,
     '/mod/ispring/report.php',
-    ['id' => $cm_id]
+    ['id' => $cmid]
 );
 
 $page->set_title(get_string('report', 'ispring'));
 $page->set_secondary_active_tab('report');
 
-$page->set_context($module_context);
+$page->set_context($modulecontext);
 echo $page->get_header();
 echo $page->get_content();
 echo $page->get_footer();

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,17 +30,14 @@ use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\report\filter;
 use lang_string;
 
-class content extends base_entity
-{
-    protected function get_default_table_aliases(): array
-    {
+class content extends base_entity {
+    protected function get_default_table_aliases(): array {
         return [
             'ispring_content' => 'isc',
         ];
     }
 
-    protected function get_default_entity_title(): lang_string
-    {
+    protected function get_default_entity_title(): lang_string {
         return new lang_string('entitycontent', 'ispring');
     }
 
@@ -51,8 +47,7 @@ class content extends base_entity
      * @return column[]
      * @throws \coding_exception
      */
-    protected function get_all_columns(): array
-    {
+    protected function get_all_columns(): array {
         $alias = $this->get_table_alias('ispring_content');
         $columns = [];
 
@@ -76,8 +71,7 @@ class content extends base_entity
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    protected function get_all_filters(): array
-    {
+    protected function get_all_filters(): array {
         $alias = $this->get_table_alias('ispring_content');
 
         $filters[] = (new filter(

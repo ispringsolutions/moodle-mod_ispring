@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,66 +24,59 @@
 
 namespace mod_ispring\session\api\input;
 
-class end_input
-{
-    private ?float $max_score;
-    private ?float $min_score;
-    private ?float $passing_score;
+class end_input {
+    private ?float $maxscore;
+    private ?float $minscore;
+    private ?float $passingscore;
     private ?float $score;
-    private ?string $detailed_report;
+    private ?string $detailedreport;
 
     public function __construct(
-        ?float $max_score,
-        ?float $min_score,
-        ?float $passing_score,
+        ?float $maxscore,
+        ?float $minscore,
+        ?float $passingscore,
         ?float $score,
-        ?string $detailed_report
-    )
-    {
-        $this->max_score = $max_score;
-        $this->min_score = $min_score;
-        $this->passing_score = $passing_score;
+        ?string $detailedreport
+    ) {
+        $this->maxscore = $maxscore;
+        $this->minscore = $minscore;
+        $this->passingscore = $passingscore;
         $this->score = $score;
-        $this->detailed_report = $detailed_report;
+        $this->detailedreport = $detailedreport;
     }
 
     /**
      * @return float|null
      */
-    public function get_max_score(): ?float
-    {
-        return $this->max_score;
+    public function get_max_score(): ?float {
+        return $this->maxscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_min_score(): ?float
-    {
-        return $this->min_score;
+    public function get_min_score(): ?float {
+        return $this->minscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_passing_score(): ?float
-    {
-        return $this->passing_score;
+    public function get_passing_score(): ?float {
+        return $this->passingscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_score(): ?float
-    {
+    public function get_score(): ?float {
         return $this->score;
     }
 
     /**
      * @return string|null
      */
-    public function get_detailed_report(): ?string
-    {
-        return $this->detailed_report;
+    public function get_detailed_report(): ?string {
+        return $this->detailedreport;
     }
 }

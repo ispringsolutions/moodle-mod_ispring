@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ namespace mod_ispring\ispring_module\app\query;
 
 use mod_ispring\ispring_module\app\query\model\ispring_module_model;
 
-interface ispring_module_query_service_interface
-{
+interface ispring_module_query_service_interface {
     /**
      * @param int $id
      * @return ispring_module_model|null

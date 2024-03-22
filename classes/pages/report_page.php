@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,34 +27,32 @@ namespace mod_ispring\pages;
 use core_reportbuilder\system_report_factory;
 use mod_ispring\report\global_report;
 
-class report_page extends base_page
-{
+class report_page extends base_page {
     private const EN_LINK_DOCUMENTATION = 'https://www.ispringsolutions.com/go/moodle-documentation';
     private const RU_LINK_DOCUMENTATION = 'https://www.ispring.ru/go/moodle-documentation';
 
-    private int $ispring_id;
-    private bool $passing_requirements_were_updated;
+    private int $ispringid;
+    private bool $passingrequirementswereupdated;
 
     public function __construct(
-        int $ispring_id,
-        bool $passing_requirements_were_updated,
+        int $ispringid,
+        bool $passingrequirementswereupdated,
         string $url,
         array $args = null
-    )
-    {
+    ) {
         parent::__construct($url, $args);
 
-        $this->ispring_id = $ispring_id;
-        $this->passing_requirements_were_updated = $passing_requirements_were_updated;
+        $this->ispringid = $ispringid;
+        $this->passingrequirementswereupdated = $passingrequirementswereupdated;
     }
 
-    public function get_content(): string
-    {
+    public function get_content(): string {
         $content = '';
-        if ($this->passing_requirements_were_updated)
-        {
+        if ($this->passingrequirementswereupdated) {
             $content .= $this->get_output()->box_start('generalbox alert alert-warning');
-            $content .= \html_writer::span(get_string('passingrequirementshavebeenupdatedteachertext', 'ispring', $this->get_url()));
+            $content .= \html_writer::span(
+                get_string('passingrequirementshavebeenupdatedteachertext', 'ispring', $this->get_url())
+            );
             $content .= $this->get_output()->box_end();
         }
 
@@ -71,19 +68,16 @@ class report_page extends base_page
         return $content;
     }
 
-    private function get_report_params(): array
-    {
+    private function get_report_params(): array {
         return [
-            global_report::PARAM_ISPRING_MODULE_ID => $this->ispring_id,
+            global_report::PARAM_ISPRING_MODULE_ID => $this->ispringid,
             global_report::PARAM_PAGE_URL => $this->get_page()->url->out(),
         ];
     }
 
-    private function get_url(): string
-    {
+    private function get_url(): string {
         $lang = current_language();
-        if (current_language() == 'ru')
-        {
+        if (current_language() == 'ru') {
             return self::RU_LINK_DOCUMENTATION;
         }
 

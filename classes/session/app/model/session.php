@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,173 +24,156 @@
 
 namespace mod_ispring\session\app\model;
 
-class session
-{
-    private int $content_id;
+class session {
+    private int $contentid;
     private float $score;
     private string $status;
-    private int $begin_time;
-    private ?int $end_time;
+    private int $begintime;
+    private ?int $endtime;
     private ?int $duration;
-    private int $user_id;
+    private int $userid;
     private int $attempt;
-    private ?string $persist_state_id;
-    private ?string $persist_state;
-    private ?float $max_score;
-    private float $min_score;
-    private ?float $passing_score;
-    private ?string $detailed_report;
-    private string $player_id;
+    private ?string $persiststateid;
+    private ?string $persiststate;
+    private ?float $maxscore;
+    private float $minscore;
+    private ?float $passingscore;
+    private ?string $detailedreport;
+    private string $playerid;
 
     public function __construct(
-        int $content_id,
+        int $contentid,
         float $score,
         string $status,
-        int $begin_time,
-        ?int $end_time,
+        int $begintime,
+        ?int $endtime,
         ?int $duration,
-        int $user_id,
+        int $userid,
         int $attempt,
-        ?string $persist_state_id,
-        ?string $persist_state,
-        ?float $max_score,
-        float $min_score,
-        ?float $passing_score,
-        ?string $detailed_report,
-        string $player_id
-    )
-    {
-        $this->content_id = $content_id;
+        ?string $persiststateid,
+        ?string $persiststate,
+        ?float $maxscore,
+        float $minscore,
+        ?float $passingscore,
+        ?string $detailedreport,
+        string $playerid
+    ) {
+        $this->contentid = $contentid;
         $this->score = $score;
         $this->status = $status;
-        $this->begin_time = $begin_time;
-        $this->end_time = $end_time;
+        $this->begintime = $begintime;
+        $this->endtime = $endtime;
         $this->duration = $duration;
-        $this->user_id = $user_id;
+        $this->userid = $userid;
         $this->attempt = $attempt;
-        $this->persist_state_id = $persist_state_id;
-        $this->persist_state = $persist_state;
-        $this->max_score = $max_score;
-        $this->min_score = $min_score;
-        $this->passing_score = $passing_score;
-        $this->detailed_report = $detailed_report;
-        $this->player_id = $player_id;
+        $this->persiststateid = $persiststateid;
+        $this->persiststate = $persiststate;
+        $this->maxscore = $maxscore;
+        $this->minscore = $minscore;
+        $this->passingscore = $passingscore;
+        $this->detailedreport = $detailedreport;
+        $this->playerid = $playerid;
     }
 
     /**
      * @return int
      */
-    public function get_content_id(): int
-    {
-        return $this->content_id;
+    public function get_content_id(): int {
+        return $this->contentid;
     }
 
     /**
      * @return float
      */
-    public function get_score(): float
-    {
+    public function get_score(): float {
         return $this->score;
     }
 
     /**
      * @return string
      */
-    public function get_status(): string
-    {
+    public function get_status(): string {
         return $this->status;
     }
 
     /**
      * @return int
      */
-    public function get_begin_time(): int
-    {
-        return $this->begin_time;
+    public function get_begin_time(): int {
+        return $this->begintime;
     }
 
     /**
      * @return int|null
      */
-    public function get_end_time(): ?int
-    {
-        return $this->end_time;
+    public function get_end_time(): ?int {
+        return $this->endtime;
     }
 
     /**
      * @return int|null
      */
-    public function get_duration(): ?int
-    {
+    public function get_duration(): ?int {
         return $this->duration;
     }
 
     /**
      * @return int
      */
-    public function get_user_id(): int
-    {
-        return $this->user_id;
+    public function get_user_id(): int {
+        return $this->userid;
     }
 
     /**
      * @return int
      */
-    public function get_attempt(): int
-    {
+    public function get_attempt(): int {
         return $this->attempt;
     }
 
     /**
      * @return string|null
      */
-    public function get_persist_state_id(): ?string
-    {
-        return $this->persist_state_id;
+    public function get_persist_state_id(): ?string {
+        return $this->persiststateid;
     }
 
     /**
      * @return string|null
      */
-    public function get_persist_state(): ?string
-    {
-        return $this->persist_state;
+    public function get_persist_state(): ?string {
+        return $this->persiststate;
     }
 
     /**
      * @return float|null
      */
-    public function get_max_score(): ?float
-    {
-        return $this->max_score;
+    public function get_max_score(): ?float {
+        return $this->maxscore;
     }
 
     /**
      * @return float
      */
-    public function get_min_score(): float
-    {
-        return $this->min_score;
+    public function get_min_score(): float {
+        return $this->minscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_passing_score(): ?float
-    {
-        return $this->passing_score;
+    public function get_passing_score(): ?float {
+        return $this->passingscore;
     }
 
     /**
      * @return string|null
      */
-    public function get_detailed_report(): ?string
-    {
-        return $this->detailed_report;
+    public function get_detailed_report(): ?string {
+        return $this->detailedreport;
     }
 
-    public function get_player_id(): string
-    {
-        return $this->player_id;
+    public function get_player_id(): string {
+        return $this->playerid;
     }
 }

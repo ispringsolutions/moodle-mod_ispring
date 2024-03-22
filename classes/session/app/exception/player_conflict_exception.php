@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,5 @@
 
 namespace mod_ispring\session\app\exception;
 
-class player_conflict_exception extends \RuntimeException
-{
+class player_conflict_exception extends \RuntimeException {
 }

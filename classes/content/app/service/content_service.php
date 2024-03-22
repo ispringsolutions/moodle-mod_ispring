@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -36,152 +35,137 @@ use mod_ispring\content\app\query\content_query_service_interface;
 use mod_ispring\content\app\query\model\content as content_query;
 use mod_ispring\content\app\repository\content_repository_interface;
 
-class content_service
-{
-    private file_storage_interface $file_storage;
-    private content_repository_interface $content_repository;
-    private ispring_module_api_interface $ispring_module_api;
-    private content_query_service_interface $content_query_service;
+class content_service {
+    private file_storage_interface $filestorage;
+    private content_repository_interface $repository;
+    private ispring_module_api_interface $ispringmoduleapi;
+    private content_query_service_interface $queryservice;
 
     public function __construct(
-        file_storage_interface $file_storage,
-        content_repository_interface $content_repository,
-        ispring_module_api_interface $ispring_module_api,
-        content_query_service_interface $content_query_service
-    )
-    {
-        $this->file_storage = $file_storage;
-        $this->content_repository = $content_repository;
-        $this->ispring_module_api = $ispring_module_api;
-        $this->content_query_service = $content_query_service;
+        file_storage_interface $filestorage,
+        content_repository_interface $repository,
+        ispring_module_api_interface $ispringmoduleapi,
+        content_query_service_interface $queryservice
+    ) {
+        $this->filestorage = $filestorage;
+        $this->repository = $repository;
+        $this->ispringmoduleapi = $ispringmoduleapi;
+        $this->queryservice = $queryservice;
     }
 
-    public function add_content(content_data $content_data): int
-    {
+    public function add_content(content_data $contentdata): int {
         return transaction_utils::do_in_transaction(
             db_transaction::class,
-            function($transaction) use ($content_data) {
-                $content = $this->content_query_service->get_latest_version_content_by_ispring_module_id(
-                    $content_data->get_ispring_module_id(),
+            function ($transaction) use ($contentdata) {
+                $content = $this->queryservice->get_latest_version_content_by_ispring_module_id(
+                    $contentdata->get_ispring_module_id(),
                 );
 
-                if (!$this->ispring_module_api->exists($content_data->get_ispring_module_id()))
-                {
+                if (!$this->ispringmoduleapi->exists($contentdata->get_ispring_module_id())) {
                     throw new \RuntimeException("Error, ispring module does not exist");
                 }
 
-                $content_needs_updating = $this->file_storage->content_needs_updating(
-                    $content_data->get_context_id(),
-                    $content_data->get_user_context_id(),
-                    $content_data->get_file_id(),
+                $needsupdating = $this->filestorage->content_needs_updating(
+                    $contentdata->get_context_id(),
+                    $contentdata->get_user_context_id(),
+                    $contentdata->get_file_id(),
                 );
-                if ($content && !$content_needs_updating)
-                {
+                if ($content && !$needsupdating) {
                     return $content->get_id();
                 }
 
                 $transaction->execute(
-                    fn() => $this->file_storage->unzip_package(
-                        $content_data->get_context_id(),
-                        $content_data->get_file_id(),
-                        $content_data->get_user_context_id(),
-                        $content_data->get_file_id(),
+                    fn() => $this->filestorage->unzip_package(
+                        $contentdata->get_context_id(),
+                        $contentdata->get_file_id(),
+                        $contentdata->get_user_context_id(),
+                        $contentdata->get_file_id(),
                     ),
-                    fn() => $this->file_storage->clear_ispring_areas(
-                        $content_data->get_context_id(),
-                        $content_data->get_file_id(),
+                    fn() => $this->filestorage->clear_ispring_areas(
+                        $contentdata->get_context_id(),
+                        $contentdata->get_file_id(),
                     ),
                 );
 
-                $description_file = $this->file_storage->get_description_file(
-                    $content_data->get_context_id(),
-                    $content_data->get_file_id()
+                $descriptionfile = $this->filestorage->get_description_file(
+                    $contentdata->get_context_id(),
+                    $contentdata->get_file_id()
                 );
 
                 $version = self::get_new_version($content);
 
-                $content_id = $transaction->execute(
-                    fn() => $this->add_content_to_repository($content_data, $description_file, $version),
-                    fn(int $id) => $this->content_repository->remove($id),
+                $contentid = $transaction->execute(
+                    fn() => $this->add_content_to_repository($contentdata, $descriptionfile, $version),
+                    fn(int $id) => $this->repository->remove($id),
                 );
 
-                return $content_id;
+                return $contentid;
             },
         );
     }
 
-    public function remove(int $module_context_id, int $content_id): void
-    {
+    public function remove(int $modulecontextid, int $contentid): void {
         $transaction = new db_transaction();
-        try
-        {
-            $content = $this->content_query_service->get_by_id($content_id);
-            if (!$content)
-            {
+        try {
+            $content = $this->queryservice->get_by_id($contentid);
+            if (!$content) {
                 throw new \RuntimeException('Content not found');
             }
-            $this->content_repository->remove($content_id);
-            $this->file_storage->clear_ispring_areas($module_context_id, $content->get_file_id());
+            $this->repository->remove($contentid);
+            $this->filestorage->clear_ispring_areas($modulecontextid, $content->get_file_id());
 
             $transaction->commit();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             $transaction->rollback($e);
             throw $e;
         }
     }
 
     public function present_file(
-        int $context_id,
+        int $contextid,
         string $filearea,
         array $args,
-        bool $force_download,
+        bool $forcedownload,
         array $options = []
-    ): bool
-    {
-        return $this->file_storage->present_file($context_id, $filearea, $args, $force_download, $options);
+    ): bool {
+        return $this->filestorage->present_file($contextid, $filearea, $args, $forcedownload, $options);
     }
 
-    private static function get_new_version(?content_query $content): int
-    {
+    private static function get_new_version(?content_query $content): int {
         return ($content ? $content->get_version() : 0) + 1;
     }
 
-    private static function generate_file_info_from_entrypoint(string $entrypoint): file_info
-    {
-        $path_info = pathinfo($entrypoint);
+    private static function generate_file_info_from_entrypoint(string $entrypoint): file_info {
+        $pathinfo = pathinfo($entrypoint);
         return new file_info(
-            '/' . $path_info['dirname'],
-            $path_info['filename'] . '.' . $path_info['extension'],
+            '/' . $pathinfo['dirname'],
+            $pathinfo['filename'] . '.' . $pathinfo['extension'],
         );
     }
 
     private function add_content_to_repository(
-        content_data $content_data,
-        \stored_file $description_file,
+        content_data $contentdata,
+        \stored_file $descriptionfile,
         int $version
-    ): int
-    {
-        $description_params = description_parser::parse($description_file)->get_description_params();
+    ): int {
+        $params = description_parser::parse($descriptionfile)->get_description_params();
 
-        $content_path = self::generate_file_info_from_entrypoint($description_params->get_entrypoint());
+        $contentpath = self::generate_file_info_from_entrypoint($params->get_entrypoint());
 
-        $report_path = null;
-        if ($description_params->get_report_entrypoint() !== null)
-        {
-            $report_path = self::generate_file_info_from_entrypoint(
-                $description_params->get_report_entrypoint(),
+        $reportpath = null;
+        if ($params->get_report_entrypoint() !== null) {
+            $reportpath = self::generate_file_info_from_entrypoint(
+                $params->get_report_entrypoint(),
             );
         }
 
-        return $this->content_repository->add(new content(
-            $content_data->get_file_id(),
-            $content_data->get_ispring_module_id(),
-            $description_params->get_creation_time(),
-            $content_path,
+        return $this->repository->add(new content(
+            $contentdata->get_file_id(),
+            $contentdata->get_ispring_module_id(),
+            $params->get_creation_time(),
+            $contentpath,
             $version,
-            $report_path,
+            $reportpath,
         ));
     }
 }

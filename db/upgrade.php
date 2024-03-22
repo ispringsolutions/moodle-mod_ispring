@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,9 +24,9 @@
 
 use mod_ispring\upgrade\upgrade_db_manager;
 
-function xmldb_ispring_upgrade($old_version)
-{
-    $db_manager = new upgrade_db_manager();
-    $db_manager->upgrade_from($old_version);
+function xmldb_ispring_upgrade($oldversion) {
+    $dbmanager = new upgrade_db_manager();
+    $dbmanager->upgrade_from($oldversion);
+
     return true;
 }

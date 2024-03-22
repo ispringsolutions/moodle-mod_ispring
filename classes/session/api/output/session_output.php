@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,88 +24,79 @@
 
 namespace mod_ispring\session\api\output;
 
-class session_output
-{
-    private int $content_id;
-    private ?string $persist_state_id;
-    private ?string $persist_state;
-    private ?float $max_score;
-    private ?float $min_score;
-    private ?float $passing_score;
+class session_output {
+    private int $contentid;
+    private ?string $persiststateid;
+    private ?string $persiststate;
+    private ?float $maxscore;
+    private ?float $minscore;
+    private ?float $passingscore;
     private float $score;
 
     public function __construct(
-        int $content_id,
-        ?string $persist_state_id,
-        ?string $persist_state,
-        ?float $max_score,
-        ?float $min_score,
-        ?float $passing_score,
+        int $contentid,
+        ?string $persiststateid,
+        ?string $persiststate,
+        ?float $maxscore,
+        ?float $minscore,
+        ?float $passingscore,
         float $score
-    )
-    {
-        $this->content_id = $content_id;
-        $this->persist_state_id = $persist_state_id;
-        $this->persist_state = $persist_state;
-        $this->max_score = $max_score;
-        $this->min_score = $min_score;
-        $this->passing_score = $passing_score;
+    ) {
+        $this->contentid = $contentid;
+        $this->persiststateid = $persiststateid;
+        $this->persiststate = $persiststate;
+        $this->maxscore = $maxscore;
+        $this->minscore = $minscore;
+        $this->passingscore = $passingscore;
         $this->score = $score;
     }
 
     /**
      * @return int
      */
-    public function get_content_id(): int
-    {
-        return $this->content_id;
+    public function get_content_id(): int {
+        return $this->contentid;
     }
 
     /**
      * @return string|null
      */
-    public function get_persist_state_id(): ?string
-    {
-        return $this->persist_state_id;
+    public function get_persist_state_id(): ?string {
+        return $this->persiststateid;
     }
 
     /**
      * @return string|null
      */
-    public function get_persist_state(): ?string
-    {
-        return $this->persist_state;
+    public function get_persist_state(): ?string {
+        return $this->persiststate;
     }
 
     /**
      * @return float|null
      */
-    public function get_max_score(): ?float
-    {
-        return $this->max_score;
+    public function get_max_score(): ?float {
+        return $this->maxscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_min_score(): ?float
-    {
-        return $this->min_score;
+    public function get_min_score(): ?float {
+        return $this->minscore;
     }
 
     /**
      * @return float|null
      */
-    public function get_passing_score(): ?float
-    {
-        return $this->passing_score;
+    public function get_passing_score(): ?float {
+        return $this->passingscore;
     }
 
     /**
      * @return float
      */
-    public function get_score(): float
-    {
+    public function get_score(): float {
         return $this->score;
     }
 }

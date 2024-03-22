@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,20 +27,19 @@ namespace mod_ispring\ispring_module\api;
 use mod_ispring\ispring_module\api\input\create_or_update_ispring_module_input;
 use mod_ispring\ispring_module\api\output\ispring_module_output;
 
-interface ispring_module_api_interface
-{
+interface ispring_module_api_interface {
     /**
-     * @param create_or_update_ispring_module_input $create_ispring_input
+     * @param create_or_update_ispring_module_input $input
      * @return int
      */
-    public function create(create_or_update_ispring_module_input $create_ispring_input): int;
+    public function create(create_or_update_ispring_module_input $input): int;
 
     /**
      * @param int $instance
-     * @param create_or_update_ispring_module_input $ispring_input
+     * @param create_or_update_ispring_module_input $input
      * @return bool
      */
-    public function update(int $instance, create_or_update_ispring_module_input $ispring_input): bool;
+    public function update(int $instance, create_or_update_ispring_module_input $input): bool;
 
     /**
      * @param int $id
@@ -68,8 +66,8 @@ interface ispring_module_api_interface
     /**
      * Check module availability
      *
-     * @param int $module_id
+     * @param int $moduleid
      * @return bool
      */
-    public function is_available(int $module_id): bool;
+    public function is_available(int $moduleid): bool;
 }

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,30 +24,26 @@
 
 namespace mod_ispring\content\api\output;
 
-class entrypoint_info
-{
-    private int $content_id;
-    private string $entrypoint_url;
+class entrypoint_info {
+    private int $contentid;
+    private string $entrypointurl;
 
-    public function __construct(int $content_id, string $entrypoint_url)
-    {
-        $this->content_id = $content_id;
-        $this->entrypoint_url = $entrypoint_url;
+    public function __construct(int $contentid, string $entrypointurl) {
+        $this->contentid = $contentid;
+        $this->entrypointurl = $entrypointurl;
     }
 
     /**
      * @return int
      */
-    public function get_content_id(): int
-    {
-        return $this->content_id;
+    public function get_content_id(): int {
+        return $this->contentid;
     }
 
     /**
      * @return string
      */
-    public function get_entrypoint_url(): string
-    {
-        return $this->entrypoint_url;
+    public function get_entrypoint_url(): string {
+        return $this->entrypointurl;
     }
 }

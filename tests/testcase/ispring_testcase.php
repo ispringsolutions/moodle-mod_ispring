@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,19 +24,16 @@
 
 namespace mod_ispring\testcase;
 
-class ispring_testcase extends \advanced_testcase
-{
-    final protected function create_course(): int
-    {
+class ispring_testcase extends \advanced_testcase {
+    final protected function create_course(): int {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         return $course->id;
     }
 
-    final protected function create_course_and_instance(array $form_data = null): \stdClass
-    {
+    final protected function create_course_and_instance(array $data = null): \stdClass {
         $this->setAdminUser();
-        $form_data['course'] = $this->create_course();
-        return $this->getDataGenerator()->create_module('ispring', $form_data);
+        $data['course'] = $this->create_course();
+        return $this->getDataGenerator()->create_module('ispring', $data);
     }
 }

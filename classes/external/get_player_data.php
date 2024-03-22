@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,8 @@
 
 namespace mod_ispring\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/externallib.php');
 
 use external_api;
@@ -34,60 +35,50 @@ use external_value;
 use mod_ispring\common\infrastructure\context_utils;
 use mod_ispring\di_container;
 
-class get_player_data extends external_api
-{
-    public static function execute_parameters(): external_function_parameters
-    {
+class get_player_data extends external_api {
+    public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'content_id' => new external_value(PARAM_INT, 'content id'),
         ]);
     }
 
-    public static function execute(int $content_id): array
-    {
+    public static function execute(int $contentid): array {
         global $USER;
 
-        ['content_id' => $content_id] = self::validate_parameters(
+        ['content_id' => $contentid] = self::validate_parameters(
             self::execute_parameters(),
-            ['content_id' => $content_id],
+            ['content_id' => $contentid],
         );
 
-        $module_context = self::get_module_context($content_id);
+        $modulecontext = self::get_module_context($contentid);
 
-        $session_api = di_container::get_session_api();
-        $session = $session_api->get_last_by_content_id($content_id, $USER->id);
+        $sessionapi = di_container::get_session_api();
+        $session = $sessionapi->get_last_by_content_id($contentid, $USER->id);
 
-        if (has_capability('mod/ispring:preview', $module_context))
-        {
-            $persist_state = null;
-        }
-        else if (has_capability('mod/ispring:view', $module_context))
-        {
-            $persist_state = $session ? $session->get_persist_state() : null;
-        }
-        else
-        {
+        if (has_capability('mod/ispring:preview', $modulecontext)) {
+            $persiststate = null;
+        } else if (has_capability('mod/ispring:view', $modulecontext)) {
+            $persiststate = $session ? $session->get_persist_state() : null;
+        } else {
             throw new \moodle_exception('contentnotfound', 'ispring');
         }
-        self::validate_context($module_context);
+        self::validate_context($modulecontext);
 
         return [
             'persist_state_id' => $session ? $session->get_persist_state_id() : null,
-            'persist_state' => $persist_state,
+            'persist_state' => $persiststate,
         ];
     }
 
-    public static function execute_returns(): external_single_structure
-    {
+    public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'persist_state_id' => new external_value(PARAM_RAW, 'content persist state id'),
             'persist_state' => new external_value(PARAM_RAW, 'content persist state'),
         ]);
     }
 
-    private static function get_module_context(int $content_id): \context_module
-    {
-        $content_api = di_container::get_content_api();
-        return context_utils::get_module_context($content_api, $content_id);
+    private static function get_module_context(int $contentid): \context_module {
+        $contentapi = di_container::get_content_api();
+        return context_utils::get_module_context($contentapi, $contentid);
     }
 }

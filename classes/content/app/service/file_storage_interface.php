@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,75 +27,74 @@ namespace mod_ispring\content\app\service;
 use mod_ispring\content\app\model\description;
 use stored_file;
 
-interface file_storage_interface
-{
+interface file_storage_interface {
     /**
      * Before adding content to db it should be unzipped and stored to filestorage in different filearea
-     * @param int $target_context_id
-     * @param int $target_item_id
-     * @param int $user_context_id
-     * @param int $user_item_id
+     * @param int $targetcontextid
+     * @param int $targetitemid
+     * @param int $usercontextid
+     * @param int $useritemid
      * @return void
      */
     public function unzip_package(
-        int $target_context_id,
-        int $target_item_id,
-        int $user_context_id,
-        int $user_item_id
+        int $targetcontextid,
+        int $targetitemid,
+        int $usercontextid,
+        int $useritemid
     ): void;
 
     /**
      * Get description file
-     * @param int $context_id
-     * @param int $item_id
+     * @param int $contextid
+     * @param int $itemid
      * @param string $filename
      * @return stored_file
      */
-    public function get_description_file(int $context_id, int $item_id, string $filename = description::FILENAME): stored_file;
+    public function get_description_file(int $contextid, int $itemid, string $filename = description::FILENAME): stored_file;
 
     /**
      * Prepare file-content for user to play or view
-     * @param int $context_id
+     * @param int $contextid
      * @param string $filearea
      * @param array $args
-     * @param bool $force_download
+     * @param bool $forcedownload
      * @param array $options
      * @return bool
      */
     public function present_file(
-        int $context_id,
+        int $contextid,
         string $filearea,
         array $args,
-        bool $force_download,
+        bool $forcedownload,
         array $options = []
     ): bool;
 
     /**
      * Generate moodle url for specified file
-     * @param int $context_id
-     * @param int $file_id
+     * @param int $contextid
+     * @param int $fileid
      * @param string $filepath
      * @param string $filename
      * @return string
      */
-    public function generate_entrypoint_url(int $context_id, int $file_id, string $filepath, string $filename): string;
+    public function generate_entrypoint_url(int $contextid, int $fileid, string $filepath, string $filename): string;
 
     /**
      * Check whether module content needs to be updated
      *
-     * @param int $target_context_id
-     * @param int $user_context_id
-     * @param int $user_item_id
+     * @param int $targetcontextid
+     * @param int $usercontextid
+     * @param int $useritemid
      * @return bool
      */
-    public function content_needs_updating(int $target_context_id, int $user_context_id, int $user_item_id): bool;
+    public function content_needs_updating(int $targetcontextid, int $usercontextid, int $useritemid): bool;
 
     /**
      * Remove all files matching given context and item ids from ispring areas
      *
-     * @param int $context_id
-     * @param int|false $item_id If not specified, files with any item_id are removed
+     * @param int $contextid
+     * @param int|false $itemid If not specified, files with any item_id are removed
      * @return bool true
      */
-    public function clear_ispring_areas(int $context_id, $item_id = false): bool;
+    public function clear_ispring_areas(int $contextid, $itemid = false): bool;
 }

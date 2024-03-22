@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,8 @@
 
 namespace mod_ispring\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/externallib.php');
 
 use external_function_parameters;
@@ -35,53 +36,46 @@ use mod_ispring\common\infrastructure\context_utils;
 use mod_ispring\di_container;
 use mod_ispring\session\api\output\detailed_report_output;
 
-class get_report_data extends \external_api
-{
-    public static function execute_parameters(): external_function_parameters
-    {
+class get_report_data extends \external_api {
+    public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'session_id' => new external_value(PARAM_INT, 'session id'),
         ]);
     }
 
-    public static function execute(int $session_id): array
-    {
-        ['session_id' => $session_id] = self::validate_parameters(
+    public static function execute(int $sessionid): array {
+        ['session_id' => $sessionid] = self::validate_parameters(
             self::execute_parameters(),
-            ['session_id' => $session_id],
+            ['session_id' => $sessionid],
         );
 
-        $session_api = di_container::get_session_api();
+        $sessionapi = di_container::get_session_api();
 
-        $detailed_report = $session_api->get_detailed_report($session_id);
-        if (!$detailed_report)
-        {
+        $detailedreport = $sessionapi->get_detailed_report($sessionid);
+        if (!$detailedreport) {
             throw new \moodle_exception('sessionnotfound', 'ispring');
         }
 
-        self::require_access_to_report($detailed_report);
+        self::require_access_to_report($detailedreport);
 
         return [
-            'report_data' => $detailed_report->get_detailed_report(),
+            'report_data' => $detailedreport->get_detailed_report(),
         ];
     }
 
-    public static function execute_returns(): external_single_structure
-    {
+    public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'report_data' => new external_value(PARAM_RAW, 'detailed report data'),
         ]);
     }
 
-    private static function require_access_to_report(detailed_report_output $detailed_report): void
-    {
-        $content_api = di_container::get_content_api();
-        $module_context = context_utils::get_module_context($content_api, $detailed_report->get_content_id());
+    private static function require_access_to_report(detailed_report_output $detailedreport): void {
+        $contentapi = di_container::get_content_api();
+        $modulecontext = context_utils::get_module_context($contentapi, $detailedreport->get_content_id());
 
-        if (!capability_utils::can_view_detailed_reports_for_user($module_context, $detailed_report->get_user_id()))
-        {
+        if (!capability_utils::can_view_detailed_reports_for_user($modulecontext, $detailedreport->get_user_id())) {
             throw new \moodle_exception('sessionnotfound', 'ispring');
         }
-        self::validate_context($module_context);
+        self::validate_context($modulecontext);
     }
 }

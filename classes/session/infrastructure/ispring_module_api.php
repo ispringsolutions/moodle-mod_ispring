@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,18 +27,15 @@ namespace mod_ispring\session\infrastructure;
 use mod_ispring\ispring_module\api\ispring_module_api_interface;
 use mod_ispring\session\app\adapter\ispring_module_api_interface as api_adapter_interface;
 
-class ispring_module_api implements api_adapter_interface
-{
+class ispring_module_api implements api_adapter_interface {
     private ispring_module_api_interface $api;
 
-    public function __construct(ispring_module_api_interface $api)
-    {
+    public function __construct(ispring_module_api_interface $api) {
         $this->api = $api;
     }
 
-    public function get_grade_method(int $ispring_module_id): int
-    {
-        $ispring = $this->api->get_by_id($ispring_module_id);
+    public function get_grade_method(int $ispringmoduleid): int {
+        $ispring = $this->api->get_by_id($ispringmoduleid);
         return $ispring ? $ispring->get_grade_method() : 0;
     }
 }

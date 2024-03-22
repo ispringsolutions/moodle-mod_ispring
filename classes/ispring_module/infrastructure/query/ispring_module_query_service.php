@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,42 +28,32 @@ use mod_ispring\ispring_module\app\model\description;
 use mod_ispring\ispring_module\app\query\ispring_module_query_service_interface;
 use mod_ispring\ispring_module\app\query\model\ispring_module_model;
 
-class ispring_module_query_service implements ispring_module_query_service_interface
-{
+class ispring_module_query_service implements ispring_module_query_service_interface {
     private \moodle_database $database;
 
-    public function __construct()
-    {
+    public function __construct() {
         global $DB;
         $this->database = $DB;
     }
 
-    public function exists(int $id): bool
-    {
-        try
-        {
+    public function exists(int $id): bool {
+        try {
             $ispring = $this->database->get_record('ispring', ['id' => $id]);
-            return (bool) $ispring;
-        }
-        catch (\Exception $e)
-        {
+            return (bool)$ispring;
+        } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function get_by_id(int $id): ?ispring_module_model
-    {
-        try
-        {
+    public function get_by_id(int $id): ?ispring_module_model {
+        try {
             $ispring = $this->database->get_record('ispring', ['id' => $id]);
-            if (!$ispring)
-            {
+            if (!$ispring) {
                 return null;
             }
 
             $description = null;
-            if ($ispring->intro !== null)
-            {
+            if ($ispring->intro !== null) {
                 $description = new description(
                     $ispring->intro,
                     $ispring->introformat,
@@ -81,9 +70,7 @@ class ispring_module_query_service implements ispring_module_query_service_inter
                 $ispring->timeopen,
                 $ispring->timeclose,
             );
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }

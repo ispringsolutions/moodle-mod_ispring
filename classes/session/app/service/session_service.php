@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,100 +36,92 @@ use mod_ispring\session\app\query\session_query_service_interface;
 use mod_ispring\session\app\repository\session_repository_interface;
 use mod_ispring\session\domain\model\session_state;
 
-class session_service
-{
+class session_service {
     private const CREATE_SESSION_TIMEOUT = 10;
-    private session_repository_interface $session_repository;
-    private content_api_interface $content_api;
-    private session_query_service_interface $session_query_service;
+    private session_repository_interface $repository;
+    private content_api_interface $contentapi;
+    private session_query_service_interface $queryservice;
 
     public function __construct(
-        session_repository_interface $session_repository,
-        content_api_interface $content_api,
-        session_query_service_interface $session_query_service
-    )
-    {
-        $this->session_repository = $session_repository;
-        $this->content_api = $content_api;
-        $this->session_query_service = $session_query_service;
+        session_repository_interface $repository,
+        content_api_interface $contentapi,
+        session_query_service_interface $queryservice
+    ) {
+        $this->repository = $repository;
+        $this->contentapi = $contentapi;
+        $this->queryservice = $queryservice;
     }
 
-    public function add(int $content_id, int $user_id, string $status, string $player_id, bool $session_restored): int
-    {
+    public function add(int $contentid, int $userid, string $status, string $playerid, bool $sessionrestored): int {
         return transaction_utils::do_in_transaction(
             db_transaction::class,
-            function() use ($content_id, $user_id, $status, $player_id, $session_restored) {
-                if (!$ispring_module_id = $this->content_api->get_ispring_module_id_by_content_id($content_id))
-                {
+            function () use ($contentid, $userid, $status, $playerid, $sessionrestored) {
+                if (!$ispringmoduleid = $this->contentapi->get_ispring_module_id_by_content_id($contentid)) {
                     throw new \RuntimeException("Invalid content id");
                 }
 
-                $lock = locking_service::get_lock('session_create', "user:{$user_id}", self::CREATE_SESSION_TIMEOUT);
-                $existing_session = $this->session_query_service->get_last_by_content_id($content_id, $user_id);
+                $lock = locking_service::get_lock('session_create', "user:{$userid}", self::CREATE_SESSION_TIMEOUT);
+                $existingsession = $this->queryservice->get_last_by_content_id($contentid, $userid);
 
-                if ($existing_session && (self::session_completed($status) || $session_restored))
-                {
+                if ($existingsession && (self::session_completed($status) || $sessionrestored)) {
                     $session = new session(
-                        $existing_session->get_content_id(),
-                        $existing_session->get_score(),
-                        $existing_session->get_status(),
-                        $existing_session->get_begin_time(),
-                        $existing_session->get_end_time(),
-                        $existing_session->get_duration(),
-                        $existing_session->get_user_id(),
-                        $existing_session->get_attempt(),
-                        $existing_session->get_persist_state_id(),
-                        $existing_session->get_persist_state(),
-                        $existing_session->get_max_score(),
-                        $existing_session->get_min_score(),
-                        $existing_session->get_passing_score(),
-                        $existing_session->get_detailed_report(),
-                        $player_id,
+                        $existingsession->get_content_id(),
+                        $existingsession->get_score(),
+                        $existingsession->get_status(),
+                        $existingsession->get_begin_time(),
+                        $existingsession->get_end_time(),
+                        $existingsession->get_duration(),
+                        $existingsession->get_user_id(),
+                        $existingsession->get_attempt(),
+                        $existingsession->get_persist_state_id(),
+                        $existingsession->get_persist_state(),
+                        $existingsession->get_max_score(),
+                        $existingsession->get_min_score(),
+                        $existingsession->get_passing_score(),
+                        $existingsession->get_detailed_report(),
+                        $playerid,
                     );
 
-                    $this->session_repository->update($existing_session->get_id(), $session);
-                    return $existing_session->get_id();
+                    $this->repository->update($existingsession->get_id(), $session);
+                    return $existingsession->get_id();
                 }
 
                 $session = new session(
-                    $content_id,
+                    $contentid,
                     0,
                     session_state::INCOMPLETE,
                     time(),
                     null,
                     null,
-                    $user_id,
-                    $this->get_next_attempt_number($ispring_module_id, $user_id),
+                    $userid,
+                    $this->get_next_attempt_number($ispringmoduleid, $userid),
                     null,
                     null,
                     null,
                     0,
                     null,
                     null,
-                    $player_id,
+                    $playerid,
                 );
-                return $this->session_repository->add($session);
+                return $this->repository->add($session);
             },
         );
     }
 
-    public function end(int $session_id, int $user_id, end_data $data): bool
-    {
+    public function end(int $sessionid, int $userid, end_data $data): bool {
         return transaction_utils::do_in_transaction(
             db_transaction::class,
-            function() use ($session_id, $user_id, $data) {
-                $session = $this->session_query_service->get($session_id);
-                if (!$session)
-                {
+            function () use ($sessionid, $userid, $data) {
+                $session = $this->queryservice->get($sessionid);
+                if (!$session) {
                     return false;
                 }
 
-                if ($session->get_user_id() !== $user_id)
-                {
+                if ($session->get_user_id() !== $userid) {
                     throw new \RuntimeException("Cannot end session started by different user");
                 }
 
-                $updated_session = new session(
+                $updatedsession = new session(
                     $session->get_content_id(),
                     $data->get_score() ?? 0,
                     $session->get_status(),
@@ -148,39 +139,34 @@ class session_service
                     $session->get_player_id(),
                 );
 
-                return $this->session_repository->update($session->get_id(), $updated_session);
+                return $this->repository->update($session->get_id(), $updatedsession);
             },
         );
     }
 
-    public function update(int $session_id, int $user_id, update_data $data): bool
-    {
+    public function update(int $sessionid, int $userid, update_data $data): bool {
         return transaction_utils::do_in_transaction(
             db_transaction::class,
-            function() use ($session_id, $user_id, $data) {
-                $session = $this->session_query_service->get($session_id);
+            function () use ($sessionid, $userid, $data) {
+                $session = $this->queryservice->get($sessionid);
 
-                if (!$session)
-                {
+                if (!$session) {
                     return false;
                 }
 
-                if ($session->get_user_id() !== $user_id)
-                {
+                if ($session->get_user_id() !== $userid) {
                     throw new \RuntimeException('Cannot update session started by different user');
                 }
 
-                if (self::session_completed($session->get_status()))
-                {
+                if (self::session_completed($session->get_status())) {
                     throw new \RuntimeException('Cannot update already ended session');
                 }
 
-                if ($data->get_player_id() != $session->get_player_id())
-                {
+                if ($data->get_player_id() != $session->get_player_id()) {
                     throw new player_conflict_exception('Cannot update from different player');
                 }
 
-                $new_session = new session(
+                $newsession = new session(
                     $session->get_content_id(),
                     $session->get_score(),
                     $data->get_status(),
@@ -198,25 +184,22 @@ class session_service
                     $session->get_player_id(),
                 );
 
-                return $this->session_repository->update($session_id, $new_session);
+                return $this->repository->update($sessionid, $newsession);
             },
         );
     }
 
-    private static function session_completed(string $session_status): bool
-    {
-        return $session_status != session_state::INCOMPLETE;
+    private static function session_completed(string $state): bool {
+        return $state != session_state::INCOMPLETE;
     }
 
-    private function get_next_attempt_number(int $ispring_module_id, int $user_id): int
-    {
-        $existing_session = $this->session_query_service->get_last_by_ispring_module_id($ispring_module_id, $user_id);
+    private function get_next_attempt_number(int $ispringmoduleid, int $userid): int {
+        $session = $this->queryservice->get_last_by_ispring_module_id($ispringmoduleid, $userid);
 
-        return 1 + ($existing_session ? $existing_session->get_attempt() : 0);
+        return 1 + ($session ? $session->get_attempt() : 0);
     }
 
-    public function delete_by_content_id(int $content_id): bool
-    {
-        return $this->session_repository->delete_by_content_id($content_id);
+    public function delete_by_content_id(int $contentid): bool {
+        return $this->repository->delete_by_content_id($contentid);
     }
 }

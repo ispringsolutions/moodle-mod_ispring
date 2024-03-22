@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,139 +29,129 @@ use mod_ispring\session\app\adapter\ispring_module_api_interface;
 use mod_ispring\session\app\query\model\session;
 use mod_ispring\session\domain\model\session_state;
 
-final class session_query_service_test extends \advanced_testcase
-{
+/**
+ * Test session_query_service class.
+ *
+ * @covers \mod_ispring\session\infrastructure\query\session_query_service
+ */
+final class session_query_service_test extends \advanced_testcase {
     /** @var mixed */
-    private $ispring_module_stub;
-    private session_query_service $session_query_service;
+    private $ispringmodulestub;
+    private session_query_service $sessionqueryservice;
 
-    protected function setUp(): void
-    {
-        $this->ispring_module_stub = $this->createStub(ispring_module_api_interface::class);
+    protected function setUp(): void {
+        $this->ispringmodulestub = $this->createStub(ispring_module_api_interface::class);
 
-        $this->session_query_service = new session_query_service($this->ispring_module_stub);
+        $this->sessionqueryservice = new session_query_service($this->ispringmodulestub);
     }
 
-    public function test_get_returns_null_for_nonexistent_id(): void
-    {
-        $this->assertNull($this->session_query_service->get(1));
+    public function test_get_returns_null_for_nonexistent_id(): void {
+        $this->assertNull($this->sessionqueryservice->get(1));
     }
 
-    public function test_get_returns_session_for_valid_id(): void
-    {
-        $session_id = $this->create_mock_sessions(2, 3, [
+    public function test_get_returns_session_for_valid_id(): void {
+        $sessionid = $this->create_mock_sessions(2, 3, [
             ['score' => 80, 'end_time' => 100],
         ])[0];
 
-        $session = $this->session_query_service->get($session_id);
+        $session = $this->sessionqueryservice->get($sessionid);
 
-        $this->assert_db_record_equals_session_model($session_id, $session);
+        $this->assert_db_record_equals_session_model($sessionid, $session);
     }
 
-    public function test_get_grades_returns_highest_grade_when_grade_method_is_set_to_highest(): void
-    {
+    public function test_get_grades_returns_highest_grade_when_grade_method_is_set_to_highest(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 1);
 
         $this->assertCount(1, $grades);
         $this->assert_grade_equals(1, 25, 20, $grades[1]);
     }
 
-    public function test_get_grades_returns_highest_grades_for_all_users(): void
-    {
+    public function test_get_grades_returns_highest_grades_for_all_users(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::HIGHEST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 0);
 
         $this->assertCount(2, $grades);
         $this->assert_grade_equals(1, 25, 20, $grades[1]);
         $this->assert_grade_equals(2, 60, 100, $grades[2]);
     }
 
-    public function test_get_grades_returns_average_grade_when_grade_method_is_set_to_average(): void
-    {
+    public function test_get_grades_returns_average_grade_when_grade_method_is_set_to_average(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 1);
 
         $this->assertCount(1, $grades);
         $this->assert_grade_equals(1, -10, null, $grades[1]);
     }
 
-    public function test_get_grades_returns_average_grades_for_all_users(): void
-    {
+    public function test_get_grades_returns_average_grades_for_all_users(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::AVERAGE);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 0);
 
         $this->assertCount(2, $grades);
         $this->assert_grade_equals(1, -10, null, $grades[1]);
         $this->assert_grade_equals(2, 60, null, $grades[2]);
     }
 
-    public function test_get_grades_returns_first_grade_when_grade_method_is_set_to_first(): void
-    {
+    public function test_get_grades_returns_first_grade_when_grade_method_is_set_to_first(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::FIRST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 1);
 
         $this->assertCount(1, $grades);
         $this->assert_grade_equals(1, 0.5, 10, $grades[1]);
     }
 
-    public function test_get_grades_returns_first_grades_for_all_users(): void
-    {
+    public function test_get_grades_returns_first_grades_for_all_users(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::FIRST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::FIRST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 0);
 
         $this->assertCount(2, $grades);
         $this->assert_grade_equals(1, 0.5, 10, $grades[1]);
         $this->assert_grade_equals(2, 60, 100, $grades[2]);
     }
 
-    public function test_get_grades_returns_last_grade_when_grade_method_is_set_to_last(): void
-    {
+    public function test_get_grades_returns_last_grade_when_grade_method_is_set_to_last(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::LAST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 1);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 1);
 
         $this->assertCount(1, $grades);
         $this->assert_grade_equals(1, -0.5, 50, $grades[1]);
     }
 
-    public function test_get_grades_returns_last_grades_for_all_users(): void
-    {
+    public function test_get_grades_returns_last_grades_for_all_users(): void {
         $this->create_mock_sessions_for_gradebook_tests();
-        $this->ispring_module_stub->method('get_grade_method')->willReturn(grading_options::LAST);
+        $this->ispringmodulestub->method('get_grade_method')->willReturn(grading_options::LAST);
 
-        $grades = $this->session_query_service->get_grades_for_gradebook(0, 2, 0);
+        $grades = $this->sessionqueryservice->get_grades_for_gradebook(0, 2, 0);
 
         $this->assertCount(2, $grades);
         $this->assert_grade_equals(1, -0.5, 50, $grades[1]);
         $this->assert_grade_equals(2, 60, 100, $grades[2]);
     }
 
-    public function test_passing_requirements_were_updated_returns_false_on_empty_content_ids(): void
-    {
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([]));
+    public function test_requirements_were_updated_returns_false_on_empty_content_ids(): void {
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([]));
     }
 
-    public function test_passing_requirements_were_updated_returns_false_on_empty_data(): void
-    {
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([1, 2]));
+    public function test_requirements_were_updated_returns_false_on_empty_data(): void {
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([1, 2]));
     }
 
-    public function test_passing_requirements_were_updated_returns_false_on_same_content_with_same_requirements(): void
-    {
+    public function test_requirements_were_updated_returns_false_on_same_content_with_same_requirements(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -173,11 +162,10 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 0]
         );
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2]));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([2]));
     }
 
-    public function test_passing_requirements_were_updated_returns_false_on_different_contents_with_same_requirements(): void
-    {
+    public function test_requirements_were_updated_returns_false_on_different_contents_with_same_requirements(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -188,11 +176,10 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 0]
         );
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2, 4]));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([2, 4]));
     }
 
-    public function test_passing_requirements_were_updated_returns_false_on_external_contents(): void
-    {
+    public function test_requirements_were_updated_returns_false_on_external_contents(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -203,11 +190,10 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 0]
         );
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([1, 3, 5]));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([1, 3, 5]));
     }
 
-    public function test_passing_requirements_were_updated_returns_true_on_sequentially_changed_contents(): void
-    {
+    public function test_requirements_were_updated_returns_true_on_sequentially_changed_contents(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -233,25 +219,22 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 0]
         );
 
-        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([2, 3]));
-        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([4, 5]));
+        $this->assertTrue($this->sessionqueryservice->passing_requirements_were_updated([2, 3]));
+        $this->assertTrue($this->sessionqueryservice->passing_requirements_were_updated([4, 5]));
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated([2, 6]));
-        $this->assertTrue($this->session_query_service->passing_requirements_were_updated([2, 4, 6]));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated([2, 6]));
+        $this->assertTrue($this->sessionqueryservice->passing_requirements_were_updated([2, 4, 6]));
     }
 
-    public function test_passing_requirements_were_updated_for_user_returns_false_on_empty_content_ids(): void
-    {
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([], 0));
+    public function test_requirements_were_updated_for_user_returns_false_on_empty_content_ids(): void {
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([], 0));
     }
 
-    public function test_passing_requirements_were_updated_for_user_returns_false_on_non_existing_content_ids(): void
-    {
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([1, 2, 3], 0));
+    public function test_requirements_were_updated_for_user_returns_false_on_non_existing_content_ids(): void {
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([1, 2, 3], 0));
     }
 
-    public function test_passing_requirements_were_updated_for_user_returns_false_on_existing_content_ids(): void
-    {
+    public function test_requirements_were_updated_for_user_returns_false_on_existing_content_ids(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -262,15 +245,14 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 0]
         );
 
-        // Method returns False, if student have passed test already
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 4));
+        // Method returns False, if student have passed test already.
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([2], 4));
 
-        // Method returns False, if student have not passed test at all
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 5));
+        // Method returns False, if student have not passed test at all.
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([2], 5));
     }
 
-    public function test_passing_requirements_were_updated_for_user_returns_false_on_changed_content_and_non_passing_test_at_all(): void
-    {
+    public function test_requirements_were_updated_for_user_returns_false_on_changed_content_and_non_passing_test_at_all(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -281,12 +263,11 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 20]
         );
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 3));
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 5));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([2, 3], 3));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([2, 3], 5));
     }
 
-    public function test_passing_requirements_were_updated_for_user_returns_false_on_changed_content_and_passing_first_test_version(): void
-    {
+    public function test_requirements_were_updated_for_user_returns_false_on_changed_content_and_passing_first_version(): void {
         $this->create_mock_sessions(2, 3,
             [['score' => 18, 'end_time' => 100]],
             ['max_score' => 20, 'min_score' => 0]
@@ -301,33 +282,31 @@ final class session_query_service_test extends \advanced_testcase
             ['max_score' => 20, 'min_score' => 20]
         );
 
-        $this->assertFalse($this->session_query_service->passing_requirements_were_updated_for_user([2], 3));
-        $this->assertTrue($this->session_query_service->passing_requirements_were_updated_for_user([2, 3], 5));
+        $this->assertFalse($this->sessionqueryservice->passing_requirements_were_updated_for_user([2], 3));
+        $this->assertTrue($this->sessionqueryservice->passing_requirements_were_updated_for_user([2, 3], 5));
     }
 
-    private function create_mock_sessions(int $content_id, int $user_id, array $grades, ?array $passing_requirements = null): array
-    {
+    private function create_mock_sessions(int $contentid, int $userid, array $grades, ?array $requirements = null): array {
         global $DB;
         $this->resetAfterTest(true);
 
         $session = new \stdClass();
-        $session->user_id = $user_id;
-        $session->ispring_content_id = $content_id;
+        $session->user_id = $userid;
+        $session->ispring_content_id = $contentid;
         $session->status = session_state::COMPLETE;
         $session->begin_time = 5;
         $session->attempt = 0;
         $session->duration = 10;
         $session->persist_state = '_state';
         $session->persist_state_id = '_id';
-        $session->max_score = $passing_requirements ? $passing_requirements['max_score'] : 100;
-        $session->min_score = $passing_requirements ? $passing_requirements['min_score'] : 20;
+        $session->max_score = $requirements ? $requirements['max_score'] : 100;
+        $session->min_score = $requirements ? $requirements['min_score'] : 20;
         $session->passing_score = 60;
         $session->detailed_report = '_report';
         $session->player_id = '1234';
 
         $ids = [];
-        foreach ($grades as $grade)
-        {
+        foreach ($grades as $grade) {
             $session->score = $grade['score'];
             ++$session->attempt;
             $session->end_time = $grade['end_time'];
@@ -337,8 +316,7 @@ final class session_query_service_test extends \advanced_testcase
         return $ids;
     }
 
-    private function create_mock_sessions_for_gradebook_tests(): void
-    {
+    private function create_mock_sessions_for_gradebook_tests(): void {
         $this->create_mock_sessions(1, 1, [
             ['score' => 100, 'end_time' => 10],
         ]);
@@ -357,10 +335,9 @@ final class session_query_service_test extends \advanced_testcase
         ]);
     }
 
-    private function assert_db_record_equals_session_model(int $session_id, session $model): void
-    {
+    private function assert_db_record_equals_session_model(int $sessionid, session $model): void {
         global $DB;
-        $record = $DB->get_record('ispring_session', ['id' => $session_id]);
+        $record = $DB->get_record('ispring_session', ['id' => $sessionid]);
 
         $this->assertEquals($record->id, $model->get_id());
         $this->assertEquals($record->user_id, $model->get_user_id());
@@ -380,13 +357,11 @@ final class session_query_service_test extends \advanced_testcase
         $this->assertEquals($record->player_id, $model->get_player_id());
     }
 
-    private function assert_grade_equals(int $user_id, float $score, ?int $date_graded, \stdClass $grade): void
-    {
-        $this->assertEquals($user_id, $grade->userid);
+    private function assert_grade_equals(int $userid, float $score, ?int $dategraded, \stdClass $grade): void {
+        $this->assertEquals($userid, $grade->userid);
         $this->assertEquals($score, $grade->rawgrade);
-        if ($date_graded !== null)
-        {
-            $this->assertEquals($date_graded, $grade->dategraded);
+        if ($dategraded !== null) {
+            $this->assertEquals($dategraded, $grade->dategraded);
         }
     }
 }

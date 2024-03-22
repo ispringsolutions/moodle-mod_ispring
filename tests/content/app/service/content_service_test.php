@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,8 @@
 
 namespace mod_ispring\content\app\service;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once(__DIR__ . '/../../../testcase/user_file_creator.php');
 
 use mod_ispring\content\app\adapter\ispring_module_api_interface;
@@ -36,37 +37,39 @@ use mod_ispring\content\app\query\content_query_service_interface;
 use mod_ispring\content\app\repository\content_repository_interface;
 use mod_ispring\testcase\user_file_creator;
 
-final class content_service_test extends \advanced_testcase
-{
+/**
+ * Test content_service class.
+ *
+ * @covers \mod_ispring\content\app\service\content_service
+ */
+final class content_service_test extends \advanced_testcase {
     /** @var mixed */
-    private $file_storage_mock;
+    private $filestoragemock;
     /** @var mixed */
-    private $content_repository_mock;
-    private content_service $content_service;
+    private $contentrepositorymock;
+    private content_service $contentservice;
 
-    protected function setUp(): void
-    {
-        $this->file_storage_mock = $this->createMock(file_storage_interface::class);
-        $this->content_repository_mock = $this->createMock(content_repository_interface::class);
-        $ispring_module_api_stub = $this->createStub(ispring_module_api_interface::class);
-        $content_query_service_stub = $this->createStub(content_query_service_interface::class);
+    protected function setUp(): void {
+        $this->filestoragemock = $this->createMock(file_storage_interface::class);
+        $this->contentrepositorymock = $this->createMock(content_repository_interface::class);
+        $ispringmoduleapistub = $this->createStub(ispring_module_api_interface::class);
+        $contentqueryservicestub = $this->createStub(content_query_service_interface::class);
 
-        $ispring_module_api_stub->method('exists')->willReturn(true);
+        $ispringmoduleapistub->method('exists')->willReturn(true);
 
-        $this->content_service = new content_service(
-            $this->file_storage_mock,
-            $this->content_repository_mock,
-            $ispring_module_api_stub,
-            $content_query_service_stub,
+        $this->contentservice = new content_service(
+            $this->filestoragemock,
+            $this->contentrepositorymock,
+            $ispringmoduleapistub,
+            $contentqueryservicestub,
         );
     }
 
-    public function test_add_content_unzips_package_and_adds_content_to_repository(): void
-    {
+    public function test_add_content_unzips_package_and_adds_content_to_repository(): void {
         $content = $this->create_stub_content();
 
-        $this->file_storage_mock->expects($this->exactly(0))->method('clear_ispring_areas');
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->exactly(0))->method('clear_ispring_areas');
+        $this->filestoragemock->expects($this->once())
             ->method('unzip_package')
             ->with(
                 $this->identicalTo($content->get_context_id()),
@@ -74,7 +77,7 @@ final class content_service_test extends \advanced_testcase
                 $this->identicalTo($content->get_user_context_id()),
                 $this->identicalTo($content->get_file_id()),
             );
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->once())
             ->method('get_description_file')
             ->with(
                 $this->identicalTo($content->get_context_id()),
@@ -87,8 +90,8 @@ final class content_service_test extends \advanced_testcase
                 . '"params":{"entrypoint":"index.html","creation_time":42}}',
             ));
 
-        $this->content_repository_mock->expects($this->exactly(0))->method('remove');
-        $this->content_repository_mock->expects($this->once())
+        $this->contentrepositorymock->expects($this->exactly(0))->method('remove');
+        $this->contentrepositorymock->expects($this->once())
             ->method('add')
             ->with($this->equalTo(new content(
                 $content->get_file_id(),
@@ -100,19 +103,18 @@ final class content_service_test extends \advanced_testcase
             )))
             ->willReturn(3);
 
-        $id = $this->content_service->add_content($content);
+        $id = $this->contentservice->add_content($content);
 
         $this->assertEquals(3, $id);
     }
 
-    public function test_add_content_removes_files_if_get_description_throws_exception(): void
-    {
+    public function test_add_content_removes_files_if_get_description_throws_exception(): void {
         $content = $this->create_stub_content();
 
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->once())
             ->method('get_description_file')
             ->willThrowException(new \RuntimeException('bad_description'));
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->once())
             ->method('clear_ispring_areas')
             ->with(
                 $this->identicalTo($content->get_context_id()),
@@ -120,19 +122,18 @@ final class content_service_test extends \advanced_testcase
             );
 
         $this->expectException(\RuntimeException::class);
-        $this->content_service->add_content($content);
+        $this->contentservice->add_content($content);
     }
 
-    public function test_add_content_removes_files_if_description_is_not_valid(): void
-    {
+    public function test_add_content_removes_files_if_description_is_not_valid(): void {
         $content = $this->create_stub_content();
 
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->once())
             ->method('get_description_file')
             ->willReturn(
                 user_file_creator::create_from_string(description::FILENAME, '{}'),
             );
-        $this->file_storage_mock->expects($this->once())
+        $this->filestoragemock->expects($this->once())
             ->method('clear_ispring_areas')
             ->with(
                 $this->identicalTo($content->get_context_id()),
@@ -140,19 +141,18 @@ final class content_service_test extends \advanced_testcase
             );
 
         $this->expectException(\RuntimeException::class);
-        $this->content_service->add_content($content);
+        $this->contentservice->add_content($content);
     }
 
-    private function create_stub_content(): content_data
-    {
+    private function create_stub_content(): content_data {
         $this->resetAfterTest();
         $this->setAdminUser();
         $file = user_file_creator::create_from_path(__DIR__ . '/../../../packages/stub.zip');
 
         global $USER;
         $context = \context_system::instance();
-        $user_context = \context_user::instance($USER->id);
+        $usercontext = \context_user::instance($USER->id);
 
-        return new content_data($file->get_itemid(), 2, $context->id, $user_context->id);
+        return new content_data($file->get_itemid(), 2, $context->id, $usercontext->id);
     }
 }

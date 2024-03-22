@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,44 +29,38 @@ use mod_ispring\di_container;
 use mod_ispring\ispring_module\api\ispring_module_api_interface;
 use mod_ispring\ispring_module\api\output\ispring_module_output;
 
-class delete_ispring_module_use_case
-{
-    private ispring_module_api_interface $ispring_module_api;
+class delete_ispring_module_use_case {
+    private ispring_module_api_interface $ispringmoduleapi;
     private ispring_module_output $module;
 
     public function __construct(
-        ispring_module_api_interface $ispring_module_api,
+        ispring_module_api_interface $ispringmoduleapi,
         ispring_module_output $module
-    )
-    {
-        $this->ispring_module_api = $ispring_module_api;
+    ) {
+        $this->ispringmoduleapi = $ispringmoduleapi;
         $this->module = $module;
     }
 
-    public function delete(): bool
-    {
+    public function delete(): bool {
         $transaction = new db_transaction();
-        try
-        {
-            $content_api = di_container::get_content_api();
-            $session_api = di_container::get_session_api();
+        try {
+            $contentapi = di_container::get_content_api();
+            $sessionapi = di_container::get_session_api();
 
-            $ids = $content_api->get_ids_by_ispring_module_id($this->module->get_id());
+            $ids = $contentapi->get_ids_by_ispring_module_id($this->module->get_id());
 
             [, $cm] = get_course_and_cm_from_instance($this->module->get_id(), 'ispring');
             $context = \context_module::instance($cm->id);
 
-            foreach ($ids as $id)
-            {
-                $content_api->remove($context->id, $id);
-                $session_api->delete_by_content_id($id);
+            foreach ($ids as $id) {
+                $contentapi->remove($context->id, $id);
+                $sessionapi->delete_by_content_id($id);
             }
-            $result = $this->ispring_module_api->delete($this->module->get_id());
+            $result = $this->ispringmoduleapi->delete($this->module->get_id());
 
             $transaction->commit();
             return $result;
-        } catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             $transaction->rollback($e);
             return false;
         }

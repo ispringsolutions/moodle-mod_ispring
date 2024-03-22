@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,23 +24,19 @@
 
 namespace mod_ispring\common\infrastructure\transaction;
 
-class db_transaction extends transaction
-{
+class db_transaction extends transaction {
     private \moodle_transaction $transaction;
 
-    public function __construct()
-    {
+    public function __construct() {
         global $DB;
         $this->transaction = $DB->start_delegated_transaction();
     }
 
-    public function commit(): void
-    {
+    public function commit(): void {
         $this->transaction->allow_commit();
     }
 
-    public function rollback(\Throwable $e): void
-    {
+    public function rollback(\Throwable $e): void {
         parent::rollback($e);
         $this->transaction->rollback($e);
     }

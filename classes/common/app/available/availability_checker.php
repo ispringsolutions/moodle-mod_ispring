@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,19 +26,17 @@ namespace mod_ispring\common\app\available;
 
 use mod_ispring\di_container;
 
-class availability_checker
-{
+class availability_checker {
     /**
      * Check module's availability
      *
-     * @param int $module_id
+     * @param int $moduleid
      * @param \context $context
      * @return bool
      */
-    public static function module_available(int $module_id, \context $context): bool
-    {
-        $can_preview = has_capability('mod/ispring:preview', $context);
+    public static function module_available(int $moduleid, \context $context): bool {
+        $canpreview = has_capability('mod/ispring:preview', $context);
 
-        return $can_preview || di_container::get_ispring_module_api()->is_available($module_id);
+        return $canpreview || di_container::get_ispring_module_api()->is_available($moduleid);
     }
 }

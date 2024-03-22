@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ namespace mod_ispring\session\app\repository;
 
 use mod_ispring\session\app\model\session;
 
-interface session_repository_interface
-{
+interface session_repository_interface {
     /**
      * Add user session to database
      * @param session $data
@@ -46,8 +44,8 @@ interface session_repository_interface
 
     /**
      * Delete sessions by content id
-     * @param int $content_id
+     * @param int $contentid
      * @return bool
      */
-    public function delete_by_content_id(int $content_id): bool;
+    public function delete_by_content_id(int $contentid): bool;
 }

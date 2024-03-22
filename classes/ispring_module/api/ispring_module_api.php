@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,64 +30,55 @@ use mod_ispring\ispring_module\api\mappers\ispring_module_mapper;
 use mod_ispring\ispring_module\app\query\ispring_module_query_service_interface;
 use mod_ispring\ispring_module\app\service\ispring_module_service;
 
-class ispring_module_api implements ispring_module_api_interface
-{
-    private ispring_module_service $ispring_service;
-    private ispring_module_query_service_interface $ispring_query_service;
+class ispring_module_api implements ispring_module_api_interface {
+    private ispring_module_service $service;
+    private ispring_module_query_service_interface $queryservice;
 
     public function __construct(
-        ispring_module_service $ispring_service,
-        ispring_module_query_service_interface $ispring_query_service
-    )
-    {
-        $this->ispring_service = $ispring_service;
-        $this->ispring_query_service = $ispring_query_service;
+        ispring_module_service $service,
+        ispring_module_query_service_interface $queryservice
+    ) {
+        $this->service = $service;
+        $this->queryservice = $queryservice;
     }
 
-    public function create(create_or_update_ispring_module_input $create_ispring_input): int
-    {
-        return $this->ispring_service->create(
-            ispring_module_mapper::get_data($create_ispring_input),
+    public function create(create_or_update_ispring_module_input $input): int {
+        return $this->service->create(
+            ispring_module_mapper::get_data($input),
         );
     }
 
-    public function exists(int $id): bool
-    {
-        return $this->ispring_query_service->exists($id);
+    public function exists(int $id): bool {
+        return $this->queryservice->exists($id);
     }
 
-    public function update(int $instance, create_or_update_ispring_module_input $ispring_input): bool
-    {
-        return $this->ispring_service->update(
+    public function update(int $instance, create_or_update_ispring_module_input $input): bool {
+        return $this->service->update(
             $instance,
-            ispring_module_mapper::get_data($ispring_input)
+            ispring_module_mapper::get_data($input)
         );
     }
 
-    public function delete(int $id): bool
-    {
-        return $this->ispring_service->delete($id);
+    public function delete(int $id): bool {
+        return $this->service->delete($id);
     }
 
-    public function get_by_id(int $id): ?ispring_module_output
-    {
-        $data = $this->ispring_query_service->get_by_id($id);
+    public function get_by_id(int $id): ?ispring_module_output {
+        $data = $this->queryservice->get_by_id($id);
         return $data ? ispring_module_mapper::get_output($data) : null;
     }
 
-    public function is_available(int $module_id): bool
-    {
-        $data = $this->ispring_query_service->get_by_id($module_id);
+    public function is_available(int $moduleid): bool {
+        $data = $this->queryservice->get_by_id($moduleid);
 
-        if (!$data)
-        {
+        if (!$data) {
             return false;
         }
 
         $now = time();
-        $after_open = $data->get_time_open() ? $data->get_time_open() <= $now : true;
-        $before_close = $data->get_time_close() ? $data->get_time_close() > $now : true;
+        $afteropen = $data->get_time_open() ? $data->get_time_open() <= $now : true;
+        $beforeclose = $data->get_time_close() ? $data->get_time_close() > $now : true;
 
-        return $after_open && $before_close;
+        return $afteropen && $beforeclose;
     }
 }

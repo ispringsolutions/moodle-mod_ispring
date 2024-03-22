@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,71 +26,63 @@ namespace mod_ispring\ispring_module\app\data;
 
 use mod_ispring\ispring_module\app\model\description;
 
-class ispring_module_data
-{
+class ispring_module_data {
     private string $name;
-    private int $moodle_course_id;
-    private int $grade_method;
+    private int $moodlecourseid;
+    private int $grademethod;
     private ?description $description;
-    private int $time_open;
-    private int $time_close;
+    private int $timeopen;
+    private int $timeclose;
 
     public function __construct(
         string $name,
-        int $moodle_course_id,
-        int $grade_method,
+        int $moodlecourseid,
+        int $grademethod,
         ?description $description,
-        int $time_open,
-        int $time_close
-    )
-    {
+        int $timeopen,
+        int $timeclose
+    ) {
         $this->name = $name;
-        $this->moodle_course_id = $moodle_course_id;
-        $this->grade_method = $grade_method;
+        $this->moodlecourseid = $moodlecourseid;
+        $this->grademethod = $grademethod;
         $this->description = $description;
-        $this->time_open = $time_open;
-        $this->time_close = $time_close;
+        $this->timeopen = $timeopen;
+        $this->timeclose = $timeclose;
     }
 
     /**
      * @return string
      */
-    public function get_name(): string
-    {
+    public function get_name(): string {
         return $this->name;
     }
 
     /**
      * @return int
      */
-    public function get_moodle_course_id(): int
-    {
-        return $this->moodle_course_id;
+    public function get_moodle_course_id(): int {
+        return $this->moodlecourseid;
     }
 
     /**
      * @return int
      */
-    public function get_grade_method(): int
-    {
-        return $this->grade_method;
+    public function get_grade_method(): int {
+        return $this->grademethod;
     }
 
     /**
      * @return description|null
      */
-    public function get_description(): ?description
-    {
+    public function get_description(): ?description {
         return $this->description;
     }
 
-    public function get_time_open(): int
-    {
-        return $this->time_open;
+    public function get_time_open(): int {
+        return $this->timeopen;
     }
 
-    public function get_time_close(): int
-    {
-        return $this->time_close;
+    public function get_time_close(): int {
+        return $this->timeclose;
     }
 }

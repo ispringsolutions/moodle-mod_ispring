@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,13 +21,10 @@
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-class backup_ispring_activity_structure_step extends backup_activity_structure_step
-{
-    protected function define_structure(): backup_nested_element
-    {
-        // Define each element separately
-        $ispring_module = new backup_nested_element('ispring', ['id'], [
+class backup_ispring_activity_structure_step extends backup_activity_structure_step {
+    protected function define_structure(): backup_nested_element {
+        // Define each element separately.
+        $ispringmodule = new backup_nested_element('ispring', ['id'], [
             'course',
             'name',
             'intro',
@@ -36,7 +32,7 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
             'grade',
             'grademethod',
             'timeopen',
-            'timeclose'
+            'timeclose',
         ]);
 
         $content = new backup_nested_element('ispring_content', ['id'], [
@@ -47,7 +43,7 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
             'creation_time',
             'version',
             'report_path',
-            'report_filename'
+            'report_filename',
         ]);
 
         $session = new backup_nested_element('ispring_session', ['id'], [
@@ -64,23 +60,23 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
             'max_score',
             'min_score',
             'passing_score',
-            'detailed_report'
+            'detailed_report',
         ]);
 
-        // Build the tree
-        $ispring_module->add_child($content);
+        // Build the tree.
+        $ispringmodule->add_child($content);
         $content->add_child($session);
 
-        // Define sources
-        $ispring_module->set_source_table('ispring', ['id' => backup::VAR_ACTIVITYID]);
+        // Define sources.
+        $ispringmodule->set_source_table('ispring', ['id' => backup::VAR_ACTIVITYID]);
         $content->set_source_table('ispring_content', ['ispring_id' => backup::VAR_PARENTID]);
         $session->set_source_table('ispring_session', ['ispring_content_id' => backup::VAR_PARENTID]);
 
         $session->annotate_ids('user', 'user_id');
 
-        // Define file annotations
-        $ispring_module->annotate_files('mod_ispring', 'content', null);
+        // Define file annotations.
+        $ispringmodule->annotate_files('mod_ispring', 'content', null);
 
-        return $this->prepare_activity_structure($ispring_module);
+        return $this->prepare_activity_structure($ispringmodule);
     }
 }

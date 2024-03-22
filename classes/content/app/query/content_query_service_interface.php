@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,21 +26,20 @@ namespace mod_ispring\content\app\query;
 
 use mod_ispring\content\app\query\model\content;
 
-interface content_query_service_interface
-{
+interface content_query_service_interface {
     /**
      * Get last uploaded content to ispring module
-     * @param int $ispring_module_id
+     * @param int $ispringmoduleid
      * @return content|null
      */
-    public function get_latest_version_content_by_ispring_module_id(int $ispring_module_id): ?content;
+    public function get_latest_version_content_by_ispring_module_id(int $ispringmoduleid): ?content;
 
     /**
      * Get content by content id
-     * @param int $content_id
+     * @param int $contentid
      * @return content|null
      */
-    public function get_by_id(int $content_id): ?content;
+    public function get_by_id(int $contentid): ?content;
 
     /**
      * Check ispring record existing
@@ -52,8 +50,8 @@ interface content_query_service_interface
 
     /**
      * Get all content ids for given module id
-     * @param int $ispring_module_id
+     * @param int $ispringmoduleid
      * @return int[]
      */
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public function get_ids_by_ispring_module_id(int $ispringmoduleid): array;
 }

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ namespace mod_ispring\content\app\repository;
 
 use mod_ispring\content\app\model\content;
 
-interface content_repository_interface
-{
+interface content_repository_interface {
     /**
      * @param content $content
      * @return int

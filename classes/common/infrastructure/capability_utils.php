@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,24 +24,20 @@
 
 namespace mod_ispring\common\infrastructure;
 
-class capability_utils
-{
+class capability_utils {
     /**
      * Checks whether current user can view detailed reports for given user id in given context
      *
      * @param \context $context Capability is checked in specified context
-     * @param int $user_id Capability is checked for detailed reports with specified user id
+     * @param int $userid Capability is checked for detailed reports with specified user id
      * @return bool True if detailed reports matching given criteria can be viewed
      */
-    public static function can_view_detailed_reports_for_user(\context $context, int $user_id): bool
-    {
+    public static function can_view_detailed_reports_for_user(\context $context, int $userid): bool {
         global $USER;
-        if (has_capability('mod/ispring:viewallreports', $context))
-        {
+        if (has_capability('mod/ispring:viewallreports', $context)) {
             return true;
         }
-        if (has_capability('mod/ispring:viewmydetailedreports', $context) && $USER->id == $user_id)
-        {
+        if (has_capability('mod/ispring:viewmydetailedreports', $context) && $USER->id == $userid) {
             return true;
         }
         return false;

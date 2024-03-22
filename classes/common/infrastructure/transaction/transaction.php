@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,28 +26,21 @@ namespace mod_ispring\common\infrastructure\transaction;
 
 use mod_ispring\common\app\transaction\transaction_client_interface;
 
-class transaction implements transaction_client_interface
-{
-    private array $rollback_stack = [];
+class transaction implements transaction_client_interface {
+    private array $rollbackstack = [];
 
-    public function execute(callable $fn, callable $undo_fn)
-    {
+    public function execute(callable $fn, callable $undofn) {
         $result = $fn();
-        array_push($this->rollback_stack, fn() => $undo_fn($result));
+        array_push($this->rollbackstack, fn() => $undofn($result));
         return $result;
     }
 
-    public function rollback(\Throwable $e): void
-    {
-        while (($undo_fn = array_pop($this->rollback_stack)) !== null)
-        {
-            try
-            {
-                $undo_fn();
-            }
-            catch (\Throwable $undo_exception)
-            {
-                error_log($undo_exception->getMessage());
+    public function rollback(\Throwable $e): void {
+        while (($undofn = array_pop($this->rollbackstack)) !== null) {
+            try {
+                $undofn();
+            } catch (\Throwable $undoexception) {
+                debugging($undoexception->getMessage());
             }
         }
     }

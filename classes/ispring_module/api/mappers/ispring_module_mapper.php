@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,22 +32,19 @@ use mod_ispring\ispring_module\app\data\ispring_module_data;
 use mod_ispring\ispring_module\app\model\description;
 use mod_ispring\ispring_module\app\query\model\ispring_module_model;
 
-class ispring_module_mapper
-{
-    public static function get_data(create_or_update_ispring_module_input $ispring_input): ispring_module_data
-    {
+class ispring_module_mapper {
+    public static function get_data(create_or_update_ispring_module_input $input): ispring_module_data {
         return new ispring_module_data(
-            $ispring_input->get_name(),
-            $ispring_input->get_moodle_course_id(),
-            $ispring_input->get_grade_method(),
-            self::get_description($ispring_input->get_description()),
-            $ispring_input->get_time_open(),
-            $ispring_input->get_time_close(),
+            $input->get_name(),
+            $input->get_moodle_course_id(),
+            $input->get_grade_method(),
+            self::get_description($input->get_description()),
+            $input->get_time_open(),
+            $input->get_time_close(),
         );
     }
 
-    public static function get_output(ispring_module_model $data): ispring_module_output
-    {
+    public static function get_output(ispring_module_model $data): ispring_module_output {
         return new ispring_module_output(
             $data->get_id(),
             $data->get_name(),
@@ -61,15 +57,13 @@ class ispring_module_mapper
         );
     }
 
-    private static function get_description(?description_input $description): ?description
-    {
+    private static function get_description(?description_input $description): ?description {
         return $description
             ? new description($description->get_text(), $description->get_format())
             : null;
     }
 
-    private static function get_description_output(?description $description): ?description_output
-    {
+    private static function get_description_output(?description $description): ?description_output {
         return $description
             ? new description_output($description->get_text(), $description->get_format())
             : null;

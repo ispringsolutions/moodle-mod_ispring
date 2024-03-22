@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,7 +24,7 @@
 
 use mod_ispring\argparser\argparser;
 
-require(__DIR__.'/../../config.php');
+require(__DIR__ . '/../../config.php');
 
 // Course module ID.
 $id = required_param('id', PARAM_INT);
@@ -34,9 +33,7 @@ $argparser = new argparser($id, \mod_ispring\di_container::get_ispring_module_ap
 
 require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 
-if (has_capability('mod/ispring:viewallreports', context_module::instance($argparser->get_cm()->id)))
-{
-    redirect('/mod/ispring/report.php?id=' . $id);
+if (has_capability('mod/ispring:viewallreports', context_module::instance($argparser->get_cm()->id))) {
+    redirect(new moodle_url('/mod/ispring/report.php', ['id' => $id]));
 }
-
-redirect('/mod/ispring/view.php?id=' . $id);
+redirect(new moodle_url('/mod/ispring/view.php', ['id' => $id]));

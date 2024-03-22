@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,33 +24,32 @@
 
 namespace mod_ispring\content\app\model;
 
-class description
-{
+class description {
     public const FILENAME = 'description.json';
 
-    private string $content_name;
+    private string $contentname;
     private string $description;
-    private description_params $description_params;
+    private description_params $descriptionparams;
 
-    public function __construct(string $content_name, string $description, description_params $description_params)
-    {
-        $this->content_name = $content_name;
+    public function __construct(
+        string $contentname,
+        string $description,
+        description_params $descriptionparams
+    ) {
+        $this->contentname = $contentname;
         $this->description = $description;
-        $this->description_params = $description_params;
+        $this->descriptionparams = $descriptionparams;
     }
 
     /**
      * @param array $data
      * @return description|null
      */
-    public static function create(array $data): ?description
-    {
+    public static function create(array $data): ?description {
         if (array_key_exists('course_name', $data)
             && array_key_exists('params', $data)
-            && array_key_exists('description', $data))
-        {
-            if (!$params = description_params::create($data['params']))
-            {
+            && array_key_exists('description', $data)) {
+            if (!$params = description_params::create($data['params'])) {
                 return null;
             }
             return new description(
@@ -67,24 +65,21 @@ class description
     /**
      * @return string
      */
-    public function get_content_name(): string
-    {
-        return $this->content_name;
+    public function get_content_name(): string {
+        return $this->contentname;
     }
 
     /**
      * @return string
      */
-    public function get_description(): string
-    {
+    public function get_description(): string {
         return $this->description;
     }
 
     /**
      * @return description_params
      */
-    public function get_description_params(): description_params
-    {
-        return $this->description_params;
+    public function get_description_params(): description_params {
+        return $this->descriptionparams;
     }
 }

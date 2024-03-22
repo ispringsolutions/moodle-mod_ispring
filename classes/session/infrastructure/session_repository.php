@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,71 +27,56 @@ namespace mod_ispring\session\infrastructure;
 use mod_ispring\session\app\model\session;
 use mod_ispring\session\app\repository\session_repository_interface;
 
-class session_repository implements session_repository_interface
-{
+class session_repository implements session_repository_interface {
     private \moodle_database $database;
 
-    public function __construct()
-    {
+    public function __construct() {
         global $DB;
         $this->database = $DB;
     }
 
-    public function add(session $data): int
-    {
+    public function add(session $data): int {
         $session = self::session_to_std_class($data);
 
         $transaction = $this->database->start_delegated_transaction();
-        try
-        {
+        try {
             $id = $this->database->insert_record('ispring_session', $session);
             $transaction->allow_commit();
             return $id;
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $transaction->rollback($e);
             throw new \RuntimeException('Cannot add session to database');
         }
     }
 
-    public function update(int $id, session $data): bool
-    {
+    public function update(int $id, session $data): bool {
         $session = self::session_to_std_class($data);
         $session->id = $id;
 
         $transaction = $this->database->start_delegated_transaction();
-        try
-        {
+        try {
             $result = $this->database->update_record('ispring_session', $session);
             $transaction->allow_commit();
             return $result;
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $transaction->rollback($e);
             throw new \RuntimeException('Cannot update session');
         }
     }
 
-    public function delete_by_content_id(int $content_id): bool
-    {
+    public function delete_by_content_id(int $contentid): bool {
         $transaction = $this->database->start_delegated_transaction();
-        try
-        {
-            $result = $this->database->delete_records('ispring_session', ['ispring_content_id' => $content_id]);
+        try {
+            $result = $this->database->delete_records('ispring_session', ['ispring_content_id' => $contentid]);
             $transaction->allow_commit();
             return $result;
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $transaction->rollback($e);
             throw new \RuntimeException('Cannot delete session');
         }
     }
 
-    private static function session_to_std_class(session $session): \stdClass
-    {
+    private static function session_to_std_class(session $session): \stdClass {
         $result = new \stdClass();
 
         $result->ispring_content_id = $session->get_content_id();

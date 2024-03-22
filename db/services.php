@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,6 +21,7 @@
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     'mod_ispring_get_player_data' => [
@@ -47,7 +47,7 @@ $functions = [
     ],
     'mod_ispring_set_state' => [
         'classname' => 'mod_ispring\external\set_state',
-        'description' => 'Sets playback state associated with specified session id. This function is called when player state changes',
+        'description' => 'Sets playback state associated with specified session id when player state changes',
         'type' => 'write',
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],

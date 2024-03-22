@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,12 +40,10 @@ class provider implements
     \core_privacy\local\request\plugin\provider,
 
     // This plugin is capable of determining which users have data within it.
-    \core_privacy\local\request\core_userlist_provider
-{
+    \core_privacy\local\request\core_userlist_provider {
     private const MOD_NAME = 'ispring';
 
-    public static function get_metadata(collection $collection): collection
-    {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'ispring_session',
             [
@@ -78,12 +75,10 @@ class provider implements
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
-    public static function get_users_in_context(userlist $userlist): void
-    {
+    public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
 
-        if (!is_a($context, \context_module::class))
-        {
+        if (!is_a($context, \context_module::class)) {
             return;
         }
 
@@ -105,11 +100,10 @@ class provider implements
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * @param int $user_id User ID
+     * @param int $userid User ID
      * @return contextlist
      */
-    public static function get_contexts_for_userid(int $user_id): contextlist
-    {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
         $params = [
             'context_level' => CONTEXT_MODULE,
@@ -123,7 +117,7 @@ class provider implements
                   JOIN {ispring} isp ON isp.id = cm.instance
                   JOIN {ispring_content} isc ON isc.ispring_id = isp.id
                   JOIN {ispring_session} iss ON iss.ispring_content_id = isc.id
-                 WHERE iss.user_id = {$user_id}
+                 WHERE iss.user_id = {$userid}
         ";
         $contextlist->add_from_sql($sql, $params);
 
@@ -135,20 +129,18 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist): void
-    {
+    public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
 
-        if (empty($contextlist))
-        {
+        if (empty($contextlist)) {
             return;
         }
 
         $user = $contextlist->get_user();
 
-        [$context_sql, $context_params] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-        $context_params['module'] = self::MOD_NAME;
-        $context_params['user_id'] = $user->id;
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        $contextparams['module'] = self::MOD_NAME;
+        $contextparams['user_id'] = $user->id;
 
         $sql = "SELECT
                     iss.*,
@@ -161,21 +153,20 @@ class provider implements
                   JOIN {ispring_session} iss ON iss.ispring_content_id = isc.id
                  WHERE (
                     iss.user_id = :user_id AND
-                    c.id {$context_sql}
+                    c.id {$contextsql}
                 )
         ";
 
-        $sessions = $DB->get_records_sql($sql, $context_params);
+        $sessions = $DB->get_records_sql($sql, $contextparams);
         $result = [];
-        foreach ($sessions as $session)
-        {
+        foreach ($sessions as $session) {
             $context = \context_module::instance($session->cmid);
-            $context_data = helper::get_context_data($context, $user);
+            $contextdata = helper::get_context_data($context, $user);
             $result[] = $session;
-            $context_data = (object)array_merge((array)$context_data, ['sessions' => $result]);
+            $contextdata = (object)array_merge((array)$contextdata, ['sessions' => $result]);
 
             helper::export_context_files($context, $user);
-            writer::with_context($context)->export_data([], $context_data);
+            writer::with_context($context)->export_data([], $contextdata);
         }
     }
 
@@ -184,23 +175,21 @@ class provider implements
      *
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
-    public static function delete_data_for_users(approved_userlist $userlist): void
-    {
+    public static function delete_data_for_users(approved_userlist $userlist): void {
         global $DB;
 
         $context = $userlist->get_context();
-        if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid))
-        {
+        if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid)) {
             return;
         }
         $ispring = $DB->get_record('ispring', ['id' => $cm->instance]);
-        $ispring_contents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispring->id], '', 'id'));
+        $contents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispring->id], '', 'id'));
 
-        [$user_in_sql, $user_in_params] = $DB->get_in_or_equal($userlist->get_userids());
-        [$content_in_sql, $content_in_params] = $DB->get_in_or_equal($ispring_contents);
-        $params = array_merge($content_in_params, $user_in_params);
+        [$usersql, $userparams] = $DB->get_in_or_equal($userlist->get_userids());
+        [$contentsql, $contentparams] = $DB->get_in_or_equal($contents);
+        $params = array_merge($contentparams, $userparams);
 
-        $DB->delete_records_select('ispring_session', "ispring_content_id {$content_in_sql} AND user_id {$user_in_sql}", $params);
+        $DB->delete_records_select('ispring_session', "ispring_content_id {$contentsql} AND user_id {$usersql}", $params);
     }
 
     /**
@@ -208,27 +197,24 @@ class provider implements
      *
      * @param \context $context The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context): void
-    {
+    public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
 
-        if (!$context instanceof \context_module)
-        {
+        if (!$context instanceof \context_module) {
             return;
         }
 
         // Get the course module.
-        if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid))
-        {
+        if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid)) {
             return;
         }
 
-        $ispring_id = $cm->instance;
+        $ispringid = $cm->instance;
 
-        $ispring_contents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispring_id], '', 'id'));
-        [$content_in_sql, $content_in_params] = $DB->get_in_or_equal($ispring_contents);
+        $contents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispringid], '', 'id'));
+        [$contentsql, $contentparams] = $DB->get_in_or_equal($contents);
 
-        $DB->delete_records_select('ispring_session', "ispring_content_id {$content_in_sql}", $content_in_params);
+        $DB->delete_records_select('ispring_session', "ispring_content_id {$contentsql}", $contentparams);
     }
 
     /**
@@ -236,29 +222,28 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist): void
-    {
+    public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
 
-        if (empty($contextlist->count()))
-        {
+        if (empty($contextlist->count())) {
             return;
         }
 
         $user = $contextlist->get_user();
-        $user_id = $user->id;
+        $userid = $user->id;
 
-        foreach ($contextlist as $context)
-        {
-            if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid))
-            {
+        foreach ($contextlist as $context) {
+            if (!$cm = get_coursemodule_from_id(self::MOD_NAME, $context->instanceid)) {
                 continue;
             }
             $ispring = $DB->get_record('ispring', ['id' => $cm->instance]);
-            $ispring_contents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispring->id], '', 'id'));
-            [$content_in_sql, $content_in_params] = $DB->get_in_or_equal($ispring_contents);
+            $ispringcontents = array_keys($DB->get_records('ispring_content', ['ispring_id' => $ispring->id], '', 'id'));
+            [$contentsql, $contentparams] = $DB->get_in_or_equal($ispringcontents);
 
-            $DB->delete_records_select('ispring_session', "ispring_content_id {$content_in_sql} AND user_id = {$user_id}", $content_in_params);
+            $DB->delete_records_select(
+                'ispring_session',
+                "ispring_content_id {$contentsql} AND user_id = {$userid}",
+                $contentparams);
         }
     }
 }

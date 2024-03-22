@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,8 +27,7 @@ namespace mod_ispring\event;
 use calendar_event;
 use mod_ispring\common\infrastructure\lock\locking_service;
 
-class open_close_event_controller
-{
+class open_close_event_controller {
     private const SET_EVENT_TIMEOUT = 10;
 
     /**
@@ -38,39 +36,31 @@ class open_close_event_controller
      * @param \stdClass $ispring
      * @return void
      */
-    public static function set_events(\stdClass $ispring): void
-    {
+    public static function set_events(\stdClass $ispring): void {
         $lock = locking_service::get_lock('set_events', "ispring_events:{$ispring->instance}", self::SET_EVENT_TIMEOUT);
 
         self::process_event($ispring, $ispring->timeopen, event_types::OPEN);
         self::process_event($ispring, $ispring->timeclose, event_types::CLOSE);
     }
 
-    private static function process_event(\stdClass $ispring, ?int $time, string $event_type): void
-    {
+    private static function process_event(\stdClass $ispring, ?int $time, string $eventtype): void {
         global $CFG;
 
         require_once($CFG->dirroot . '/calendar/lib.php');
 
-        $event_id = self::get_event_id($ispring->instance, $event_type);
-        if ($time > 0)
-        {
-            $event = self::create_event($event_type, $ispring, $event_id);
+        $eventid = self::get_event_id($ispring->instance, $eventtype);
+        if ($time > 0) {
+            $event = self::create_event($eventtype, $ispring, $eventid);
 
-            if ($event_id)
-            {
-                $calendar_event = calendar_event::load($event_id);
-                $calendar_event->update($event, false);
-            }
-            else
-            {
+            if ($eventid) {
+                $calendarevent = calendar_event::load($eventid);
+                $calendarevent->update($event, false);
+            } else {
                 calendar_event::create($event, false);
             }
-        }
-        else if ($event_id)
-        {
-            $calendar_event = calendar_event::load($event_id);
-            $calendar_event->delete();
+        } else if ($eventid) {
+            $calendarevent = calendar_event::load($eventid);
+            $calendarevent->delete();
         }
     }
 
@@ -78,33 +68,31 @@ class open_close_event_controller
      * Get event id
      *
      * @param int $instance
-     * @param string $event_type
+     * @param string $eventtype
      * @return int
      */
-    private static function get_event_id(int $instance, string $event_type): int
-    {
+    private static function get_event_id(int $instance, string $eventtype): int {
         global $DB;
 
         return $DB->get_field('event', 'id',
-            ['modulename' => 'ispring', 'instance' => $instance, 'eventtype' => $event_type]);
+            ['modulename' => 'ispring', 'instance' => $instance, 'eventtype' => $eventtype]);
     }
 
     /**
      * Generate event by params
      *
-     * @param string $event_type
+     * @param string $eventtype
      * @param \stdClass $ispring
-     * @param int $event_id
+     * @param int $eventid
      * @return \stdClass
      */
-    private static function create_event(string $event_type, \stdClass $ispring, int $event_id): \stdClass
-    {
-        $event = $event_type == event_types::OPEN
+    private static function create_event(string $eventtype, \stdClass $ispring, int $eventid): \stdClass {
+        $event = $eventtype == event_types::OPEN
             ? self::create_default_open_event($ispring)
             : self::create_default_close_event($ispring);
 
-        $event_id
-            ? self::add_params_to_existent_event($event, $event_id)
+        $eventid
+            ? self::add_params_to_existent_event($event, $eventid)
             : self::add_params_to_nonexistent_event($event, $ispring);
 
         return $event;
@@ -116,8 +104,7 @@ class open_close_event_controller
      * @param \stdClass $ispring
      * @return \stdClass
      */
-    private static function create_default_event(\stdClass $ispring): \stdClass
-    {
+    private static function create_default_event(\stdClass $ispring): \stdClass {
         $event = new \stdClass();
         $event->description = format_module_intro('ispring', $ispring, $ispring->coursemodule, false);
         $event->format = FORMAT_HTML;
@@ -133,8 +120,7 @@ class open_close_event_controller
      * @param \stdClass $ispring
      * @return \stdClass
      */
-    private static function create_default_close_event(\stdClass $ispring): \stdClass
-    {
+    private static function create_default_close_event(\stdClass $ispring): \stdClass {
         $event = self::create_default_event($ispring);
 
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -152,8 +138,7 @@ class open_close_event_controller
      * @param \stdClass $ispring
      * @return \stdClass
      */
-    private static function create_default_open_event(\stdClass $ispring): \stdClass
-    {
+    private static function create_default_open_event(\stdClass $ispring): \stdClass {
         $event = self::create_default_event($ispring);
         $event->type = CALENDAR_EVENT_TYPE_STANDARD;
         $event->eventtype = event_types::OPEN;
@@ -168,12 +153,11 @@ class open_close_event_controller
      * Add params for existing event
      *
      * @param \stdClass $event
-     * @param int $event_id
+     * @param int $eventid
      * @return void
      */
-    private static function add_params_to_existent_event(\stdClass &$event, int $event_id): void
-    {
-        $event->id = $event_id;
+    private static function add_params_to_existent_event(\stdClass &$event, int $eventid): void {
+        $event->id = $eventid;
     }
 
     /**
@@ -183,8 +167,7 @@ class open_close_event_controller
      * @param \stdClass $ispring
      * @return void
      */
-    private static function add_params_to_nonexistent_event(\stdClass &$event, \stdClass $ispring): void
-    {
+    private static function add_params_to_nonexistent_event(\stdClass &$event, \stdClass $ispring): void {
         $event->courseid = $ispring->course;
         $event->groupid = 0;
         $event->userid = 0;

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,65 +28,56 @@ use mod_ispring\ispring_module\api\ispring_module_api_interface;
 use mod_ispring\ispring_module\api\output\ispring_module_output;
 use stdClass;
 
-class argparser
-{
+class argparser {
     private stdClass $cm;
-    private stdClass $moodle_course;
-    private ispring_module_output $ispring_module;
+    private stdClass $moodlecourse;
+    private ispring_module_output $ispringmodule;
 
     public function __construct(
-        int $cm_id,
-        ispring_module_api_interface $ispring_module_api
-    )
-    {
-        if (empty($cm_id))
-        {
+        int $cmid,
+        ispring_module_api_interface $ispringmoduleapi
+    ) {
+        if (empty($cmid)) {
             throw new \moodle_exception('missingparameter');
         }
 
-        $cm = get_coursemodule_from_id('ispring', $cm_id);
-        if (!$cm)
-        {
+        $cm = get_coursemodule_from_id('ispring', $cmid);
+        if (!$cm) {
             throw new \moodle_exception('invalidcoursemodule');
         }
         $this->cm = $cm;
 
         $course = get_course($this->cm->course);
-        if (!$course)
-        {
+        if (!$course) {
             throw new \moodle_exception('coursemisconf');
         }
-        $this->moodle_course = $course;
+        $this->moodlecourse = $course;
 
-        $module = $ispring_module_api->get_by_id($this->cm->instance);
-        if (!$module)
-        {
+        $module = $ispringmoduleapi->get_by_id($this->cm->instance);
+        if (!$module) {
             throw new \moodle_exception('invalidcoursemodule');
         }
-        $this->ispring_module = $module;
+        $this->ispringmodule = $module;
     }
 
     /**
      * @return stdClass
      */
-    public function get_cm(): stdClass
-    {
+    public function get_cm(): stdClass {
         return $this->cm;
     }
 
     /**
      * @return stdClass
      */
-    public function get_moodle_course(): stdClass
-    {
-        return $this->moodle_course;
+    public function get_moodle_course(): stdClass {
+        return $this->moodlecourse;
     }
 
     /**
      * @return ispring_module_output
      */
-    public function get_ispring_module(): ispring_module_output
-    {
-        return $this->ispring_module;
+    public function get_ispring_module(): ispring_module_output {
+        return $this->ispringmodule;
     }
 }

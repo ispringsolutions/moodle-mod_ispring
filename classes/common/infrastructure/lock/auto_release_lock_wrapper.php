@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,30 +27,25 @@ namespace mod_ispring\common\infrastructure\lock;
 use core\lock\lock;
 use mod_ispring\common\app\lock\lock_interface;
 
-class auto_release_lock_wrapper implements lock_interface
-{
+class auto_release_lock_wrapper implements lock_interface {
     private lock $lock;
 
     public function __construct(
         lock $lock
-    )
-    {
+    ) {
         $this->lock = $lock;
     }
 
-    public function __destruct()
-    {
-        try
-        {
+    public function __destruct() {
+        try {
             $this->release();
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
+            // Release of lock must be without exception.
+            return;
         }
     }
 
-    public function release(): void
-    {
+    public function release(): void {
         $this->lock->release();
     }
 }

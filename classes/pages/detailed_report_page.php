@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,43 +24,38 @@
 
 namespace mod_ispring\pages;
 
-class detailed_report_page extends base_page
-{
+class detailed_report_page extends base_page {
     private const PLAYER_ID = 'mod-ispring-report-player';
     private const PRELOADER_ID = 'mod-ispring-preloader';
 
-    private int $session_id;
-    private string $report_url;
-    private string $back_url;
-    private int $user_id;
-
+    private int $sessionid;
+    private string $reporturl;
+    private string $backurl;
+    private int $userid;
 
     public function __construct(
-        int $session_id,
-        string $report_url,
-        string $back_url,
-        int $user_id,
+        int $sessionid,
+        string $reporturl,
+        string $backurl,
+        int $userid,
         string $url,
         array $args = null
-    )
-    {
+    ) {
         parent::__construct($url, $args);
 
-        $this->session_id = $session_id;
-        $this->report_url = $report_url;
-        $this->back_url = $back_url;
-        $this->user_id = $user_id;
+        $this->sessionid = $sessionid;
+        $this->reporturl = $reporturl;
+        $this->backurl = $backurl;
+        $this->userid = $userid;
 
         $this->define_properties();
     }
 
-    public function get_content(): string
-    {
-        $content = $this->get_output()->single_button($this->back_url, get_string('back', 'ispring'), 'get');
+    public function get_content(): string {
+        $content = $this->get_output()->single_button($this->backurl, get_string('back', 'ispring'), 'get');
 
-        $user = \core_user::get_user($this->user_id);
-        if (!$user)
-        {
+        $user = \core_user::get_user($this->userid);
+        if (!$user) {
             throw new \moodle_exception('invaliduserid');
         }
         $content .= \html_writer::tag('div', \fullname($user), ['class' => 'detailed-report__username']);
@@ -76,18 +70,17 @@ class detailed_report_page extends base_page
         $content .= \html_writer::end_tag('div');
 
         $this->get_page()->requires->js_call_amd('mod_ispring/detailed_report_api', 'init', [
-            $this->session_id,
+            $this->sessionid,
             current_language(),
             self::PLAYER_ID,
-            $this->report_url,
+            $this->reporturl,
             self::PRELOADER_ID,
         ]);
 
         return $content;
     }
 
-    private function define_properties(): void
-    {
+    private function define_properties(): void {
         $this->get_page()->add_body_class('limitedwidth');
     }
 }

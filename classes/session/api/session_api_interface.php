@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,94 +29,93 @@ use mod_ispring\session\api\input\update_input;
 use mod_ispring\session\api\output\detailed_report_output;
 use mod_ispring\session\api\output\session_output;
 
-interface session_api_interface
-{
+interface session_api_interface {
     /**
      * Create new session for given content id and user id
-     * @param int $content_id
-     * @param int $user_id
+     * @param int $contentid
+     * @param int $userid
      * @param string $status
-     * @param string $player_id
-     * @param bool $session_restored
+     * @param string $playerid
+     * @param bool $sessionrestored
      * @return int
      */
-    public function add(int $content_id, int $user_id, string $status, string $player_id, bool $session_restored): int;
+    public function add(int $contentid, int $userid, string $status, string $playerid, bool $sessionrestored): int;
 
     /**
      * End session and save state
-     * @param int $session_id
-     * @param int $user_id
+     * @param int $sessionid
+     * @param int $userid
      * @param end_input $data
      * @return bool
      */
-    public function end(int $session_id, int $user_id, end_input $data): bool;
+    public function end(int $sessionid, int $userid, end_input $data): bool;
 
     /**
      * Update session
-     * @param int $session_id
-     * @param int $user_id
+     * @param int $sessionid
+     * @param int $userid
      * @param update_input $data
      * @return bool
      */
-    public function update(int $session_id, int $user_id, update_input $data): bool;
+    public function update(int $sessionid, int $userid, update_input $data): bool;
 
     /**
      * Get last user session by content id
-     * @param int $content_id
-     * @param int $user_id
+     * @param int $contentid
+     * @param int $userid
      * @return session_output|null
      */
-    public function get_last_by_content_id(int $content_id, int $user_id): ?session_output;
+    public function get_last_by_content_id(int $contentid, int $userid): ?session_output;
 
     /**
      * Return true if given ispring module has at least one session for specified user id
-     * @param int $ispring_module_id
-     * @param int $user_id
+     * @param int $ispringmoduleid
+     * @param int $userid
      * @return bool
      */
-    public function ispring_module_has_sessions_with_user_id(int $ispring_module_id, int $user_id): bool;
+    public function ispring_module_has_sessions_with_user_id(int $ispringmoduleid, int $userid): bool;
 
     /**
      * Get grades for gradebook
      * @param int $id
-     * @param int $user_id
+     * @param int $userid
      * @return array|null
      */
-    public function get_grades_for_gradebook(int $id, int $user_id): ?array;
+    public function get_grades_for_gradebook(int $id, int $userid): ?array;
 
     /**
      * Get session record by id
-     * @param int $session_id
+     * @param int $sessionid
      * @return session_output|null
      */
-    public function get_by_id(int $session_id): ?session_output;
+    public function get_by_id(int $sessionid): ?session_output;
 
     /**
      * Delete session records by content id
-     * @param int $content_id
+     * @param int $contentid
      * @return bool
      */
-    public function delete_by_content_id(int $content_id): bool;
+    public function delete_by_content_id(int $contentid): bool;
 
     /**
      * Get detailed report for session
-     * @param int $session_id
+     * @param int $sessionid
      * @return detailed_report_output|null
      */
-    public function get_detailed_report(int $session_id): ?detailed_report_output;
+    public function get_detailed_report(int $sessionid): ?detailed_report_output;
 
     /**
      * Returns true if passing requirements were updated
-     * @param int $ispring_module_id
+     * @param int $ispringmoduleid
      * @return bool
      */
-    public function passing_requirements_were_updated(int $ispring_module_id): bool;
+    public function passing_requirements_were_updated(int $ispringmoduleid): bool;
 
     /**
      * Returns true if passing requirements were updated for given user
-     * @param int $ispring_module_id
-     * @param int $user_id
+     * @param int $ispringmoduleid
+     * @param int $userid
      * @return bool
      */
-    public function passing_requirements_were_updated_for_user(int $ispring_module_id, int $user_id): bool;
+    public function passing_requirements_were_updated_for_user(int $ispringmoduleid, int $userid): bool;
 }

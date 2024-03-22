@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,37 +27,31 @@ namespace mod_ispring\session\infrastructure;
 use mod_ispring\content\api\content_api_interface;
 use mod_ispring\session\app\adapter\content_api_interface as content_api_adapter_interface;
 
-class content_api implements content_api_adapter_interface
-{
-    private content_api_interface $api_interface;
+class content_api implements content_api_adapter_interface {
+    private content_api_interface $api;
 
     public function __construct(
-        content_api_interface $api_interface
-    )
-    {
-        $this->api_interface = $api_interface;
+        content_api_interface $api
+    ) {
+        $this->api = $api;
     }
 
-    public function get_ispring_module_id_by_content_id(int $id): int
-    {
-        $content = $this->api_interface->get_by_id($id);
+    public function get_ispring_module_id_by_content_id(int $id): int {
+        $content = $this->api->get_by_id($id);
 
         return $content ? $content->get_ispring_module_id() : 0;
     }
 
-    public function get_newest_content_id(int $ispring_module_id): int
-    {
-        $content = $this->api_interface->get_latest_version_content_by_ispring_module_id($ispring_module_id);
-        if ($content)
-        {
+    public function get_newest_content_id(int $ispringmoduleid): int {
+        $content = $this->api->get_latest_version_content_by_ispring_module_id($ispringmoduleid);
+        if ($content) {
             return $content->get_id();
         }
 
         return 0;
     }
 
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array
-    {
-        return $this->api_interface->get_ids_by_ispring_module_id($ispring_module_id);
+    public function get_ids_by_ispring_module_id(int $ispringmoduleid): array {
+        return $this->api->get_ids_by_ispring_module_id($ispringmoduleid);
     }
 }

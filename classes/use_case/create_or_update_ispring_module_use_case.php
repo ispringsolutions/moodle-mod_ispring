@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,95 +31,85 @@ use mod_ispring\ispring_module\api\input\create_or_update_ispring_module_input;
 use mod_ispring\ispring_module\api\input\description_input;
 use mod_ispring\ispring_module\api\ispring_module_api_interface;
 
-final class create_or_update_ispring_module_use_case
-{
-    private ispring_module_api_interface $ispring_module_api;
-    private content_api_interface $content_api;
+final class create_or_update_ispring_module_use_case {
+    private ispring_module_api_interface $ispringmoduleapi;
+    private content_api_interface $contentapi;
 
     public function __construct(
-        ispring_module_api_interface $ispring_module_api,
-        content_api_interface $content_api
-    )
-    {
-        $this->ispring_module_api = $ispring_module_api;
-        $this->content_api = $content_api;
+        ispring_module_api_interface $ispringmoduleapi,
+        content_api_interface $contentapi
+    ) {
+        $this->ispringmoduleapi = $ispringmoduleapi;
+        $this->contentapi = $contentapi;
     }
 
-    public function create(\stdClass $new_ispring, int $module_context_id, int $user_context_id): int
-    {
+    public function create(\stdClass $newispring, int $modulecontextid, int $usercontextid): int {
         $transaction = new db_transaction();
-        try
-        {
-            $ispring_module_id = $transaction->execute(
-                fn() => $this->ispring_module_api->create(new create_or_update_ispring_module_input(
-                    $new_ispring->name,
-                    $new_ispring->course,
-                    $new_ispring->grademethod,
+        try {
+            $ispringmoduleid = $transaction->execute(
+                fn() => $this->ispringmoduleapi->create(new create_or_update_ispring_module_input(
+                    $newispring->name,
+                    $newispring->course,
+                    $newispring->grademethod,
                     new description_input(
-                        $new_ispring->intro,
-                        $new_ispring->introformat,
+                        $newispring->intro,
+                        $newispring->introformat,
                     ),
-                    $new_ispring->timeopen,
-                    $new_ispring->timeclose,
+                    $newispring->timeopen,
+                    $newispring->timeclose,
                 )),
-                fn(int $id) => $this->ispring_module_api->delete($id),
+                fn(int $id) => $this->ispringmoduleapi->delete($id),
             );
 
             $transaction->execute(
-                fn() => $this->content_api->add_content(new content_input(
-                    $new_ispring->userfile,
-                    $ispring_module_id,
-                    $module_context_id,
-                    $user_context_id,
+                fn() => $this->contentapi->add_content(new content_input(
+                    $newispring->userfile,
+                    $ispringmoduleid,
+                    $modulecontextid,
+                    $usercontextid,
                 )),
-                fn(int $id) => $this->content_api->remove($module_context_id, $id),
+                fn(int $id) => $this->contentapi->remove($modulecontextid, $id),
             );
 
             $transaction->commit();
-            return $ispring_module_id;
-        }
-        catch (\Throwable $e)
-        {
+            return $ispringmoduleid;
+        } catch (\Throwable $e) {
             $transaction->rollback($e);
             throw $e;
         }
     }
 
-    public function update(\stdClass $new_ispring, int $module_context_id, int $user_context_id): bool
-    {
+    public function update(\stdClass $newispring, int $modulecontextid, int $usercontextid): bool {
         $transaction = new db_transaction();
-        try
-        {
-            $this->ispring_module_api->update(
-                $new_ispring->instance,
+        try {
+            $this->ispringmoduleapi->update(
+                $newispring->instance,
                 new create_or_update_ispring_module_input(
-                    $new_ispring->name,
-                    $new_ispring->course,
-                    $new_ispring->grademethod,
+                    $newispring->name,
+                    $newispring->course,
+                    $newispring->grademethod,
                     new description_input(
-                        $new_ispring->intro,
-                        $new_ispring->introformat,
+                        $newispring->intro,
+                        $newispring->introformat,
                     ),
-                    $new_ispring->timeopen,
-                    $new_ispring->timeclose,
+                    $newispring->timeopen,
+                    $newispring->timeclose,
                 ),
             );
 
             $transaction->execute(
-                fn() => $this->content_api->add_content(new content_input(
-                    $new_ispring->userfile,
-                    $new_ispring->instance,
-                    $module_context_id,
-                    $user_context_id,
+                fn() => $this->contentapi->add_content(new content_input(
+                    $newispring->userfile,
+                    $newispring->instance,
+                    $modulecontextid,
+                    $usercontextid,
                 )),
-                fn(int $id) => $this->content_api->remove($module_context_id, $id),
+                fn(int $id) => $this->contentapi->remove($modulecontextid, $id),
             );
 
             $transaction->commit();
             return true;
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             $transaction->rollback($e);
             throw $e;
         }

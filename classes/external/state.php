@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,63 +24,56 @@
 
 namespace mod_ispring\external;
 
-class state
-{
+class state {
     private int $duration;
     private string $id;
-    private string $persist_state;
+    private string $persiststate;
     private string $status;
-    private string $player_id;
+    private string $playerid;
 
     public function __construct(
         int $duration,
         string $id,
-        string $persist_state,
+        string $persiststate,
         string $status,
-        string $player_id
-    )
-    {
+        string $playerid
+    ) {
         $this->duration = $duration;
         $this->id = $id;
-        $this->persist_state = $persist_state;
+        $this->persiststate = $persiststate;
         $this->status = $status;
-        $this->player_id = $player_id;
+        $this->playerid = $playerid;
     }
 
     /**
      * @return int
      */
-    public function get_duration(): int
-    {
+    public function get_duration(): int {
         return $this->duration;
     }
 
     /**
      * @return string
      */
-    public function get_id(): string
-    {
+    public function get_id(): string {
         return $this->id;
     }
 
     /**
      * @return string
      */
-    public function get_persist_state(): string
-    {
-        return $this->persist_state;
+    public function get_persist_state(): string {
+        return $this->persiststate;
     }
 
     /**
      * @return string
      */
-    public function get_status(): string
-    {
+    public function get_status(): string {
         return $this->status;
     }
 
-    public function get_player_id(): string
-    {
-        return $this->player_id;
+    public function get_player_id(): string {
+        return $this->playerid;
     }
 }

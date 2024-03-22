@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,22 +28,24 @@ use mod_ispring\ispring_module\app\data\ispring_module_data;
 use mod_ispring\ispring_module\app\repository\ispring_module_repository_interface;
 use mod_ispring\ispring_module\domain\model\grading_options;
 
-final class ispring_module_service_test extends \basic_testcase
-{
+/**
+ * Test ispring_module_service class.
+ *
+ * @covers \mod_ispring\ispring_module\app\service\ispring_module_service
+ */
+final class ispring_module_service_test extends \basic_testcase {
     /** @var mixed */
-    private $ispring_module_repository_mock;
-    private ispring_module_service $ispring_module_service;
+    private $ispringmodulerepositorymock;
+    private ispring_module_service $ispringmoduleservice;
 
-    protected function setUp(): void
-    {
-        $this->ispring_module_repository_mock = $this->createMock(ispring_module_repository_interface::class);
+    protected function setUp(): void {
+        $this->ispringmodulerepositorymock = $this->createMock(ispring_module_repository_interface::class);
 
-        $this->ispring_module_service = new ispring_module_service($this->ispring_module_repository_mock);
+        $this->ispringmoduleservice = new ispring_module_service($this->ispringmodulerepositorymock);
     }
 
-    public function test_create_adds_module_to_repository(): void
-    {
-        $ispring_module = new ispring_module_data(
+    public function test_create_adds_module_to_repository(): void {
+        $data = new ispring_module_data(
             'test_create',
             2,
             grading_options::FIRST,
@@ -53,36 +54,34 @@ final class ispring_module_service_test extends \basic_testcase
             time()
         );
 
-        $this->ispring_module_repository_mock->expects($this->exactly(0))->method('update');
-        $this->ispring_module_repository_mock->expects($this->exactly(0))->method('remove');
-        $this->ispring_module_repository_mock->expects($this->once())
+        $this->ispringmodulerepositorymock->expects($this->exactly(0))->method('update');
+        $this->ispringmodulerepositorymock->expects($this->exactly(0))->method('remove');
+        $this->ispringmodulerepositorymock->expects($this->once())
             ->method('add')
-            ->with($this->identicalTo($ispring_module))
+            ->with($this->identicalTo($data))
             ->willReturn(1);
 
-        $id = $this->ispring_module_service->create($ispring_module);
+        $id = $this->ispringmoduleservice->create($data);
 
         $this->assertEquals(1, $id);
     }
 
-    public function test_create_throws_exception_if_grade_option_is_not_valid(): void
-    {
+    public function test_create_throws_exception_if_grade_option_is_not_valid(): void {
         $this->expectException(\RuntimeException::class);
-        $this->ispring_module_service->create(
+        $this->ispringmoduleservice->create(
             new ispring_module_data('test_create', 2, 0, null, time(), time()),
         );
     }
 
-    public function test_delete_removes_module_from_repository(): void
-    {
-        $ispring_module_id = 1;
+    public function test_delete_removes_module_from_repository(): void {
+        $ispringmoduleid = 1;
 
-        $this->ispring_module_repository_mock->expects($this->exactly(0))->method('add');
-        $this->ispring_module_repository_mock->expects($this->exactly(0))->method('update');
-        $this->ispring_module_repository_mock->expects($this->once())
+        $this->ispringmodulerepositorymock->expects($this->exactly(0))->method('add');
+        $this->ispringmodulerepositorymock->expects($this->exactly(0))->method('update');
+        $this->ispringmodulerepositorymock->expects($this->once())
             ->method('remove')
-            ->with($this->identicalTo($ispring_module_id));
+            ->with($this->identicalTo($ispringmoduleid));
 
-        $this->ispring_module_service->delete($ispring_module_id);
+        $this->ispringmoduleservice->delete($ispringmoduleid);
     }
 }

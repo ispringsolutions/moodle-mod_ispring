@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,65 +28,64 @@ use mod_ispring\session\app\adapter\ispring_module_api_interface;
 use mod_ispring\session\domain\model\session_state;
 use mod_ispring\session\infrastructure\query\session_query_service;
 
-class session_repository_test extends \advanced_testcase
-{
-    private session_repository $session_repository;
-    private session_query_service $session_query_service;
+/**
+ * Test session_repository class.
+ *
+ * @covers \mod_ispring\session\infrastructure\session_repository
+ */
+class session_repository_test extends \advanced_testcase {
+    private session_repository $sessionrepository;
+    private session_query_service $sessionqueryservice;
 
-    protected function setUp(): void
-    {
-        $ispring_module_stub = $this->createStub(ispring_module_api_interface::class);
-        $this->session_repository = new session_repository();
-        $this->session_query_service = new session_query_service($ispring_module_stub);
+    protected function setUp(): void {
+        $ispringmodulestub = $this->createStub(ispring_module_api_interface::class);
+        $this->sessionrepository = new session_repository();
+        $this->sessionqueryservice = new session_query_service($ispringmodulestub);
     }
 
-    public function test_delete_by_content_id_removes_single_session_with_given_content_id(): void
-    {
-        $session_id = $this->create_mock_session(2, 3);
+    public function test_delete_by_content_id_removes_single_session_with_given_content_id(): void {
+        $sessionid = $this->create_mock_session(2, 3);
         $this->create_mock_session(3, 3);
 
-        $this->assertTrue($this->session_repository->delete_by_content_id(2));
+        $this->assertTrue($this->sessionrepository->delete_by_content_id(2));
 
-        $this->assertNull($this->session_query_service->get($session_id));
+        $this->assertNull($this->sessionqueryservice->get($sessionid));
     }
 
-    public function test_delete_by_content_id_removes_many_sessions_with_given_content_id(): void
-    {
-        $session_id_1 = $this->create_mock_session(2, 3);
-        $session_id_2 = $this->create_mock_session(2, 3);
-        $session_id_3 = $this->create_mock_session(2, 3);
-        $session_id_4 = $this->create_mock_session(4, 3);
+    public function test_delete_by_content_id_removes_many_sessions_with_given_content_id(): void {
+        $sessionid1 = $this->create_mock_session(2, 3);
+        $sessionid2 = $this->create_mock_session(2, 3);
+        $sessionid3 = $this->create_mock_session(2, 3);
+        $sessionid4 = $this->create_mock_session(4, 3);
 
-        $this->assertTrue($this->session_repository->delete_by_content_id(2));
+        $this->assertTrue($this->sessionrepository->delete_by_content_id(2));
 
-        $this->assertNull($this->session_query_service->get($session_id_1));
-        $this->assertNull($this->session_query_service->get($session_id_2));
-        $this->assertNull($this->session_query_service->get($session_id_3));
+        $this->assertNull($this->sessionqueryservice->get($sessionid1));
+        $this->assertNull($this->sessionqueryservice->get($sessionid2));
+        $this->assertNull($this->sessionqueryservice->get($sessionid3));
 
-        $this->assertNotNull($this->session_query_service->get($session_id_4));
+        $this->assertNotNull($this->sessionqueryservice->get($sessionid4));
     }
 
-    public function test_delete_by_content_id_removes_no_session_with_given_content_id(): void
-    {
-        $session_id_1 = $this->create_mock_session(2, 3);
-        $session_id_2 = $this->create_mock_session(2, 3);
-        $session_id_3 = $this->create_mock_session(2, 3);
+    public function test_delete_by_content_id_removes_no_session_with_given_content_id(): void {
+        $sessionid1 = $this->create_mock_session(2, 3);
+        $sessionid2 = $this->create_mock_session(2, 3);
+        $sessionid3 = $this->create_mock_session(2, 3);
 
-        $this->assertTrue($this->session_repository->delete_by_content_id(3));
+        $this->assertTrue($this->sessionrepository->delete_by_content_id(3));
 
-        $this->assertNotNull($this->session_query_service->get($session_id_1));
-        $this->assertNotNull($this->session_query_service->get($session_id_2));
-        $this->assertNotNull($this->session_query_service->get($session_id_3));
+        $this->assertNotNull($this->sessionqueryservice->get($sessionid1));
+        $this->assertNotNull($this->sessionqueryservice->get($sessionid2));
+        $this->assertNotNull($this->sessionqueryservice->get($sessionid3));
     }
 
-    private function create_mock_session(int $content_id, int $user_id): int
-    {
+    private function create_mock_session(int $contentid, int $userid): int {
         global $DB;
         $this->resetAfterTest(true);
 
         $session = new \stdClass();
-        $session->user_id = $user_id;
-        $session->ispring_content_id = $content_id;
+        $session->user_id = $userid;
+        $session->ispring_content_id = $contentid;
         $session->status = session_state::COMPLETE;
         $session->begin_time = 5;
         $session->attempt = 0;
