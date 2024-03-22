@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,51 +30,43 @@ use mod_ispring\session\app\query\session_query_service_interface;
 use mod_ispring\ispring_module\domain\model\grading_options;
 use mod_ispring\session\domain\model\session_state;
 
-class session_query_service implements session_query_service_interface
-{
+class session_query_service implements session_query_service_interface {
     private \moodle_database $database;
-    private ispring_module_api_interface $ispring_module_api;
+    private ispring_module_api_interface $ispringmoduleapi;
 
     public function __construct(
-        ispring_module_api_interface $ispring_module_api
-    )
-    {
+        ispring_module_api_interface $ispringmoduleapi
+    ) {
         global $DB;
         $this->database = $DB;
-        $this->ispring_module_api = $ispring_module_api;
+        $this->ispringmoduleapi = $ispringmoduleapi;
     }
 
-    public function get_last_by_content_id(int $content_id, int $user_id): ?session
-    {
-        try
-        {
+    public function get_last_by_content_id(int $contentid, int $userid): ?session {
+        try {
             $sessions = $this->database->get_records(
                 'ispring_session',
-                ['ispring_content_id' => $content_id, 'user_id' => $user_id],
+                ['ispring_content_id' => $contentid, 'user_id' => $userid],
                 'attempt desc',
                 '*',
                 0,
                 1
             );
 
-            if (count($sessions) === 0)
-            {
+            if (count($sessions) === 0) {
                 return null;
             }
 
             $session = array_values($sessions)[0];
 
             return $this->get_session($session);
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function get_last_by_ispring_module_id(int $ispring_module_id, int $user_id): ?session
-    {
-        try
-        {
+    public function get_last_by_ispring_module_id(int $ispringmoduleid, int $userid): ?session {
+        try {
             $sessions = $this->database->get_records_sql('
                 SELECT iss.*
                 FROM {ispring_content} isc
@@ -83,8 +74,8 @@ class session_query_service implements session_query_service_interface
                 WHERE isc.ispring_id = :ispring_module_id AND iss.user_id = :user_id
                 ORDER BY iss.attempt DESC',
                 [
-                    'ispring_module_id' => $ispring_module_id,
-                    'user_id' => $user_id,
+                    'ispring_module_id' => $ispringmoduleid,
+                    'user_id' => $userid,
                 ],
                 0,
                 1,
@@ -94,90 +85,77 @@ class session_query_service implements session_query_service_interface
             return $session !== false
                 ? $this->get_session($session)
                 : null;
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function ispring_module_has_sessions_with_user_id(int $ispring_module_id, int $user_id): bool
-    {
-        try
-        {
+    public function ispring_module_has_sessions_with_user_id(int $ispringmoduleid, int $userid): bool {
+        try {
             $sessions = $this->database->get_records_sql('
                 SELECT NULL
                 FROM {ispring_content} isc
                 JOIN {ispring_session} iss ON isc.id = iss.ispring_content_id
                 WHERE isc.ispring_id = :ispring_module_id AND iss.user_id = :user_id',
                 [
-                    'ispring_module_id' => $ispring_module_id,
-                    'user_id' => $user_id,
+                    'ispring_module_id' => $ispringmoduleid,
+                    'user_id' => $userid,
                 ],
                 0,
                 1,
             );
             return count($sessions) > 0;
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function get(int $session_id): ?session
-    {
-        try
-        {
-            $session = $this->database->get_record('ispring_session', ['id' => $session_id]);
-            if (!$session)
-            {
+    public function get(int $sessionid): ?session {
+        try {
+            $session = $this->database->get_record('ispring_session', ['id' => $sessionid]);
+            if (!$session) {
                 return null;
             }
 
             return $this->get_session($session);
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function get_grades_for_gradebook(int $ispring_module_id, int $content_id, int $user_id): array
-    {
-        $grade_method = $this->ispring_module_api->get_grade_method($ispring_module_id);
+    public function get_grades_for_gradebook(int $ispringmoduleid, int $contentid, int $userid): array {
+        $grademethod = $this->ispringmoduleapi->get_grade_method($ispringmoduleid);
 
-        switch ($grade_method)
-        {
+        switch ($grademethod) {
             case grading_options::HIGHEST:
-                return $this->get_highest_grade($content_id, $user_id);
+                return $this->get_highest_grade($contentid, $userid);
             case grading_options::AVERAGE:
-                return $this->get_average_grade($content_id, $user_id);
+                return $this->get_average_grade($contentid, $userid);
             case grading_options::FIRST:
-                return $this->get_first_grade($content_id, $user_id);
+                return $this->get_first_grade($contentid, $userid);
             case grading_options::LAST:
-                return $this->get_last_grade($content_id, $user_id);
+                return $this->get_last_grade($contentid, $userid);
             default:
                 debugging('Unexpected grading option');
                 return [];
         }
     }
 
-    public function exist(int $session_id): bool
-    {
-        return $this->database->record_exists('ispring_session', ['id' => $session_id]);
+    public function exist(int $sessionid): bool {
+        return $this->database->record_exists('ispring_session', ['id' => $sessionid]);
     }
 
-    public function passing_requirements_were_updated(array $content_ids): bool
-    {
-        if (empty($content_ids))
-        {
+    public function passing_requirements_were_updated(array $contentids): bool {
+        if (empty($contentids)) {
             return false;
         }
 
-        $params = $content_ids;
+        $params = $contentids;
         $params[] = session_state::INCOMPLETE;
         $records = $this->database->get_records_sql("
             SELECT ROW_NUMBER() OVER () AS i, COUNT(max_score), COUNT(min_score)
             FROM {ispring_session}
-                WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($content_ids)) . ")
+                WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($contentids)) . ")
                 AND status != ?
             GROUP BY max_score, min_score;",
             $params
@@ -185,29 +163,25 @@ class session_query_service implements session_query_service_interface
         return count($records) > 1;
     }
 
-    public function passing_requirements_were_updated_for_user(array $content_ids, int $user_id): bool
-    {
-        if (empty($content_ids))
-        {
+    public function passing_requirements_were_updated_for_user(array $contentids, int $userid): bool {
+        if (empty($contentids)) {
             return false;
         }
 
-        $current_requirements = $this->get_current_requirements($content_ids);
+        $requirements = $this->get_current_requirements($contentids);
 
-        $current_user_requirements = $this->get_current_requirements($content_ids, $user_id);
+        $userrequirements = $this->get_current_requirements($contentids, $userid);
 
-        return $current_requirements && $current_user_requirements && $current_requirements != $current_user_requirements;
+        return $requirements && $userrequirements && $requirements != $userrequirements;
     }
 
-    private function get_highest_grade(int $content_id, int $user_id): array
-    {
-        $params = [$content_id];
-        $user_condition = '';
-        if ($user_id)
-        {
-            $user_condition = "AND user_id = $user_id";
+    private function get_highest_grade(int $contentid, int $userid): array {
+        $params = [$contentid];
+        $usercondition = '';
+        if ($userid) {
+            $usercondition = "AND user_id = $userid";
         }
-        $status_condition = "AND status != '" . session_state::INCOMPLETE . "'";
+        $statuscondition = "AND status != '" . session_state::INCOMPLETE . "'";
 
         $result = $this->database->get_records_sql("
             SELECT
@@ -222,8 +196,8 @@ class session_query_service implements session_query_service_interface
                     max(score) AS score
                 FROM {ispring_session}
                 WHERE ispring_content_id = ?
-                $status_condition
-                $user_condition
+                $statuscondition
+                $usercondition
                 GROUP BY ispring_content_id, user_id
             ) x USING (ispring_content_id, user_id, score)
             GROUP BY userid",
@@ -233,15 +207,13 @@ class session_query_service implements session_query_service_interface
         return $result;
     }
 
-    private function get_average_grade(int $content_id, int $user_id): array
-    {
-        $params = [$content_id];
-        $user_condition = '';
-        if ($user_id)
-        {
-            $user_condition = "AND user_id = $user_id";
+    private function get_average_grade(int $contentid, int $userid): array {
+        $params = [$contentid];
+        $usercondition = '';
+        if ($userid) {
+            $usercondition = "AND user_id = $userid";
         }
-        $status_condition = "AND status != '" . session_state::INCOMPLETE . "'";
+        $statuscondition = "AND status != '" . session_state::INCOMPLETE . "'";
 
         $result = $this->database->get_records_sql("
             SELECT
@@ -250,8 +222,8 @@ class session_query_service implements session_query_service_interface
             FROM {ispring_session}
             WHERE
                 ispring_content_id = ?
-            $status_condition
-            $user_condition
+            $statuscondition
+            $usercondition
             GROUP BY user_id;",
             $params
         );
@@ -259,15 +231,13 @@ class session_query_service implements session_query_service_interface
         return $result;
     }
 
-    private function get_first_grade(int $content_id, int $user_id): array
-    {
-        $params = [$content_id];
-        $user_condition = '';
-        if ($user_id)
-        {
-            $user_condition = "AND user_id = $user_id";
+    private function get_first_grade(int $contentid, int $userid): array {
+        $params = [$contentid];
+        $usercondition = '';
+        if ($userid) {
+            $usercondition = "AND user_id = $userid";
         }
-        $status_condition = "AND status != '" . session_state::INCOMPLETE . "'";
+        $statuscondition = "AND status != '" . session_state::INCOMPLETE . "'";
 
         $result = $this->database->get_records_sql("
             SELECT
@@ -282,8 +252,8 @@ class session_query_service implements session_query_service_interface
                     min(attempt) AS attempt
                 FROM {ispring_session}
                 WHERE ispring_content_id = ?
-                $status_condition
-                $user_condition
+                $statuscondition
+                $usercondition
                 GROUP BY ispring_content_id, user_id
             ) x USING (ispring_content_id, user_id, attempt);",
             $params
@@ -292,30 +262,29 @@ class session_query_service implements session_query_service_interface
         return $result;
     }
 
-    private function get_last_grade(int $content_id, int $user_id): array
-    {
-        $params = [$content_id];
-        $user_condition = '';
-        if ($user_id)
-        {
-            $user_condition = "AND user_id = $user_id";
+    private function get_last_grade(int $contentid, int $userid): array {
+        $params = [$contentid];
+        $usercondition = '';
+        if ($userid) {
+            $usercondition = "AND user_id = $userid";
         }
-        $status_condition = "AND status != '" . session_state::INCOMPLETE . "'";
+        $statuscondition = "AND status != '" . session_state::INCOMPLETE . "'";
+
         $result = $this->database->get_records_sql("
-            SELECT 
+            SELECT
                 c.user_id AS userid,
                 c.score AS rawgrade,
                 c.end_time AS dategraded
-            FROM {ispring_session} c 
+            FROM {ispring_session} c
             JOIN (
-                SELECT 
-                    ispring_content_id, 
-                    user_id, 
-                    max(attempt) AS attempt 
-                FROM {ispring_session} 
+                SELECT
+                    ispring_content_id,
+                    user_id,
+                    max(attempt) AS attempt
+                FROM {ispring_session}
                 WHERE ispring_content_id = ?
-                $status_condition
-                $user_condition
+                $statuscondition
+                $usercondition
                 GROUP BY ispring_content_id, user_id
             ) x USING (ispring_content_id, user_id, attempt);",
             $params
@@ -324,8 +293,7 @@ class session_query_service implements session_query_service_interface
         return $result;
     }
 
-    private static function get_session(\stdClass $data): session
-    {
+    private static function get_session(\stdClass $data): session {
         return new session(
             $data->id,
             $data->ispring_content_id,
@@ -346,23 +314,20 @@ class session_query_service implements session_query_service_interface
         );
     }
 
-    private function get_current_requirements(array $content_ids, ?int $user_id = null): ?\stdClass
-    {
-        try
-        {
-            $user_condition = '';
-            if ($user_id)
-            {
-                $user_condition = ' AND user_id = ' . $user_id;
+    private function get_current_requirements(array $contentids, ?int $userid = null): ?\stdClass {
+        try {
+            $usercondition = '';
+            if ($userid) {
+                $usercondition = ' AND user_id = ' . $userid;
             }
-            $params = $content_ids;
+            $params = $contentids;
             $params[] = session_state::INCOMPLETE;
             $requirements = $this->database->get_records_sql("
                 SELECT max_score, min_score
                 FROM {ispring_session}
-                    WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($content_ids)) . ") 
+                    WHERE ispring_content_id IN (" . self::generate_sql_params_template(count($contentids)) . ")
                     AND status != ?
-                    $user_condition
+                    $usercondition
                 ORDER BY id DESC",
                 $params,
                 0,
@@ -370,22 +335,18 @@ class session_query_service implements session_query_service_interface
             );
             $requirement = reset($requirements);
 
-            if (!$requirement)
-            {
+            if (!$requirement) {
                 return null;
             }
 
             return $requirement;
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    private static function generate_sql_params_template(int $count): string
-    {
-        if ($count <= 0)
-        {
+    private static function generate_sql_params_template(int $count): string {
+        if ($count <= 0) {
             return '';
         }
 

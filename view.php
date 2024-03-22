@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,37 +29,37 @@ use mod_ispring\event\course_module_viewed;
 use mod_ispring\pages\view_page;
 
 require_once('../../config.php');
-$cm_id = optional_param('id', '', PARAM_INT);
+$cmid = optional_param('id', '', PARAM_INT);
 
-$argparser = new argparser($cm_id, di_container::get_ispring_module_api());
+$argparser = new argparser($cmid, di_container::get_ispring_module_api());
 
 $ispring = $argparser->get_ispring_module();
 
 require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 
-$module_context = context_module::instance($argparser->get_cm()->id);
+$modulecontext = context_module::instance($argparser->get_cm()->id);
 $event = course_module_viewed::create([
     'objectid' => $ispring->get_id(),
-    'context' => $module_context
+    'context' => $modulecontext,
 ]);
 $event->trigger();
 
-$session_api = di_container::get_session_api();
-$passing_requirements_were_updated = $session_api->passing_requirements_were_updated_for_user($ispring->get_id(), $USER->id);
+$sessionapi = di_container::get_session_api();
+$passingrequirementswereupdated = $sessionapi->passing_requirements_were_updated_for_user($ispring->get_id(), $USER->id);
 
 $page = new view_page(
     $ispring,
-    $session_api,
-    $cm_id,
+    $sessionapi,
+    $cmid,
     $USER->id,
-    $passing_requirements_were_updated,
-    availability_checker::module_available($ispring->get_id(), $module_context),
+    $passingrequirementswereupdated,
+    availability_checker::module_available($ispring->get_id(), $modulecontext),
     '/mod/ispring/view.php',
-    ['id' => $cm_id],
+    ['id' => $cmid],
 );
 
 $page->set_title($ispring->get_name());
-$page->set_context($module_context);
+$page->set_context($modulecontext);
 $page->set_secondary_active_tab('modulepage');
 
 echo $page->get_header();

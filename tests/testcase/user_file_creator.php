@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,16 +24,14 @@
 
 namespace mod_ispring\testcase;
 
-final class user_file_creator
-{
-    public static function create_from_path(string $filepath): \stored_file
-    {
+final class user_file_creator {
+    public static function create_from_path(string $filepath): \stored_file {
         global $USER;
-        $user_context = \context_user::instance($USER->id);
+        $usercontext = \context_user::instance($USER->id);
 
         return get_file_storage()->create_file_from_pathname(
             [
-                'contextid' => $user_context->id,
+                'contextid' => $usercontext->id,
                 'component' => 'user',
                 'filearea' => 'draft',
                 'itemid' => file_get_unused_draft_itemid(),
@@ -45,14 +42,13 @@ final class user_file_creator
         );
     }
 
-    public static function create_from_string(string $basename, string $content): \stored_file
-    {
+    public static function create_from_string(string $basename, string $content): \stored_file {
         global $USER;
-        $user_context = \context_user::instance($USER->id);
+        $usercontext = \context_user::instance($USER->id);
 
         return get_file_storage()->create_file_from_string(
             [
-                'contextid' => $user_context->id,
+                'contextid' => $usercontext->id,
                 'component' => 'user',
                 'filearea' => 'draft',
                 'itemid' => file_get_unused_draft_itemid(),

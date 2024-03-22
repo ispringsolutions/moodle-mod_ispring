@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,22 +27,20 @@ namespace mod_ispring\pages;
 use core_reportbuilder\system_report_factory;
 use mod_ispring\report\course_modules_report;
 
-class index_page extends base_page
-{
-    private int $moodle_course_id;
+class index_page extends base_page {
+    private int $moodlecourseid;
 
     public function __construct(
-        int $moodle_course_id,
+        int $moodlecourseid,
         string $url,
-        array $args = null)
-    {
+        array $args = null
+    ) {
         parent::__construct($url, $args);
 
-        $this->moodle_course_id = $moodle_course_id;
+        $this->moodlecourseid = $moodlecourseid;
     }
 
-    public function get_content(): string
-    {
+    public function get_content(): string {
         $report = system_report_factory::create(
             course_modules_report::class,
             $this->get_page()->context,
@@ -55,10 +52,9 @@ class index_page extends base_page
         return $report->output();
     }
 
-    private function get_report_params(): array
-    {
+    private function get_report_params(): array {
         return [
-            course_modules_report::PARAM_MOODLE_COURSE_ID => $this->moodle_course_id,
+            course_modules_report::PARAM_MOODLE_COURSE_ID => $this->moodlecourseid,
         ];
     }
 }

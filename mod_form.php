@@ -25,23 +25,19 @@
 use mod_ispring\ispring_module\domain\model\grading_options;
 use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
-class mod_ispring_mod_form extends moodleform_mod
-{
-    function definition(): void
-    {
+class mod_ispring_mod_form extends moodleform_mod {
+    public function definition(): void {
         $mform = $this->_form;
 
         // -------------------------------------------------------------------------------
         // General settings.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size' => 64));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => 64]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
@@ -52,16 +48,15 @@ class mod_ispring_mod_form extends moodleform_mod
         $mform->addElement('header', 'fieldsetpackage', get_string('fieldsetpackage', 'ispring'));
         $mform->setExpanded('fieldsetpackage');
 
-        $filemanager_options = [
+        $filemanageroptions = [
             'accepted_types' => ['.zip'],
             'maxbytes' => 0,
             'maxfiles' => 1,
             'subdirs' => 0,
         ];
 
-        $mform->addElement('filemanager', 'userfile', get_string('uploadcoursefile', 'ispring'), null, $filemanager_options);
-        if (empty($this->current->instance))
-        {
+        $mform->addElement('filemanager', 'userfile', get_string('uploadcoursefile', 'ispring'), null, $filemanageroptions);
+        if (empty($this->current->instance)) {
             $mform->addRule('userfile', get_string('missinguserfile', 'ispring'), 'required', null, 'client');
         }
 
@@ -96,33 +91,30 @@ class mod_ispring_mod_form extends moodleform_mod
         // -------------------------------------------------------------------------------
         // Activity completion settings.
         // In Moodle 4.3 The 'completionpassgrade' is a radio element with multiple options, so we should remove all of them.
-        while ($mform->elementExists('completionpassgrade'))
-        {
+        while ($mform->elementExists('completionpassgrade')) {
             $mform->removeElement('completionpassgrade');
         }
     }
 
-    public function data_preprocessing(&$default_values): void
-    {
-        $default_values['timeopen'] = !empty($default_values['timeopen']) ? $default_values['timeopen'] : 0;
-        $default_values['timeclose'] = !empty($default_values['timeclose']) ? $default_values['timeclose'] : 0;
+    public function data_preprocessing(&$defaultvalues): void {
+        $defaultvalues['timeopen'] = !empty($defaultvalues['timeopen']) ? $defaultvalues['timeopen'] : 0;
+        $defaultvalues['timeclose'] = !empty($defaultvalues['timeclose']) ? $defaultvalues['timeclose'] : 0;
 
-        // prepare already uploaded file
-        $draft_item_id = file_get_submitted_draft_itemid('userfile');
+        // Prepare already uploaded file.
+        $draftitemid = file_get_submitted_draft_itemid('userfile');
 
         file_prepare_draft_area(
-            $draft_item_id,
+            $draftitemid,
             $this->context->id,
             ispring_file_storage::COMPONENT_NAME,
             ispring_file_storage::PACKAGE_FILEAREA,
             ispring_file_storage::PACKAGE_ITEM_ID,
             ['subdirs' => 0, 'maxfiles' => 1, 'maxbytes' => 0]
         );
-        $default_values['userfile'] = $draft_item_id;
+        $defaultvalues['userfile'] = $draftitemid;
     }
 
-    public function validation($data, $files): array
-    {
+    public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
 
         if ($data['timeopen'] && $data['timeclose'] && $data['timeopen'] > $data['timeclose']) {
@@ -132,8 +124,7 @@ class mod_ispring_mod_form extends moodleform_mod
         return $errors;
     }
 
-    private static function get_grading_options_translations(): array
-    {
+    private static function get_grading_options_translations(): array {
         return [
             grading_options::HIGHEST => get_string('highest', 'ispring'),
             grading_options::AVERAGE => get_string('average', 'ispring'),

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,48 +27,42 @@ namespace mod_ispring\report;
 use core_reportbuilder\system_report;
 use mod_ispring\report\entity\ispring_module;
 
-class course_modules_report extends system_report
-{
+class course_modules_report extends system_report {
     public const PARAM_MOODLE_COURSE_ID = 'moodle_course_id';
 
-    protected function initialise(): void
-    {
-        $moodle_course_id = $this->get_parameter(self::PARAM_MOODLE_COURSE_ID, 0, PARAM_INT);
+    protected function initialise(): void {
+        $courseid = $this->get_parameter(self::PARAM_MOODLE_COURSE_ID, 0, PARAM_INT);
 
-        $entity_ispring = new ispring_module();
-        $entity_ispring_alias = $entity_ispring->get_table_alias('ispring');
-        $this->add_entity($entity_ispring);
+        $entity = new ispring_module();
+        $entityalias = $entity->get_table_alias('ispring');
+        $this->add_entity($entity);
 
-        $this->set_main_table('ispring', $entity_ispring_alias);
+        $this->set_main_table('ispring', $entityalias);
 
-        $this->add_base_condition_simple("{$entity_ispring_alias}.course", $moodle_course_id);
-        $this->add_columns($moodle_course_id, $entity_ispring);
+        $this->add_base_condition_simple("{$entityalias}.course", $courseid);
+        $this->add_columns($courseid, $entity);
     }
 
-    protected function can_view(): bool
-    {
+    protected function can_view(): bool {
         return true;
     }
 
-    private function add_columns(int $moodle_course_id, ispring_module $entity_ispring): void
-    {
-        $mod_info = get_fast_modinfo($moodle_course_id);
-        $course_format = $mod_info->get_course()->format;
+    private function add_columns(int $courseid, ispring_module $entity): void {
+        $modinfo = get_fast_modinfo($courseid);
+        $courseformat = $modinfo->get_course()->format;
 
-        if (course_format_uses_sections($course_format))
-        {
+        if (course_format_uses_sections($courseformat)) {
             $this->add_column(
-                $entity_ispring->get_column(ispring_module::COLUMN_SECTION_NAME),
+                $entity->get_column(ispring_module::COLUMN_SECTION_NAME),
             )
-                ->set_title(new \lang_string('sectionname', "format_{$course_format}"));
+                ->set_title(new \lang_string('sectionname', "format_{$courseformat}"));
         }
 
-        $this->add_column($entity_ispring->get_column(ispring_module::COLUMN_NAME));
-        $this->add_column($entity_ispring->get_column(ispring_module::COLUMN_DESCRIPTION));
+        $this->add_column($entity->get_column(ispring_module::COLUMN_NAME));
+        $this->add_column($entity->get_column(ispring_module::COLUMN_DESCRIPTION));
 
-        if (has_capability('mod/ispring:viewallreports', $this->get_context()))
-        {
-            $this->add_column($entity_ispring->get_column(ispring_module::COLUMN_REPORT));
+        if (has_capability('mod/ispring:viewallreports', $this->get_context())) {
+            $this->add_column($entity->get_column(ispring_module::COLUMN_REPORT));
         }
     }
 }

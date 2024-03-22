@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,24 +21,21 @@
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/ispring/backup/moodle2/backup_ispring_stepslib.php');
 
-class backup_ispring_activity_task extends backup_activity_task
-{
-    protected function define_my_settings(): void
-    {
-        // No particular settings for this activity
+class backup_ispring_activity_task extends backup_activity_task {
+    protected function define_my_settings(): void {
+        // No particular settings for this activity.
     }
 
-    protected function define_my_steps(): void
-    {
+    protected function define_my_steps(): void {
         $this->add_step(new backup_ispring_activity_structure_step('ispring_structure', 'ispring.xml'));
     }
 
-    static public function encode_content_links($content): string
-    {
-        // No particular settings for this activity
+    public static function encode_content_links($content): string {
+        // No particular settings for this activity.
         return $content;
     }
 }

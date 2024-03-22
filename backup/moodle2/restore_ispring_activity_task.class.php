@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,36 +21,31 @@
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/ispring/backup/moodle2/restore_ispring_stepslib.php');
 
-class restore_ispring_activity_task extends restore_activity_task
-{
-    protected function define_my_steps(): void
-    {
+class restore_ispring_activity_task extends restore_activity_task {
+    protected function define_my_steps(): void {
         $this->add_step(new restore_ispring_activity_structure_step('ispring_structure', 'ispring.xml'));
     }
 
-    protected function define_my_settings(): void
-    {
-        // No particular settings for this activity
+    protected function define_my_settings(): void {
+        // No particular settings for this activity.
     }
 
-    static public function define_decode_contents(): array
-    {
+    public static function define_decode_contents(): array {
         return [
             new restore_decode_content('ispring', ['intro'], 'ispring'),
         ];
     }
 
-    static public function define_decode_rules(): array
-    {
-        // No decode rules for this activity
+    public static function define_decode_rules(): array {
+        // No decode rules for this activity.
         return [];
     }
 
-    static public function define_restore_log_rules(): array
-    {
+    public static function define_restore_log_rules(): array {
         return [
             new restore_log_rule('ispring', 'add', 'view.php?id={course_module}', '{ispring}'),
             new restore_log_rule('ispring', 'update', 'view.php?id={course_module}', '{ispring}'),
@@ -59,8 +53,7 @@ class restore_ispring_activity_task extends restore_activity_task
         ];
     }
 
-    static public function define_restore_log_rules_for_course(): array
-    {
+    public static function define_restore_log_rules_for_course(): array {
         return [
             new restore_log_rule('ispring', 'view all', 'index.php?id={course}', null),
         ];

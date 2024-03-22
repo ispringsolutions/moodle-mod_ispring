@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,27 +30,23 @@ use lang_string;
 use mod_ispring\report\entity\base as base_entity;
 use stdClass;
 
-class ispring_module extends base_entity
-{
+class ispring_module extends base_entity {
     public const COLUMN_SECTION_NAME = 'section_name';
     public const COLUMN_NAME = 'name';
     public const COLUMN_DESCRIPTION = 'description';
     public const COLUMN_REPORT = 'report';
 
-    protected function get_default_table_aliases(): array
-    {
+    protected function get_default_table_aliases(): array {
         return [
             'ispring' => 'ism',
         ];
     }
 
-    protected function get_default_entity_title(): lang_string
-    {
+    protected function get_default_entity_title(): lang_string {
         return new lang_string('entityispring', 'ispring');
     }
 
-    protected function get_all_columns(): array
-    {
+    protected function get_all_columns(): array {
         $alias = $this->get_table_alias('ispring');
 
         $columns[] = (new column(
@@ -63,9 +58,8 @@ class ispring_module extends base_entity
             ->set_type(column::TYPE_TEXT)
             ->add_field("{$alias}.id", 'id')
             ->add_field("{$alias}.course", 'course')
-            ->add_callback(static function($value, stdClass $row): string {
-                if (!$cm = self::get_fast_cm_info($row->course, $row->id))
-                {
+            ->add_callback(static function ($value, stdClass $row): string {
+                if (!$cm = self::get_fast_cm_info($row->course, $row->id)) {
                     return '';
                 }
                 return get_section_name($cm->get_course(), $cm->sectionnum);
@@ -81,9 +75,8 @@ class ispring_module extends base_entity
             ->add_field("{$alias}.id", 'id')
             ->add_field("{$alias}.course", 'course')
             ->add_field("{$alias}.name", 'name')
-            ->add_callback(static function($value, stdClass $row): string {
-                if (!$cm = self::get_fast_cm_info($row->course, $row->id))
-                {
+            ->add_callback(static function ($value, stdClass $row): string {
+                if (!$cm = self::get_fast_cm_info($row->course, $row->id)) {
                     return $row->name;
                 }
                 return html_writer::link($cm->url, $row->name);
@@ -100,9 +93,8 @@ class ispring_module extends base_entity
             ->add_field("{$alias}.course", 'course')
             ->add_field("{$alias}.intro", 'intro')
             ->add_field("{$alias}.introformat", 'introformat')
-            ->add_callback(static function($value, stdClass $row): string {
-                if (!$cm = self::get_fast_cm_info($row->course, $row->id))
-                {
+            ->add_callback(static function ($value, stdClass $row): string {
+                if (!$cm = self::get_fast_cm_info($row->course, $row->id)) {
                     return '';
                 }
                 return format_module_intro('ispring', $row, $cm->id);
@@ -117,13 +109,11 @@ class ispring_module extends base_entity
             ->set_type(column::TYPE_TEXT)
             ->add_field("{$alias}.id", 'id')
             ->add_field("{$alias}.course", 'course')
-            ->add_callback(static function($value, stdClass $row): string {
-                if (!$cm = self::get_fast_cm_info($row->course, $row->id))
-                {
+            ->add_callback(static function ($value, stdClass $row): string {
+                if (!$cm = self::get_fast_cm_info($row->course, $row->id)) {
                     return '';
                 }
-                if (!has_capability('mod/ispring:viewallreports', $cm->context))
-                {
+                if (!has_capability('mod/ispring:viewallreports', $cm->context)) {
                     return '';
                 }
                 $url = new \moodle_url('/mod/ispring/report.php', ['id' => $cm->id]);
@@ -133,14 +123,12 @@ class ispring_module extends base_entity
         return $columns;
     }
 
-    protected function get_all_filters(): array
-    {
+    protected function get_all_filters(): array {
         return [];
     }
 
-    private static function get_fast_cm_info(int $moodle_course_id, int $ispring_module_id): ?\cm_info
-    {
-        $mod_info = get_fast_modinfo($moodle_course_id);
-        return $mod_info->get_instances_of('ispring')[$ispring_module_id] ?? null;
+    private static function get_fast_cm_info(int $courseid, int $ispringmoduleid): ?\cm_info {
+        $modinfo = get_fast_modinfo($courseid);
+        return $modinfo->get_instances_of('ispring')[$ispringmoduleid] ?? null;
     }
 }

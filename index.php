@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,12 +26,12 @@ use mod_ispring\pages\index_page;
 
 require_once('../../config.php');
 
-$moodle_course_id = required_param('id', PARAM_INT);
-$course = get_course($moodle_course_id);
+$courseid = required_param('id', PARAM_INT);
+$course = get_course($courseid);
 
 require_login($course);
 
-$page = new index_page($moodle_course_id, '/mod/ispring/index.php', ['id' => $moodle_course_id]);
+$page = new index_page($courseid, '/mod/ispring/index.php', ['id' => $courseid]);
 $page->set_title(get_string('coursemoduleslisttitle', 'ispring', $course->shortname));
 $page->set_heading($course->fullname);
 $page->set_page_layout('incourse');

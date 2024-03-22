@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,21 +26,17 @@ namespace mod_ispring\content\app\model;
 
 use stored_file;
 
-class description_parser
-{
-    public static function parse(stored_file $file): description
-    {
+class description_parser {
+    public static function parse(stored_file $file): description {
         $content = json_decode($file->get_content(), true);
 
-        if (!is_array($content))
-        {
+        if (!is_array($content)) {
             throw new \RuntimeException("File format is wrong");
         }
 
         $result = description::create($content);
 
-        if (!$result)
-        {
+        if (!$result) {
             throw new \RuntimeException("Description file does not contain all required fields");
         }
 

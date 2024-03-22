@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,83 +24,69 @@
 
 namespace mod_ispring\external;
 
-class state_parser
-{
-    public static function parse_state(string $data): state
-    {
-        $parsed_data = self::parse_json($data);
-        self::require_properties($parsed_data, ['duration', 'id', 'persistState', 'status', 'playerId']);
-        self::require_properties_are_numeric($parsed_data, ['duration']);
+class state_parser {
+    public static function parse_state(string $json): state {
+        $data = self::parse_json($json);
+        self::require_properties($data, ['duration', 'id', 'persistState', 'status', 'playerId']);
+        self::require_properties_are_numeric($data, ['duration']);
 
         return new state(
-            (int)$parsed_data->duration,
-            $parsed_data->id,
-            json_encode($parsed_data->persistState),
-            $parsed_data->status,
-            $parsed_data->playerId,
+            (int)$data->duration,
+            $data->id,
+            json_encode($data->persistState),
+            $data->status,
+            $data->playerId,
         );
     }
 
-    public static function parse_result_state(string $data): result_state
-    {
-        $state = self::parse_state($data);
+    public static function parse_result_state(string $json): result_state {
+        $state = self::parse_state($json);
 
-        $parsed_data = self::parse_json($data);
-        self::require_properties_are_numeric($parsed_data, ['maxScore', 'minScore', 'passingScore', 'score']);
+        $data = self::parse_json($json);
+        self::require_properties_are_numeric($data, ['maxScore', 'minScore', 'passingScore', 'score']);
 
         return new result_state(
             $state,
-            property_exists($parsed_data, 'maxScore') ? $parsed_data->maxScore : null,
-            property_exists($parsed_data, 'minScore') ? $parsed_data->minScore : null,
-            property_exists($parsed_data, 'passingScore') ? $parsed_data->passingScore : null,
-            property_exists($parsed_data, 'score') ? $parsed_data->score : null,
-            property_exists($parsed_data, 'detailedReport') ? json_encode($parsed_data->detailedReport) : null,
+            property_exists($data, 'maxScore') ? $data->maxScore : null,
+            property_exists($data, 'minScore') ? $data->minScore : null,
+            property_exists($data, 'passingScore') ? $data->passingScore : null,
+            property_exists($data, 'score') ? $data->score : null,
+            property_exists($data, 'detailedReport') ? json_encode($data->detailedReport) : null,
         );
     }
 
-    public static function parse_start_state(string $data): start_state
-    {
-        $parsed_data = self::parse_json($data);
+    public static function parse_start_state(string $json): start_state {
+        $data = self::parse_json($json);
 
-        self::require_properties($parsed_data, ['status', 'playerId', 'sessionRestored']);
+        self::require_properties($data, ['status', 'playerId', 'sessionRestored']);
 
         return new start_state(
-            $parsed_data->status,
-            $parsed_data->playerId,
-            $parsed_data->sessionRestored,
+            $data->status,
+            $data->playerId,
+            $data->sessionRestored,
         );
     }
 
-    private static function require_properties($data, array $properties): void
-    {
-        foreach ($properties as $property)
-        {
-            if (!property_exists($data, $property))
-            {
+    private static function require_properties($data, array $properties): void {
+        foreach ($properties as $property) {
+            if (!property_exists($data, $property)) {
                 throw new \invalid_parameter_exception("Key {$property} is missing");
             }
         }
     }
 
-    private static function require_properties_are_numeric($data, array $properties): void
-    {
-        foreach ($properties as $property)
-        {
-            if (property_exists($data, $property) && !is_numeric($data->$property))
-            {
+    private static function require_properties_are_numeric($data, array $properties): void {
+        foreach ($properties as $property) {
+            if (property_exists($data, $property) && !is_numeric($data->$property)) {
                 throw new \invalid_parameter_exception("Key {$property} is not a number");
             }
         }
     }
 
-    private static function parse_json(string $json): \stdClass
-    {
-        try
-        {
+    private static function parse_json(string $json): \stdClass {
+        try {
             return json_decode($json);
-        }
-        catch (\Throwable $e)
-        {
+        } catch (\Throwable $e) {
             throw new \invalid_parameter_exception("Wrong data format");
         }
     }

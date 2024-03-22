@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,11 +24,10 @@
 
 namespace mod_ispring\session\app\adapter;
 
-interface content_api_interface
-{
+interface content_api_interface {
     public function get_ispring_module_id_by_content_id(int $id): int;
 
-    public function get_newest_content_id(int $ispring_module_id): int;
+    public function get_newest_content_id(int $ispringmoduleid): int;
 
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array;
+    public function get_ids_by_ispring_module_id(int $ispringmoduleid): array;
 }

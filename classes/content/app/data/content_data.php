@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,50 +24,49 @@
 
 namespace mod_ispring\content\app\data;
 
-class content_data
-{
-    private int $file_id;
-    private int $ispring_module_id;
-    private int $context_id;
-    private int $user_context_id;
+class content_data {
+    private int $fileid;
+    private int $ispringmoduleid;
+    private int $contextid;
+    private int $usercontextid;
 
-    public function __construct(int $file_id, int $ispring_module_id, int $context_id, int $user_context_id)
-    {
-        $this->file_id = $file_id;
-        $this->ispring_module_id = $ispring_module_id;
-        $this->context_id = $context_id;
-        $this->user_context_id = $user_context_id;
+    public function __construct(
+        int $fileid,
+        int $ispringmoduleid,
+        int $contextid,
+        int $usercontextid
+    ) {
+        $this->fileid = $fileid;
+        $this->ispringmoduleid = $ispringmoduleid;
+        $this->contextid = $contextid;
+        $this->usercontextid = $usercontextid;
     }
 
     /**
      * @return int
      */
-    public function get_file_id(): int
-    {
-        return $this->file_id;
+    public function get_file_id(): int {
+        return $this->fileid;
     }
 
     /**
      * @return int
      */
-    public function get_ispring_module_id(): int
-    {
-        return $this->ispring_module_id;
+    public function get_ispring_module_id(): int {
+        return $this->ispringmoduleid;
     }
 
     /**
      * @return int
      */
-    public function get_context_id(): int
-    {
-        return $this->context_id;
+    public function get_context_id(): int {
+        return $this->contextid;
     }
 
     /**
      * @return int
      */
-    public function get_user_context_id(): int
-    {
-        return $this->user_context_id;
+    public function get_user_context_id(): int {
+        return $this->usercontextid;
     }
 }

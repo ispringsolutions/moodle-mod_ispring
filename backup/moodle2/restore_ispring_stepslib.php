@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,11 +21,8 @@
  * @author      Desktop Team <desktop-team@ispring.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-class restore_ispring_activity_structure_step extends restore_activity_structure_step
-{
-    protected function define_structure()
-    {
+class restore_ispring_activity_structure_step extends restore_activity_structure_step {
+    protected function define_structure() {
         $paths = [
             new restore_path_element('ispring', '/activity/ispring'),
             new restore_path_element('ispring_content', '/activity/ispring/ispring_content'),
@@ -36,8 +32,7 @@ class restore_ispring_activity_structure_step extends restore_activity_structure
         return $this->prepare_activity_structure($paths);
     }
 
-    protected function process_ispring(array $data): void
-    {
+    protected function process_ispring(array $data): void {
         global $DB;
 
         $data = (object)$data;
@@ -48,31 +43,27 @@ class restore_ispring_activity_structure_step extends restore_activity_structure
         $this->apply_activity_instance($id);
     }
 
-    protected function process_ispring_content(array $data): void
-    {
+    protected function process_ispring_content(array $data): void {
         global $DB;
 
         $data = (object)$data;
-        $old_id = $data->id;
+        $oldid = $data->id;
         $data->ispring_id = $this->get_new_parentid('ispring');
 
-        $new_id = $DB->insert_record('ispring_content', $data);
-        $this->set_mapping('ispring_content', $old_id, $new_id);
+        $newid = $DB->insert_record('ispring_content', $data);
+        $this->set_mapping('ispring_content', $oldid, $newid);
     }
 
-    protected function process_ispring_session(array $data): void
-    {
+    protected function process_ispring_session(array $data): void {
         global $DB;
 
         $data = (object)$data;
-        $old_id = $data->id;
         $data->ispring_content_id = $this->get_new_parentid('ispring_content');
 
         $DB->insert_record('ispring_session', $data);
     }
 
-    protected function after_execute(): void
-    {
+    protected function after_execute(): void {
         $this->add_related_files('mod_ispring', 'content', null);
     }
 }

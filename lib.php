@@ -30,20 +30,14 @@ use mod_ispring\use_case\create_or_update_ispring_module_use_case;
 use mod_ispring\use_case\delete_ispring_module_use_case;
 use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../config.php');
-
 /**
  * Returns true, false or null depending on plugin support for $feature.
  *
  * @param string $feature Constant representing the feature.
  * @return bool|null True if the feature is supported, false if not, null if unknown.
  */
-function ispring_supports(string $feature): ?bool
-{
-    switch ($feature)
-    {
+function ispring_supports(string $feature): ?bool {
+    switch ($feature) {
         case FEATURE_GRADE_HAS_GRADE:
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_BACKUP_MOODLE2:
@@ -54,45 +48,43 @@ function ispring_supports(string $feature): ?bool
 }
 
 /**
- * Creates a new instance of ispring activity module using the data from $new_ispring.
- * Additional properties for $new_ispring can be defined in {@see mod_form.php}.
+ * Creates a new instance of ispring activity module using the data from $newispring.
+ * Additional properties for $newispring can be defined in {@see mod_form.php}.
  *
- * @param stdClass $new_ispring
+ * @param stdClass $newispring
  * @param stdClass $mform
  * @return int
  */
-function ispring_add_instance($new_ispring, $mform = null): int
-{
+function ispring_add_instance($newispring, $mform = null): int {
     global $USER;
 
-    $ispring_module_api = di_container::get_ispring_module_api();
-    $content_api = di_container::get_content_api();
+    $ispringmoduleapi = di_container::get_ispring_module_api();
+    $contentapi = di_container::get_content_api();
 
-    $module_context = context_module::instance($new_ispring->coursemodule);
-    $user_context = context_user::instance($USER->id);
+    $modulecontext = context_module::instance($newispring->coursemodule);
+    $usercontext = context_user::instance($USER->id);
 
-    $use_case = new create_or_update_ispring_module_use_case($ispring_module_api, $content_api);
-    $ispring_module_id = $use_case->create($new_ispring, $module_context->id, $user_context->id);
+    $usecase = new create_or_update_ispring_module_use_case($ispringmoduleapi, $contentapi);
+    $ispringmoduleid = $usecase->create($newispring, $modulecontext->id, $usercontext->id);
 
-    $ispring_instance = std_mapper::ispring_module_output_to_std_class(
-        $ispring_module_api->get_by_id($ispring_module_id),
+    $ispringinstance = std_mapper::ispring_module_output_to_std_class(
+        $ispringmoduleapi->get_by_id($ispringmoduleid),
     );
 
-    ispring_update_grades($ispring_instance);
-    if ($new_ispring->completionexpected)
-    {
+    ispring_update_grades($ispringinstance);
+    if ($newispring->completionexpected) {
         \core_completion\api::update_completion_date_event(
-            $new_ispring->coursemodule,
+            $newispring->coursemodule,
             'ispring',
-            $ispring_instance,
-            $new_ispring->completionexpected,
+            $ispringinstance,
+            $newispring->completionexpected,
         );
     }
 
-    $new_ispring->instance = $ispring_module_id;
-    open_close_event_controller::set_events($new_ispring);
+    $newispring->instance = $ispringmoduleid;
+    open_close_event_controller::set_events($newispring);
 
-    return $ispring_module_id;
+    return $ispringmoduleid;
 }
 
 /**
@@ -103,7 +95,7 @@ function ispring_add_instance($new_ispring, $mform = null): int
  * @param stdClass $context context object
  * @param string $filearea file area
  * @param array $args extra arguments
- * @param bool $force_download whether force download
+ * @param bool $forcedownload whether force download
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - just send the file
  */
@@ -113,14 +105,13 @@ function ispring_pluginfile(
     stdClass $context,
     string $filearea,
     array $args,
-    bool $force_download,
+    bool $forcedownload,
     array $options = []
-): bool
-{
+): bool {
     require_login($course, true, $cm);
 
-    $content_api = di_container::get_content_api();
-    return $content_api->present_file($context->id, $filearea, $args, $force_download, $options);
+    $contentapi = di_container::get_content_api();
+    return $contentapi->present_file($context->id, $filearea, $args, $forcedownload, $options);
 }
 
 /**
@@ -131,8 +122,7 @@ function ispring_pluginfile(
  * @param stdClass $context
  * @return array
  */
-function ispring_get_file_areas(stdClass $course, stdClass $cm, stdClass $context): array
-{
+function ispring_get_file_areas(stdClass $course, stdClass $cm, stdClass $context): array {
     return [
         'package' => get_string('areapackage', 'ispring'),
     ];
@@ -147,7 +137,7 @@ function ispring_get_file_areas(stdClass $course, stdClass $cm, stdClass $contex
  * @param stdClass $cm
  * @param stdClass $context
  * @param string $filearea
- * @param int|null $item_id
+ * @param int|null $itemid
  * @param string|null $filepath
  * @param string|null $filename
  * @return file_info|null
@@ -159,35 +149,40 @@ function ispring_get_file_info(
     stdClass $cm,
     stdClass $context,
     string $filearea,
-    ?int $item_id,
+    ?int $itemid,
     ?string $filepath,
     ?string $filename
-): ?file_info
-{
+): ?file_info {
     global $CFG;
 
-    // show only packages
-    if ($filearea !== ispring_file_storage::PACKAGE_FILEAREA)
-    {
+    // Show only packages.
+    if ($filearea !== ispring_file_storage::PACKAGE_FILEAREA) {
         return null;
     }
 
     $fs = get_file_storage();
     $filepath = $filepath ?? '/';
     $filename = $filename ?? '.';
-    $item_id = $item_id ?? 0;
+    $itemid = $itemid ?? 0;
 
-    if (!$stored_file = $fs->get_file($context->id, ispring_file_storage::COMPONENT_NAME, $filearea, $item_id, $filepath, $filename))
-    {
+    $storedfile = $fs->get_file(
+        $context->id,
+        ispring_file_storage::COMPONENT_NAME,
+        $filearea,
+        $itemid,
+        $filepath,
+        $filename
+    );
+    if (!$storedfile) {
         return null;
     }
 
-    $url_base = $CFG->wwwroot . '/pluginfile.php';
+    $urlbase = $CFG->wwwroot . '/pluginfile.php';
     return new file_info_stored(
         $browser,
         $context,
-        $stored_file,
-        $url_base,
+        $storedfile,
+        $urlbase,
         $areas[$filearea],
         false,
         true,
@@ -197,59 +192,54 @@ function ispring_get_file_info(
 }
 
 /**
- * Updates an existing instance of ispring activity module with the data from $new_ispring.
- * Additional properties for $new_ispring can be defined in {@see mod_form.php}.
+ * Updates an existing instance of ispring activity module with the data from $newispring.
+ * Additional properties for $newispring can be defined in {@see mod_form.php}.
  *
- * @param stdClass $new_ispring object containing all the properties required to update an instance
+ * @param stdClass $newispring object containing all the properties required to update an instance
  * @return bool true if ispring activity module was updated successfully
  */
-function ispring_update_instance(stdClass $new_ispring): bool
-{
+function ispring_update_instance(stdClass $newispring): bool {
     global $USER;
 
-    $ispring_module_api = di_container::get_ispring_module_api();
-    $content_api = di_container::get_content_api();
+    $ispringmoduleapi = di_container::get_ispring_module_api();
+    $contentapi = di_container::get_content_api();
 
-    $module_context = context_module::instance($new_ispring->coursemodule);
-    $user_context = context_user::instance($USER->id);
+    $modulecontext = context_module::instance($newispring->coursemodule);
+    $usercontext = context_user::instance($USER->id);
 
-    $use_case = new create_or_update_ispring_module_use_case($ispring_module_api, $content_api);
-    if (!$use_case->update($new_ispring, $module_context->id, $user_context->id))
-    {
+    $usecase = new create_or_update_ispring_module_use_case($ispringmoduleapi, $contentapi);
+    if (!$usecase->update($newispring, $modulecontext->id, $usercontext->id)) {
         return false;
     }
 
-    $ispring_instance = std_mapper::ispring_module_output_to_std_class(
-        $ispring_module_api->get_by_id($new_ispring->instance),
+    $ispringinstance = std_mapper::ispring_module_output_to_std_class(
+        $ispringmoduleapi->get_by_id($newispring->instance),
     );
 
-    ispring_update_grades($ispring_instance);
+    ispring_update_grades($ispringinstance);
     \core_completion\api::update_completion_date_event(
-        $new_ispring->coursemodule,
+        $newispring->coursemodule,
         'ispring',
-        $ispring_instance,
-        $new_ispring->completionexpected ? $new_ispring->completionexpected : null,
+        $ispringinstance,
+        $newispring->completionexpected ? $newispring->completionexpected : null,
     );
 
-    open_close_event_controller::set_events($new_ispring);
+    open_close_event_controller::set_events($newispring);
 
     return true;
 }
 
-function ispring_delete_instance($id): bool
-{
+function ispring_delete_instance($id): bool {
     global $DB;
-    $ispring_module_api = di_container::get_ispring_module_api();
-    $module = $ispring_module_api->get_by_id($id);
-    if (!$module)
-    {
+    $ispringmoduleapi = di_container::get_ispring_module_api();
+    $module = $ispringmoduleapi->get_by_id($id);
+    if (!$module) {
         return false;
     }
 
-    $use_case = new delete_ispring_module_use_case($ispring_module_api, $module);
+    $usecase = new delete_ispring_module_use_case($ispringmoduleapi, $module);
 
-    if ($use_case->delete())
-    {
+    if ($usecase->delete()) {
         $events = $DB->get_records('event', ['modulename' => 'ispring', 'instance' => $module->get_id()]);
         foreach ($events as $event) {
             $event = calendar_event::load($event);
@@ -270,12 +260,10 @@ function ispring_delete_instance($id): bool
  * @param navigation_node $ispringnode navigation_node object.
  * @return void
  */
-function ispring_extend_settings_navigation(settings_navigation $settings, navigation_node $ispringnode): void
-{
-    if (has_capability('mod/ispring:viewallreports', $settings->get_page()->cm->context))
-    {
+function ispring_extend_settings_navigation(settings_navigation $settings, navigation_node $ispringnode): void {
+    if (has_capability('mod/ispring:viewallreports', $settings->get_page()->cm->context)) {
         $url = new moodle_url('/mod/ispring/report.php', ['id' => $settings->get_page()->cm->id]);
-        $new_node = $ispringnode->add(
+        $ispringnode->add(
             get_string('report', 'ispring'),
             $url,
             navigation_node::TYPE_CUSTOM,
@@ -289,41 +277,38 @@ function ispring_extend_settings_navigation(settings_navigation $settings, navig
  * Creates or updates grade item for the given mod_ispring instance.
  * Needed by {@see grade_update_mod_grades()}.
  *
- * @param stdClass $module_instance Instance object with extra cmidnumber and modname property.
+ * @param stdClass $instance Instance object with extra cmidnumber and modname property.
  * @param mixed $grades Optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return void
  * @throws coding_exception
  */
-function ispring_grade_item_update(stdClass $module_instance, $grades = null): void
-{
+function ispring_grade_item_update(stdClass $instance, $grades = null): void {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
     $details = [
-        'itemname' => clean_param($module_instance->name, PARAM_NOTAGS),
+        'itemname' => clean_param($instance->name, PARAM_NOTAGS),
     ];
 
-    if (property_exists($module_instance, 'max_score'))
-    {
+    if (property_exists($instance, 'max_score')) {
         $details['gradetype'] = GRADE_TYPE_VALUE;
-        $details['grademax'] = $module_instance->max_score;
-        $details['grademin'] = $module_instance->min_score ?? 0;
+        $details['grademax'] = $instance->max_score;
+        $details['grademin'] = $instance->min_score ?? 0;
 
         $details['hidden'] = false;
     }
 
-    if ($grades === 'reset')
-    {
+    if ($grades === 'reset') {
         $details['reset'] = true;
         $grades = null;
     }
 
     grade_update(
         'mod/ispring',
-        $module_instance->course,
+        $instance->course,
         'mod',
         'ispring',
-        $module_instance->id,
+        $instance->id,
         0,
         $grades,
         $details
@@ -333,51 +318,45 @@ function ispring_grade_item_update(stdClass $module_instance, $grades = null): v
 /**
  * Update grades in central gradebook
  *
- * @param stdClass $module_instance Instance object with extra cmidnumber and modname property.
- * @param int $user_id specific user only, 0 means all users.
- * @param bool $null_if_none If a single user is specified and $null_if_none is true a grade item with a null rawgrade will be inserted
+ * @param stdClass $instance Instance object with extra cmidnumber and modname property.
+ * @param int $userid specific user only, 0 means all users.
+ * @param bool $nullifnone If a single user is specified and $null_if_none
+ * is true a grade item with a null rawgrade will be inserted
  * @throws coding_exception
  */
-function ispring_update_grades(stdClass $module_instance, int $user_id = 0, bool $null_if_none = true): void
-{
-    if ($grades = ispring_get_user_grades($module_instance, $user_id))
-    {
+function ispring_update_grades(stdClass $instance, int $userid = 0, bool $nullifnone = true): void {
+    if ($grades = ispring_get_user_grades($instance, $userid)) {
         count($grades) === 0
-            ? ispring_grade_item_update($module_instance)
-            : ispring_grade_item_update($module_instance, $grades);
+            ? ispring_grade_item_update($instance)
+            : ispring_grade_item_update($instance, $grades);
         return;
     }
-    if ($null_if_none && $user_id)
-    {
+    if ($nullifnone && $userid) {
         $grade = new stdClass();
-        $grade->userid = $user_id;
+        $grade->userid = $userid;
         $grade->rawgrade = null;
-        ispring_grade_item_update($module_instance, $grade);
-    }
-    else
-    {
-        ispring_grade_item_update($module_instance);
+        ispring_grade_item_update($instance, $grade);
+    } else {
+        ispring_grade_item_update($instance);
     }
 }
 
 /**
  * Delete grade item for given mod_ispring instance.
  *
- * @param stdClass $module_instance Instance object.
+ * @param stdClass $instance Instance object.
  * @return int
  */
-function ispring_grade_item_delete($module_instance): int
-{
+function ispring_grade_item_delete($instance): int {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
-    return grade_update('/mod/ispring', $module_instance->course, 'mod', 'ispring',
-        $module_instance->id, 0, null, ['deleted' => 1]);
+    return grade_update('/mod/ispring', $instance->course, 'mod', 'ispring',
+        $instance->id, 0, null, ['deleted' => 1]);
 }
 
-function ispring_get_user_grades(stdClass $module_instance, int $user_id): ?array
-{
-    return di_container::get_session_api()->get_grades_for_gradebook($module_instance->id, $user_id);
+function ispring_get_user_grades(stdClass $instance, int $userid): ?array {
+    return di_container::get_session_api()->get_grades_for_gradebook($instance->id, $userid);
 }
 
 /**
@@ -386,20 +365,18 @@ function ispring_get_user_grades(stdClass $module_instance, int $user_id): ?arra
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
- * @param int $user_id User id to use for all capability checks, etc. Set to 0 for current user (default).
+ * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
 function mod_ispring_core_calendar_provide_event_action(
     calendar_event $event,
     \core_calendar\action_factory $factory,
-    int $user_id = null
-): ?\core_calendar\local\event\entities\action_interface
-{
-    $mod_info = get_fast_modinfo($event->courseid);
-    $cm = $mod_info->get_instances_of('ispring')[$event->instance];
+    int $userid = null
+): ?\core_calendar\local\event\entities\action_interface {
+    $modinfo = get_fast_modinfo($event->courseid);
+    $cm = $modinfo->get_instances_of('ispring')[$event->instance];
 
-    if (!$cm)
-    {
+    if (!$cm) {
         return null;
     }
 
@@ -414,29 +391,25 @@ function mod_ispring_core_calendar_provide_event_action(
 /**
  * Create cached info for ispring course module.
  *
- * @param stdClass $course_module The course_module object (record).
+ * @param stdClass $coursemodule The course_module object (record).
  * @return cached_cm_info|bool An object on information that the courses
  *                        will know about (most noticeably, an icon).
  */
-function ispring_get_coursemodule_info(stdClass $course_module)
-{
-    if (!$module = di_container::get_ispring_module_api()->get_by_id($course_module->instance))
-    {
+function ispring_get_coursemodule_info(stdClass $coursemodule) {
+    if (!$module = di_container::get_ispring_module_api()->get_by_id($coursemodule->instance)) {
         return false;
     }
 
     $result = new cached_cm_info();
     $result->name = $module->get_name();
-    $time_open = $module->get_time_open();
-    $time_close = $module->get_time_close();
+    $timeopen = $module->get_time_open();
+    $timeclose = $module->get_time_close();
 
-    if ($time_open)
-    {
-        $result->customdata['timeopen'] = $time_open;
+    if ($timeopen) {
+        $result->customdata['timeopen'] = $timeopen;
     }
-    if ($time_close)
-    {
-        $result->customdata['timeclose'] = $time_close;
+    if ($timeclose) {
+        $result->customdata['timeclose'] = $timeclose;
     }
 
     return $result;
@@ -463,24 +436,21 @@ function ispring_get_coursemodule_info(stdClass $course_module)
  * @param stdClass $module The module instance to get the range from
  * @return array
  */
-function mod_ispring_core_calendar_get_valid_event_timestart_range(calendar_event $event, stdClass $module): array
-{
-    $min_date = null;
-    $max_date = null;
+function mod_ispring_core_calendar_get_valid_event_timestart_range(calendar_event $event, stdClass $module): array {
+    $mindate = null;
+    $maxdate = null;
 
-    if ($event->eventtype == event_types::OPEN && !empty($module->timeclose))
-    {
-        $min_date = [
+    if ($event->eventtype == event_types::OPEN && !empty($module->timeclose)) {
+        $mindate = [
             $module->timeclose,
             get_string('openafterclose', 'ispring'),
         ];
-    } else if ($event->eventtype == event_types::CLOSE && !empty($module->timeopen))
-    {
-        $max_date = [
+    } else if ($event->eventtype == event_types::CLOSE && !empty($module->timeopen)) {
+        $maxdate = [
             $module->timeopen,
             get_string('closebeforeopen', 'ispring'),
         ];
     }
 
-    return [$min_date, $max_date];
+    return [$mindate, $maxdate];
 }

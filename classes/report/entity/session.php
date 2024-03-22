@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,26 +32,22 @@ use lang_string;
 use mod_ispring\report\entity\base as base_entity;
 use mod_ispring\session\domain\model\session_state;
 
-class session extends base_entity
-{
-    private string $page_url;
+class session extends base_entity {
+    private string $pageurl;
 
     public function __construct(
-        string $page_url
-    )
-    {
-        $this->page_url = $page_url;
+        string $pageurl
+    ) {
+        $this->pageurl = $pageurl;
     }
 
-    protected function get_default_table_aliases(): array
-    {
+    protected function get_default_table_aliases(): array {
         return [
             'ispring_session' => 'iss',
         ];
     }
 
-    protected function get_default_entity_title(): lang_string
-    {
+    protected function get_default_entity_title(): lang_string {
         return new lang_string('entitysession', 'ispring');
     }
 
@@ -62,8 +57,7 @@ class session extends base_entity
      * @return column[]
      * @throws \coding_exception
      */
-    protected function get_all_columns(): array
-    {
+    protected function get_all_columns(): array {
         $alias = $this->get_table_alias('ispring_session');
         $columns = [];
 
@@ -75,8 +69,8 @@ class session extends base_entity
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
             ->add_field("{$alias}.id")
-            ->add_callback(function(string $session_id): string {
-                $link = $this->get_detailed_report_link($session_id);
+            ->add_callback(function (string $sessionid): string {
+                $link = $this->get_detailed_report_link($sessionid);
                 return \html_writer::link($link->out(false), get_string('reviewattempt', 'ispring'));
             });
 
@@ -89,14 +83,18 @@ class session extends base_entity
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(true)
             ->add_field("{$alias}.status")
-            ->add_callback(static function(string $status): string {
-                switch ($status)
-                {
-                    case session_state::INCOMPLETE: return get_string('statusinprogress', 'ispring');
-                    case session_state::COMPLETE: return get_string('statuscomplete', 'ispring');
-                    case session_state::PASSED: return get_string('statuspassed', 'ispring');
-                    case session_state::FAILED: return get_string('statusfailed', 'ispring');
-                    default: return get_string('statusunknown', 'ispring');
+            ->add_callback(static function (string $status): string {
+                switch ($status) {
+                    case session_state::INCOMPLETE:
+                        return get_string('statusinprogress', 'ispring');
+                    case session_state::COMPLETE:
+                        return get_string('statuscomplete', 'ispring');
+                    case session_state::PASSED:
+                        return get_string('statuspassed', 'ispring');
+                    case session_state::FAILED:
+                        return get_string('statusfailed', 'ispring');
+                    default:
+                        return get_string('statusunknown', 'ispring');
                 }
             });
 
@@ -137,12 +135,11 @@ class session extends base_entity
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
             ->add_field("{$alias}.end_time")
-            ->add_callback(static function(?int $end_time): string {
-                if ($end_time === null)
-                {
+            ->add_callback(static function (?int $endtime): string {
+                if ($endtime === null) {
                     return '-';
                 }
-                return userdate($end_time, get_string('strftimedatetime', 'langconfig'));
+                return userdate($endtime, get_string('strftimedatetime', 'langconfig'));
             })
             ->set_is_sortable(true);
 
@@ -154,8 +151,8 @@ class session extends base_entity
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
             ->add_field("{$alias}.begin_time")
-            ->add_callback(static function(int $begin_time): string {
-                return userdate($begin_time, get_string('strftimedatetime', 'langconfig'));
+            ->add_callback(static function (int $begintime): string {
+                return userdate($begintime, get_string('strftimedatetime', 'langconfig'));
             })
             ->set_is_sortable(true);
 
@@ -167,7 +164,7 @@ class session extends base_entity
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
             ->add_field("{$alias}.duration")
-            ->add_callback(static function(?int $duration): string {
+            ->add_callback(static function (?int $duration): string {
                 return self::format_duration($duration);
             })
             ->set_is_sortable(true);
@@ -182,8 +179,7 @@ class session extends base_entity
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    protected function get_all_filters(): array
-    {
+    protected function get_all_filters(): array {
         $alias = $this->get_table_alias('ispring_session');
 
         $filters[] = (new filter(
@@ -243,17 +239,14 @@ class session extends base_entity
         return $filters;
     }
 
-    private static function format_duration(?int $duration): string
-    {
+    private static function format_duration(?int $duration): string {
         return $duration ? format_time($duration) : '-';
     }
 
-    private function get_detailed_report_link(string $session_id): \moodle_url
-    {
-        $args = ['session_id' => $session_id];
-        if ($this->page_url)
-        {
-            $args['return_url'] = $this->page_url;
+    private function get_detailed_report_link(string $sessionid): \moodle_url {
+        $args = ['session_id' => $sessionid];
+        if ($this->pageurl) {
+            $args['return_url'] = $this->pageurl;
         }
         return new \moodle_url('/mod/ispring/detailed_report.php', $args);
     }

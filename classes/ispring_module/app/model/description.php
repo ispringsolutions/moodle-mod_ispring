@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,16 +24,14 @@
 
 namespace mod_ispring\ispring_module\app\model;
 
-final class description
-{
+final class description {
     private string $text;
     private int $format;
 
     public function __construct(
         string $text,
         int $format
-    )
-    {
+    ) {
         $this->text = $text;
         $this->format = $format;
     }
@@ -42,16 +39,14 @@ final class description
     /**
      * @return string
      */
-    public function get_text(): string
-    {
+    public function get_text(): string {
         return $this->text;
     }
 
     /**
      * @return int
      */
-    public function get_format(): int
-    {
+    public function get_format(): int {
         return $this->format;
     }
 }

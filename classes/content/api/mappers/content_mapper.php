@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,28 +29,25 @@ use mod_ispring\content\api\output\content_output;
 use mod_ispring\content\app\data\content_data;
 use mod_ispring\content\app\query\model\content;
 
-class content_mapper
-{
-    public static function get_content_data(content_input $content_input): content_data
-    {
+class content_mapper {
+    public static function get_content_data(content_input $contentinput): content_data {
         return new content_data(
-            $content_input->get_file_id(),
-            $content_input->get_ispring_module_id(),
-            $content_input->get_context_id(),
-            $content_input->get_user_context_id(),
+            $contentinput->get_file_id(),
+            $contentinput->get_ispring_module_id(),
+            $contentinput->get_context_id(),
+            $contentinput->get_user_context_id(),
         );
     }
 
-    public static function get_content_output(content $content_info_data): content_output
-    {
+    public static function get_content_output(content $contentinfodata): content_output {
         return new content_output(
-            $content_info_data->get_id(),
-            $content_info_data->get_file_id(),
-            $content_info_data->get_ispring_module_id(),
-            $content_info_data->get_creation_time(),
-            $content_info_data->get_filename(),
-            $content_info_data->get_filepath(),
-            $content_info_data->get_version(),
+            $contentinfodata->get_id(),
+            $contentinfodata->get_file_id(),
+            $contentinfodata->get_ispring_module_id(),
+            $contentinfodata->get_creation_time(),
+            $contentinfodata->get_filename(),
+            $contentinfodata->get_filepath(),
+            $contentinfodata->get_version(),
         );
     }
 }

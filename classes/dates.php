@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -38,26 +37,26 @@ class dates extends activity_dates {
      * @throws \coding_exception
      */
     protected function get_dates(): array {
-        $time_open = $this->cm->customdata['timeopen'] ?? null;
-        $time_close = $this->cm->customdata['timeclose'] ?? null;
+        $timeopen = $this->cm->customdata['timeopen'] ?? null;
+        $timeclose = $this->cm->customdata['timeclose'] ?? null;
         $now = time();
         $dates = [];
 
-        if ($time_open) {
-            $open_label_id = $time_open > $now ? 'activitydate:opens' : 'activitydate:opened';
+        if ($timeopen) {
+            $openlabelid = $timeopen > $now ? 'activitydate:opens' : 'activitydate:opened';
             $dates[] = [
                 'dataid' => 'timeopen',
-                'label' => get_string($open_label_id, 'core_course'),
-                'timestamp' => (int) $time_open,
+                'label' => get_string($openlabelid, 'core_course'),
+                'timestamp' => (int)$timeopen,
             ];
         }
 
-        if ($time_close) {
-            $close_label_id = $time_close > $now ? 'activitydate:closes' : 'activitydate:closed';
+        if ($timeclose) {
+            $closelabelid = $timeclose > $now ? 'activitydate:closes' : 'activitydate:closed';
             $dates[] = [
                 'dataid' => 'timeclose',
-                'label' => get_string($close_label_id, 'core_course'),
-                'timestamp' => (int) $time_close,
+                'label' => get_string($closelabelid, 'core_course'),
+                'timestamp' => (int)$timeclose,
             ];
         }
 

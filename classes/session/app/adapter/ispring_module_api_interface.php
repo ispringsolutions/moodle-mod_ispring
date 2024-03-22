@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,7 +24,6 @@
 
 namespace mod_ispring\session\app\adapter;
 
-interface ispring_module_api_interface
-{
-    public function get_grade_method(int $ispring_module_id): int;
+interface ispring_module_api_interface {
+    public function get_grade_method(int $ispringmoduleid): int;
 }

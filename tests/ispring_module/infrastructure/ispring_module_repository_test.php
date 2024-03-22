@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,74 +24,75 @@
 
 namespace mod_ispring\ispring_module\infrastructure;
 
+defined('MOODLE_INTERNAL') || die();
+
 use mod_ispring\ispring_module\app\data\ispring_module_data;
 use mod_ispring\ispring_module\app\model\description;
 use mod_ispring\ispring_module\domain\model\grading_options;
 
 require_once(__DIR__ . '/../../testcase/ispring_testcase.php');
 
-final class ispring_module_repository_test extends \mod_ispring\testcase\ispring_testcase
-{
-    private ispring_module_repository $ispring_repository;
+/**
+ * Test ispring_module_repository class.
+ *
+ * @covers \mod_ispring\ispring_module\infrastructure\ispring_module_repository
+ */
+final class ispring_module_repository_test extends \mod_ispring\testcase\ispring_testcase {
+    private ispring_module_repository $ispringrepository;
 
-    protected function setUp(): void
-    {
-        $this->ispring_repository = new ispring_module_repository();
+    protected function setUp(): void {
+        $this->ispringrepository = new ispring_module_repository();
     }
 
-    public function test_add_with_description(): void
-    {
-        $moodle_course_id = $this->create_course();
-        $ispring_module = new ispring_module_data(
+    public function test_add_with_description(): void {
+        $courseid = $this->create_course();
+        $data = new ispring_module_data(
             'test_add',
-            $moodle_course_id,
+            $courseid,
             grading_options::AVERAGE,
             new description('test_add_description', FORMAT_PLAIN),
             time(),
             time() + 3,
         );
 
-        $id = $this->ispring_repository->add($ispring_module);
+        $id = $this->ispringrepository->add($data);
 
-        $this->assert_db_record_equals_module_data($ispring_module, $id);
+        $this->assert_db_record_equals_module_data($data, $id);
     }
 
-    public function test_add_without_description(): void
-    {
-        $moodle_course_id = $this->create_course();
-        $ispring_module = new ispring_module_data(
+    public function test_add_without_description(): void {
+        $courseid = $this->create_course();
+        $data = new ispring_module_data(
             'test_add',
-            $moodle_course_id,
+            $courseid,
             grading_options::AVERAGE,
             null,
             time(),
             time() + 3,
         );
 
-        $id = $this->ispring_repository->add($ispring_module);
+        $id = $this->ispringrepository->add($data);
 
-        $this->assert_db_record_equals_module_data($ispring_module, $id);
+        $this->assert_db_record_equals_module_data($data, $id);
     }
 
-    public function test_update(): void
-    {
-        $ispring_instance = $this->create_course_and_instance();
-        $ispring_module = new ispring_module_data(
+    public function test_update(): void {
+        $instance = $this->create_course_and_instance();
+        $data = new ispring_module_data(
             'test_update',
-            $ispring_instance->course,
+            $instance->course,
             grading_options::AVERAGE,
             new description('test_update_description', FORMAT_PLAIN),
             time(),
             time() + 3,
         );
 
-        $this->assertTrue($this->ispring_repository->update($ispring_instance->id, $ispring_module));
+        $this->assertTrue($this->ispringrepository->update($instance->id, $data));
 
-        $this->assert_db_record_equals_module_data($ispring_module, $ispring_instance->id);
+        $this->assert_db_record_equals_module_data($data, $instance->id);
     }
 
-    public function test_remove(): void
-    {
+    public function test_remove(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -101,28 +101,25 @@ final class ispring_module_repository_test extends \mod_ispring\testcase\ispring
         ]);
         $this->assertTrue(self::module_exists($id));
 
-        $this->ispring_repository->remove($id);
+        $this->ispringrepository->remove($id);
 
         $this->assertFalse(self::module_exists($id));
     }
 
-    private function assert_db_record_equals_module_data(ispring_module_data $data, int $ispring_id): void
-    {
+    private function assert_db_record_equals_module_data(ispring_module_data $data, int $ispringid): void {
         global $DB;
-        $ispring_instance = $DB->get_record('ispring', ['id' => $ispring_id]);
+        $instance = $DB->get_record('ispring', ['id' => $ispringid]);
 
-        $this->assertEquals($data->get_name(), $ispring_instance->name);
-        $this->assertEquals($data->get_moodle_course_id(), $ispring_instance->course);
-        $this->assertEquals($data->get_grade_method(), $ispring_instance->grademethod);
-        if ($description = $data->get_description())
-        {
-            $this->assertEquals($description->get_text(), $ispring_instance->intro);
-            $this->assertEquals($description->get_format(), $ispring_instance->introformat);
+        $this->assertEquals($data->get_name(), $instance->name);
+        $this->assertEquals($data->get_moodle_course_id(), $instance->course);
+        $this->assertEquals($data->get_grade_method(), $instance->grademethod);
+        if ($description = $data->get_description()) {
+            $this->assertEquals($description->get_text(), $instance->intro);
+            $this->assertEquals($description->get_format(), $instance->introformat);
         }
     }
 
-    private static function module_exists(int $id): bool
-    {
+    private static function module_exists(int $id): bool {
         global $DB;
         return $DB->record_exists('ispring', ['id' => $id]);
     }

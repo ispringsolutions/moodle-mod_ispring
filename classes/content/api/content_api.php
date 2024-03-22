@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,101 +32,88 @@ use mod_ispring\content\app\query\content_query_service_interface;
 use mod_ispring\content\app\service\content_service;
 use mod_ispring\content\app\service\file_storage_interface;
 
-class content_api implements content_api_interface
-{
-    private content_service $content_service;
-    private content_query_service_interface $content_query_service;
-    private file_storage_interface $file_storage;
+class content_api implements content_api_interface {
+    private content_service $service;
+    private content_query_service_interface $queryservice;
+    private file_storage_interface $filestorage;
 
     public function __construct(
-        content_service $content_service,
-        content_query_service_interface $content_query_service,
-        file_storage_interface $file_storage
-    )
-    {
-        $this->content_service = $content_service;
-        $this->content_query_service = $content_query_service;
-        $this->file_storage = $file_storage;
+        content_service $service,
+        content_query_service_interface $queryservice,
+        file_storage_interface $filestorage
+    ) {
+        $this->service = $service;
+        $this->queryservice = $queryservice;
+        $this->filestorage = $filestorage;
     }
 
-    public function add_content(content_input $content_input): int
-    {
-        return $this->content_service->add_content(
-            content_mapper::get_content_data($content_input),
+    public function add_content(content_input $input): int {
+        return $this->service->add_content(
+            content_mapper::get_content_data($input),
         );
     }
 
-    public function remove(int $module_context_id, int $content_id): void
-    {
-        $this->content_service->remove($module_context_id, $content_id);
+    public function remove(int $modulecontextid, int $contentid): void {
+        $this->service->remove($modulecontextid, $contentid);
     }
 
     public function present_file(
-        int $context_id,
+        int $contextid,
         string $filearea,
         array $args,
-        bool $force_download,
+        bool $forcedownload,
         array $options = []
-    ): bool
-    {
-        return $this->content_service->present_file($context_id, $filearea, $args, $force_download, $options);
+    ): bool {
+        return $this->service->present_file($contextid, $filearea, $args, $forcedownload, $options);
     }
 
-    public function get_latest_version_entrypoint_info(int $context_id, int $ispring_module_id): ?entrypoint_info
-    {
-        $content = $this->content_query_service->get_latest_version_content_by_ispring_module_id($ispring_module_id);
-        if (!$content)
-        {
+    public function get_latest_version_entrypoint_info(int $contextid, int $ispringmoduleid): ?entrypoint_info {
+        $content = $this->queryservice->get_latest_version_content_by_ispring_module_id($ispringmoduleid);
+        if (!$content) {
             return null;
         }
 
-        return new entrypoint_info($content->get_id(), $this->file_storage->generate_entrypoint_url(
-            $context_id,
+        return new entrypoint_info($content->get_id(), $this->filestorage->generate_entrypoint_url(
+            $contextid,
             $content->get_file_id(),
             $content->get_filepath(),
             $content->get_filename(),
         ));
     }
 
-    public function get_latest_version_content_by_ispring_module_id(int $ispring_module_id): ?content_output
-    {
-        $content = $this->content_query_service->get_latest_version_content_by_ispring_module_id($ispring_module_id);
+    public function get_latest_version_content_by_ispring_module_id(int $ispringmoduleid): ?content_output {
+        $content = $this->queryservice->get_latest_version_content_by_ispring_module_id($ispringmoduleid);
 
         return $content !== null ? content_mapper::get_content_output($content) : null;
     }
 
-    public function exists(int $id): bool
-    {
-        return $this->content_query_service->exists($id);
+    public function exists(int $id): bool {
+        return $this->queryservice->exists($id);
     }
 
-    public function get_by_id(int $content_id): ?content_output
-    {
-        $content = $this->content_query_service->get_by_id($content_id);
+    public function get_by_id(int $contentid): ?content_output {
+        $content = $this->queryservice->get_by_id($contentid);
 
         return $content !== null
             ? content_mapper::get_content_output($content)
             : null;
     }
 
-    public function get_report_url(int $context_id, int $content_id): ?string
-    {
-        $content = $this->content_query_service->get_by_id($content_id);
-        if (!$content || !$content->get_report_path() || !$content->get_report_filename())
-        {
+    public function get_report_url(int $contextid, int $contentid): ?string {
+        $content = $this->queryservice->get_by_id($contentid);
+        if (!$content || !$content->get_report_path() || !$content->get_report_filename()) {
             return null;
         }
 
-        return $this->file_storage->generate_entrypoint_url(
-            $context_id,
+        return $this->filestorage->generate_entrypoint_url(
+            $contextid,
             $content->get_file_id(),
             $content->get_report_path(),
             $content->get_report_filename(),
         );
     }
 
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array
-    {
-        return $this->content_query_service->get_ids_by_ispring_module_id($ispring_module_id);
+    public function get_ids_by_ispring_module_id(int $ispringmoduleid): array {
+        return $this->queryservice->get_ids_by_ispring_module_id($ispringmoduleid);
     }
 }

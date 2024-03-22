@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,42 +24,37 @@
 
 namespace mod_ispring\content\app\model;
 
-class description_params
-{
+class description_params {
     private string $entrypoint;
-    private int $creation_time;
-    private ?string $report_entrypoint;
+    private int $creationtime;
+    private ?string $reportentrypoint;
 
     public function __construct(
         string $entrypoint,
-        int $creation_time,
-        ?string $report_entrypoint
-    )
-    {
+        int $creationtime,
+        ?string $reportentrypoint
+    ) {
         $this->entrypoint = $entrypoint;
-        $this->creation_time = $creation_time;
-        $this->report_entrypoint = $report_entrypoint;
+        $this->creationtime = $creationtime;
+        $this->reportentrypoint = $reportentrypoint;
     }
 
     /**
      * @param string[] $data
      * @return description_params|null
      */
-    public static function create(array $data): ?description_params
-    {
-        $report_entrypoint = null;
-        if (array_key_exists('report_entrypoint', $data))
-        {
-            $report_entrypoint = $data['report_entrypoint'];
+    public static function create(array $data): ?description_params {
+        $entrypoint = null;
+        if (array_key_exists('report_entrypoint', $data)) {
+            $entrypoint = $data['report_entrypoint'];
         }
 
         if (array_key_exists('entrypoint', $data)
-            && array_key_exists('creation_time', $data))
-        {
+            && array_key_exists('creation_time', $data)) {
             return new description_params(
                 $data['entrypoint'],
-                (int) $data['creation_time'],
-                $report_entrypoint
+                (int)$data['creation_time'],
+                $entrypoint
             );
         }
 
@@ -70,24 +64,21 @@ class description_params
     /**
      * @return string
      */
-    public function get_entrypoint(): string
-    {
+    public function get_entrypoint(): string {
         return $this->entrypoint;
     }
 
     /**
      * @return int
      */
-    public function get_creation_time(): int
-    {
-        return $this->creation_time;
+    public function get_creation_time(): int {
+        return $this->creationtime;
     }
 
     /**
      * @return string|null
      */
-    public function get_report_entrypoint(): ?string
-    {
-        return $this->report_entrypoint;
+    public function get_report_entrypoint(): ?string {
+        return $this->reportentrypoint;
     }
 }

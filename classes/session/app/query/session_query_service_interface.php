@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,65 +26,64 @@ namespace mod_ispring\session\app\query;
 
 use mod_ispring\session\app\query\model\session;
 
-interface session_query_service_interface
-{
+interface session_query_service_interface {
     /**
      * Get last user session by content id
-     * @param int $content_id
-     * @param int $user_id
+     * @param int $contentid
+     * @param int $userid
      * @return session|null
      */
-    public function get_last_by_content_id(int $content_id, int $user_id): ?session;
+    public function get_last_by_content_id(int $contentid, int $userid): ?session;
 
     /**
      * Get last user session by ispring module id
-     * @param int $ispring_module_id
-     * @param int $user_id
+     * @param int $ispringmoduleid
+     * @param int $userid
      * @return session|null
      */
-    public function get_last_by_ispring_module_id(int $ispring_module_id, int $user_id): ?session;
+    public function get_last_by_ispring_module_id(int $ispringmoduleid, int $userid): ?session;
 
     /**
      * Return true if given ispring module has at least one session for specified user id
-     * @param int $ispring_module_id
-     * @param int $user_id
+     * @param int $ispringmoduleid
+     * @param int $userid
      * @return bool
      */
-    public function ispring_module_has_sessions_with_user_id(int $ispring_module_id, int $user_id): bool;
+    public function ispring_module_has_sessions_with_user_id(int $ispringmoduleid, int $userid): bool;
 
     /**
      * Get session id
-     * @param int $session_id
+     * @param int $sessionid
      * @return session|null
      */
-    public function get(int $session_id): ?session;
+    public function get(int $sessionid): ?session;
 
     /**
-     * @param int $ispring_module_id
-     * @param int $content_id
-     * @param int $user_id
+     * @param int $ispringmoduleid
+     * @param int $contentid
+     * @param int $userid
      * @return array
      */
-    public function get_grades_for_gradebook(int $ispring_module_id, int $content_id, int $user_id): array;
+    public function get_grades_for_gradebook(int $ispringmoduleid, int $contentid, int $userid): array;
 
     /**
-     * @param int $session_id
+     * @param int $sessionid
      * @return bool
      */
-    public function exist(int $session_id): bool;
+    public function exist(int $sessionid): bool;
 
     /**
      * Returns true if passing requirements were updated
-     * @param array $content_ids
+     * @param array $contentids
      * @return bool
      */
-    public function passing_requirements_were_updated(array $content_ids): bool;
+    public function passing_requirements_were_updated(array $contentids): bool;
 
     /**
      * Returns true if passing requirements were updated for given user
-     * @param array $content_ids
-     * @param int $user_id
+     * @param array $contentids
+     * @param int $userid
      * @return bool
      */
-    public function passing_requirements_were_updated_for_user(array $content_ids, int $user_id): bool;
+    public function passing_requirements_were_updated_for_user(array $contentids, int $userid): bool;
 }

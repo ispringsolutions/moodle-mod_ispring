@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,16 +24,14 @@
 
 namespace mod_ispring\ispring_module\domain\model;
 
-class grading_options
-{
+class grading_options {
     public const HIGHEST = 1;
     public const AVERAGE = 2;
     public const FIRST = 3;
     public const LAST = 4;
 
-    public static function is_grade_option(int $grade_method): bool
-    {
-        return in_array($grade_method, [
+    public static function is_grade_option(int $grademethod): bool {
+        return in_array($grademethod, [
             self::HIGHEST,
             self::AVERAGE,
             self::FIRST,

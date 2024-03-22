@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,36 +24,37 @@
 
 namespace mod_ispring\common\infrastructure\transaction;
 
-final class transaction_test extends \basic_testcase
-{
+/**
+ * Test transaction class.
+ *
+ * @covers \mod_ispring\common\infrastructure\transaction\transaction
+ */
+final class transaction_test extends \basic_testcase {
     private transaction $transaction;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         $this->transaction = new transaction();
     }
 
-    public function test_execute_calls_fn(): void
-    {
-        $fn_was_executed = false;
+    public function test_execute_calls_fn(): void {
+        $wasexecuted = false;
 
         $this->transaction->execute(
-            function() use(&$fn_was_executed) {
-                $fn_was_executed = true;
+            function () use (&$wasexecuted) {
+                $wasexecuted = true;
             },
-            function() {
+            function () {
                 throw new \LogicException('Unexpected call to $undo_fn');
             },
         );
 
-        $this->assertTrue($fn_was_executed);
+        $this->assertTrue($wasexecuted);
     }
 
-    public function test_execute_returns_value_returned_by_fn(): void
-    {
+    public function test_execute_returns_value_returned_by_fn(): void {
         $result = $this->transaction->execute(
             fn() => 'test_return_value',
-            function() {
+            function () {
                 throw new \LogicException('Unexpected call to $undo_fn');
             },
         );
@@ -62,44 +62,41 @@ final class transaction_test extends \basic_testcase
         $this->assertEquals('test_return_value', $result);
     }
 
-    public function test_execute_rethrows_exception(): void
-    {
+    public function test_execute_rethrows_exception(): void {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('test_error');
         $this->transaction->execute(
-            function() {
+            function () {
                 throw new \RuntimeException('test_error');
             },
-            function() {
+            function () {
                 throw new \LogicException('Unexpected call to $undo_fn');
             },
         );
     }
 
-    public function test_rollback_reverts_successful_operation(): void
-    {
-        $fn_was_executed = false;
+    public function test_rollback_reverts_successful_operation(): void {
+        $wasexecuted = false;
         $this->transaction->execute(
-            function() use(&$fn_was_executed) {
-                $fn_was_executed = true;
+            function () use (&$wasexecuted) {
+                $wasexecuted = true;
             },
-            function() use(&$fn_was_executed) {
-                $fn_was_executed = false;
+            function () use (&$wasexecuted) {
+                $wasexecuted = false;
             },
         );
-        $this->assertTrue($fn_was_executed);
+        $this->assertTrue($wasexecuted);
 
         $this->transaction->rollback(new \Exception());
 
-        $this->assertFalse($fn_was_executed);
+        $this->assertFalse($wasexecuted);
     }
 
-    public function test_rollback_passes_fn_return_value_to_undo_fn(): void
-    {
+    public function test_rollback_passes_fn_return_value_to_undo_fn(): void {
         $result = null;
         $this->transaction->execute(
             fn() => 'test_return_value',
-            function($value) use(&$result) {
+            function ($value) use (&$result) {
                 $result = $value;
             },
         );
@@ -109,22 +106,21 @@ final class transaction_test extends \basic_testcase
         $this->assertEquals('test_return_value', $result);
     }
 
-    public function test_rollback_reverts_operations_in_reverse_order(): void
-    {
+    public function test_rollback_reverts_operations_in_reverse_order(): void {
         $log = [];
         $this->transaction->execute(
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Do 1';
             },
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Undo 1';
             },
         );
         $this->transaction->execute(
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Do 2';
             },
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Undo 2';
             },
         );
@@ -138,19 +134,18 @@ final class transaction_test extends \basic_testcase
         $this->assertEquals('Undo 1', $log[3]);
     }
 
-    public function test_rollback_ignores_exceptions_in_undo_fn(): void
-    {
+    public function test_rollback_ignores_exceptions_in_undo_fn(): void {
         $log = [];
         $this->transaction->execute(
             fn() => null,
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Undo 1';
                 throw new \Exception();
             },
         );
         $this->transaction->execute(
             fn() => null,
-            function() use(&$log) {
+            function () use (&$log) {
                 $log[] = 'Undo 2';
                 throw new \Exception();
             },

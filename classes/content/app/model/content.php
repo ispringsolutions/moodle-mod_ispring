@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,77 +24,69 @@
 
 namespace mod_ispring\content\app\model;
 
-class content
-{
-    private int $file_id;
-    private int $ispring_module_id;
-    private int $creation_time;
-    private file_info $content_path;
+class content {
+    private int $fileid;
+    private int $ispringmoduleid;
+    private int $creationtime;
+    private file_info $contentpath;
     private int $version;
-    private ?file_info $report_path;
+    private ?file_info $reportpath;
 
     public function __construct(
-        int $file_id,
-        int $ispring_module_id,
-        int $creation_time,
-        file_info $content_path,
+        int $fileid,
+        int $ispringmoduleid,
+        int $creationtime,
+        file_info $contentpath,
         int $version,
-        ?file_info $report_path
-    )
-    {
-        $this->file_id = $file_id;
-        $this->ispring_module_id = $ispring_module_id;
-        $this->creation_time = $creation_time;
-        $this->content_path = $content_path;
+        ?file_info $reportpath
+    ) {
+        $this->fileid = $fileid;
+        $this->ispringmoduleid = $ispringmoduleid;
+        $this->creationtime = $creationtime;
+        $this->contentpath = $contentpath;
         $this->version = $version;
-        $this->report_path = $report_path;
+        $this->reportpath = $reportpath;
     }
 
     /**
      * @return int
      */
-    public function get_file_id(): int
-    {
-        return $this->file_id;
+    public function get_file_id(): int {
+        return $this->fileid;
     }
 
     /**
      * @return int
      */
-    public function get_ispring_module_id(): int
-    {
-        return $this->ispring_module_id;
+    public function get_ispring_module_id(): int {
+        return $this->ispringmoduleid;
     }
 
     /**
      * @return int
      */
-    public function get_creation_time(): int
-    {
-        return $this->creation_time;
+    public function get_creation_time(): int {
+        return $this->creationtime;
     }
 
     /**
      * @return file_info
      */
-    public function get_content_path(): file_info
-    {
-        return $this->content_path;
+    public function get_content_path(): file_info {
+        return $this->contentpath;
     }
 
     /**
      * @return int
      */
-    public function get_version(): int
-    {
+    public function get_version(): int {
         return $this->version;
     }
 
     /**
      * @return file_info|null
      */
-    public function get_report_path(): ?file_info
-    {
-        return $this->report_path;
+    public function get_report_path(): ?file_info {
+        return $this->reportpath;
     }
 }

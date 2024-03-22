@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,23 +25,22 @@
 use mod_ispring\common\infrastructure\capability_utils;
 use mod_ispring\di_container;
 use mod_ispring\pages\detailed_report_page;
+
 require_once('../../config.php');
 
-$session_id = required_param('session_id', PARAM_INT);
-$return_url = optional_param('return_url', '', PARAM_LOCALURL);
+$sessionid = required_param('session_id', PARAM_INT);
+$returnurl = optional_param('return_url', '', PARAM_LOCALURL);
 
-$session_api = di_container::get_session_api();
-$content_api = di_container::get_content_api();
+$sessionapi = di_container::get_session_api();
+$contentapi = di_container::get_content_api();
 
-$detailed_report = $session_api->get_detailed_report($session_id);
-if (!$detailed_report)
-{
+$report = $sessionapi->get_detailed_report($sessionid);
+if (!$report) {
     throw new \moodle_exception('sessionnotfound', 'ispring');
 }
 
-$content = $content_api->get_by_id($detailed_report->get_content_id());
-if (!$content)
-{
+$content = $contentapi->get_by_id($report->get_content_id());
+if (!$content) {
     throw new \moodle_exception('contentnotfound', 'ispring');
 }
 
@@ -50,45 +48,41 @@ if (!$content)
 
 require_login($course->id, true, $cm);
 
-$module_context = context_module::instance($cm->id);
-if (!capability_utils::can_view_detailed_reports_for_user($module_context, $detailed_report->get_user_id()))
-{
+$modulecontext = context_module::instance($cm->id);
+if (!capability_utils::can_view_detailed_reports_for_user($modulecontext, $report->get_user_id())) {
     throw new \moodle_exception('sessionnotfound', 'ispring');
 }
 
-$report_url = $content_api->get_report_url($module_context->id, $detailed_report->get_content_id());
-if (!$report_url)
-{
+$reporturl = $contentapi->get_report_url($modulecontext->id, $report->get_content_id());
+if (!$reporturl) {
     throw new \moodle_exception('reportnotfound', 'ispring');
 }
 
-$can_view_general_report = has_capability('mod/ispring:viewallreports', $module_context);
-if (!$return_url)
-{
-    $return_url = $can_view_general_report ? "report.php?id={$cm->id}" : "view.php?id={$cm->id}";
+$canviewgeneralreport = has_capability('mod/ispring:viewallreports', $modulecontext);
+if (!$returnurl) {
+    $returnurl = $canviewgeneralreport ? "report.php?id={$cm->id}" : "view.php?id={$cm->id}";
 }
 
-$page_url = '/mod/ispring/detailed_report.php';
-$page_args = ['session_id' => $session_id];
+$pageurl = '/mod/ispring/detailed_report.php';
+$pageargs = ['session_id' => $sessionid];
 $page = new detailed_report_page(
-    $session_id,
-    $report_url,
-    $return_url,
-    $detailed_report->get_user_id(),
-    $page_url,
-    $page_args
+    $sessionid,
+    $reporturl,
+    $returnurl,
+    $report->get_user_id(),
+    $pageurl,
+    $pageargs
 );
 
 $page->set_title(get_string('detailedreport', 'ispring'));
 $page->set_secondary_active_tab('report');
 
-if ($can_view_general_report)
-{
+if ($canviewgeneralreport) {
     $page->add_navbar(get_string('report', 'ispring'), '/mod/ispring/report.php', ['id' => $cm->id]);
 }
-$page->add_navbar(get_string('detailedreport', 'ispring'), $page_url, $page_args);
+$page->add_navbar(get_string('detailedreport', 'ispring'), $pageurl, $pageargs);
 
-$page->set_context($module_context);
+$page->set_context($modulecontext);
 echo $page->get_header();
 echo $page->get_content();
 echo $page->get_footer();

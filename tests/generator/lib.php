@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,23 +22,22 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once(__DIR__ . '/../testcase/user_file_creator.php');
 
 use mod_ispring\ispring_module\domain\model\grading_options;
 use mod_ispring\testcase\user_file_creator;
 
-class mod_ispring_generator extends testing_module_generator
-{
-    public function create_instance($record = null, array $options = null)
-    {
+class mod_ispring_generator extends testing_module_generator {
+    public function create_instance($record = null, array $options = null) {
         $record = (array)$record + [
-            'grademethod' => grading_options::HIGHEST,
-            'timeopen' => 0,
-            'timeclose' => 3,
-        ];
+                'grademethod' => grading_options::HIGHEST,
+                'timeopen' => 0,
+                'timeclose' => 3,
+            ];
 
-        if (!isset($record['userfile']))
-        {
+        if (!isset($record['userfile'])) {
             $file = user_file_creator::create_from_path(__DIR__ . '/../packages/stub.zip');
             $record['userfile'] = $file->get_itemid();
         }

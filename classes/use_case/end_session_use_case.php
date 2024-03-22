@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -34,73 +33,71 @@ use mod_ispring\session\api\input\end_input;
 use mod_ispring\session\api\input\update_input;
 use mod_ispring\session\api\session_api_interface;
 
-class end_session_use_case
-{
-    private ispring_module_api_interface $ispring_module_api;
-    private session_api_interface $session_api;
+class end_session_use_case {
+    private ispring_module_api_interface $ispringmoduleapi;
+    private session_api_interface $sessionapi;
 
     public function __construct(
-        ispring_module_api_interface $ispring_module_api,
-        session_api_interface $session_api
-    )
-    {
-        $this->ispring_module_api = $ispring_module_api;
-        $this->session_api = $session_api;
+        ispring_module_api_interface $ispringmoduleapi,
+        session_api_interface $sessionapi
+    ) {
+        $this->ispringmoduleapi = $ispringmoduleapi;
+        $this->sessionapi = $sessionapi;
     }
 
-    public function end_session(int $ispring_module_id, int $session_id, int $user_id, result_state $result_state): void
-    {
+    public function end_session(
+        int $ispringmoduleid,
+        int $sessionid,
+        int $userid,
+        result_state $state
+    ): void {
         transaction_utils::do_in_transaction(
             db_transaction::class,
-            function() use ($session_id, $user_id, $result_state) {
-                $this->session_api->update($session_id, $user_id, new update_input(
-                    $result_state->get_state()->get_duration(),
-                    $result_state->get_state()->get_id(),
-                    $result_state->get_state()->get_persist_state(),
-                    $result_state->get_state()->get_status(),
-                    $result_state->get_state()->get_player_id(),
+            function () use ($sessionid, $userid, $state) {
+                $this->sessionapi->update($sessionid, $userid, new update_input(
+                    $state->get_state()->get_duration(),
+                    $state->get_state()->get_id(),
+                    $state->get_state()->get_persist_state(),
+                    $state->get_state()->get_status(),
+                    $state->get_state()->get_player_id(),
                 ));
 
-                $this->session_api->end($session_id, $user_id, new end_input(
-                    $result_state->get_max_score(),
-                    $result_state->get_min_score(),
-                    $result_state->get_passing_score(),
-                    $result_state->get_score(),
-                    $result_state->get_detailed_report(),
+                $this->sessionapi->end($sessionid, $userid, new end_input(
+                    $state->get_max_score(),
+                    $state->get_min_score(),
+                    $state->get_passing_score(),
+                    $state->get_score(),
+                    $state->get_detailed_report(),
                 ));
             },
         );
-        $this->update_grades_and_completion_state($ispring_module_id, $session_id, $user_id);
+        $this->update_grades_and_completion_state($ispringmoduleid, $sessionid, $userid);
     }
 
-    private function update_grades_and_completion_state(int $ispring_module_id, int $session_id, int $user_id): bool
-    {
-        $module = $this->ispring_module_api->get_by_id($ispring_module_id);
-        if (!$module)
-        {
+    private function update_grades_and_completion_state(int $ispringmoduleid, int $sessionid, int $userid): bool {
+        $module = $this->ispringmoduleapi->get_by_id($ispringmoduleid);
+        if (!$module) {
             return false;
         }
-        $session = $this->session_api->get_by_id($session_id);
-        if (!$session)
-        {
+        $session = $this->sessionapi->get_by_id($sessionid);
+        if (!$session) {
             return false;
         }
 
-        $module_instance = std_mapper::ispring_module_output_to_std_class($module);
-        $module_instance->max_score = $session->get_max_score();
-        $module_instance->min_score = $session->get_min_score();
+        $moduleinstance = std_mapper::ispring_module_output_to_std_class($module);
+        $moduleinstance->max_score = $session->get_max_score();
+        $moduleinstance->min_score = $session->get_min_score();
 
         global $CFG;
         require_once($CFG->dirroot . '/mod/ispring/lib.php');
 
-        ispring_update_grades($module_instance, $user_id);
+        ispring_update_grades($moduleinstance, $userid);
 
-        [$course, $cm] = get_course_and_cm_from_instance($ispring_module_id, 'ispring');
+        [$course, $cm] = get_course_and_cm_from_instance($ispringmoduleid, 'ispring');
 
         $completion = new \completion_info($course);
-        if ($completion->is_enabled($cm) && $session->get_passing_score() <= $session->get_score())
-        {
-            $completion->update_state($cm, COMPLETION_COMPLETE, $user_id);
+        if ($completion->is_enabled($cm) && $session->get_passing_score() <= $session->get_score()) {
+            $completion->update_state($cm, COMPLETION_COMPLETE, $userid);
         }
         grade_regrade_final_grades_if_required($course);
 

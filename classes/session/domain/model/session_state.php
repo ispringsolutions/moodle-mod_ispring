@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,8 +24,7 @@
 
 namespace mod_ispring\session\domain\model;
 
-class session_state
-{
+class session_state {
     public const INCOMPLETE = 'incomplete';
     public const COMPLETE = 'complete';
     public const PASSED = 'passed';

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,10 +26,8 @@ namespace mod_ispring\mapper;
 
 use mod_ispring\ispring_module\api\output\ispring_module_output;
 
-class std_mapper
-{
-    public static function ispring_module_output_to_std_class(ispring_module_output $data): \stdClass
-    {
+class std_mapper {
+    public static function ispring_module_output_to_std_class(ispring_module_output $data): \stdClass {
         $description = $data->get_description();
         $result = new \stdClass();
 

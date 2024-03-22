@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,113 +27,91 @@ namespace mod_ispring\content\infrastructure\query;
 use mod_ispring\content\app\query\content_query_service_interface;
 use mod_ispring\content\app\query\model\content;
 
-class content_query_service implements content_query_service_interface
-{
+class content_query_service implements content_query_service_interface {
     private \moodle_database $database;
 
-    public function __construct()
-    {
+    public function __construct() {
         global $DB;
         $this->database = $DB;
     }
 
-    public function get_latest_version_content_by_ispring_module_id(int $ispring_module_id): ?content
-    {
-        try
-        {
+    public function get_latest_version_content_by_ispring_module_id(int $ispringmoduleid): ?content {
+        try {
             $contents = $this->database->get_records(
                 'ispring_content',
-                ['ispring_id' => $ispring_module_id],
+                ['ispring_id' => $ispringmoduleid],
                 'version desc',
                 '*',
                 0,
                 1
             );
 
-            if (count($contents) === 0)
-            {
+            if (count($contents) === 0) {
                 return null;
             }
 
             $content = array_values($contents)[0];
 
             return $this->get_content($content);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function exists(int $id): bool
-    {
-        try
-        {
+    public function exists(int $id): bool {
+        try {
             $content = $this->database->get_record('ispring_content', ['id' => $id]);
-            return (bool) $content;
-        }
-        catch (\Exception $e)
-        {
+            return (bool)$content;
+        } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function get_by_id(int $content_id): ?content
-    {
-        try
-        {
-            $content = $this->database->get_record('ispring_content', ['id' => $content_id]);
+    public function get_by_id(int $contentid): ?content {
+        try {
+            $content = $this->database->get_record('ispring_content', ['id' => $contentid]);
 
-            if (!$content)
-            {
+            if (!$content) {
                 return null;
             }
 
             return $this->get_content($content);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function get_ids_by_ispring_module_id(int $ispring_module_id): array
-    {
-        try
-        {
+    public function get_ids_by_ispring_module_id(int $ispringmoduleid): array {
+        try {
             $contents = $this->database->get_records(
                 'ispring_content',
-                ['ispring_id' => $ispring_module_id],
+                ['ispring_id' => $ispringmoduleid],
                 '',
                 'id'
             );
 
             $result = [];
-            foreach ($contents as $content)
-            {
+            foreach ($contents as $content) {
                 $result[] = $content->id;
             }
 
             return $result;
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return [];
         }
     }
 
-    private function get_content(\stdClass $content_data): content
-    {
+    private function get_content(\stdClass $contentdata): content {
         return new content(
-            $content_data->id,
-            $content_data->file_id,
-            $content_data->ispring_id,
-            $content_data->creation_time,
-            $content_data->filename,
-            $content_data->path,
-            $content_data->version,
-            $content_data->report_path,
-            $content_data->report_filename,
+            $contentdata->id,
+            $contentdata->file_id,
+            $contentdata->ispring_id,
+            $contentdata->creation_time,
+            $contentdata->filename,
+            $contentdata->path,
+            $contentdata->version,
+            $contentdata->report_path,
+            $contentdata->report_filename,
         );
     }
 }

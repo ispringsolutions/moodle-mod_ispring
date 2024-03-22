@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,7 @@ namespace mod_ispring\ispring_module\app\repository;
 
 use mod_ispring\ispring_module\app\data\ispring_module_data;
 
-interface ispring_module_repository_interface
-{
+interface ispring_module_repository_interface {
     /**
      * Add ispring cm to database
      * @param ispring_module_data $data

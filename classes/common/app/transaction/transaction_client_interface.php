@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,8 +24,7 @@
 
 namespace mod_ispring\common\app\transaction;
 
-interface transaction_client_interface
-{
+interface transaction_client_interface {
     /**
      * Executes callable `$fn` which is expected to do exactly one of the following:
      * 1) complete successfully and return a value
@@ -37,10 +35,10 @@ interface transaction_client_interface
      *
      * @param callable $fn Action to be executed. `$fn` is called synchronously with no arguments.
      * It is the responsibility of `$fn` to undo any changes if an exception is thrown.
-     * @param callable $undo_fn Action that must be executed during rollback to undo every change performed in `$fn`.
+     * @param callable $undofn Action that must be executed during rollback to undo every change performed in `$fn`.
      * `$undo_fn` receives the value returned by `$fn` as the only argument. Any exceptions thrown in `$undo_fn` are
      * ignored.
      * @return mixed Value returned by `$fn`
      */
-    public function execute(callable $fn, callable $undo_fn);
+    public function execute(callable $fn, callable $undofn);
 }

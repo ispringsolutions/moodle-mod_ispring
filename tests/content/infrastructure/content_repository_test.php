@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,17 +27,19 @@ namespace mod_ispring\content\infrastructure;
 use mod_ispring\content\app\model\content;
 use mod_ispring\content\app\model\file_info;
 
-final class content_repository_test extends \advanced_testcase
-{
-    private content_repository $content_repository;
+/**
+ * Test content_repository class.
+ *
+ * @covers \mod_ispring\content\infrastructure\content_repository
+ */
+final class content_repository_test extends \advanced_testcase {
+    private content_repository $contentrepository;
 
-    protected function setUp(): void
-    {
-        $this->content_repository = new content_repository();
+    protected function setUp(): void {
+        $this->contentrepository = new content_repository();
     }
 
-    public function test_add_with_report_path(): void
-    {
+    public function test_add_with_report_path(): void {
         $this->resetAfterTest();
         $content = new content(
             1,
@@ -49,13 +50,12 @@ final class content_repository_test extends \advanced_testcase
             new file_info('/report_path', 'report.html'),
         );
 
-        $id = $this->content_repository->add($content);
+        $id = $this->contentrepository->add($content);
 
         $this->assert_db_record_equals_content_data($content, $id);
     }
 
-    public function test_add_without_report_path(): void
-    {
+    public function test_add_without_report_path(): void {
         $this->resetAfterTest();
         $content = new content(
             1,
@@ -66,13 +66,12 @@ final class content_repository_test extends \advanced_testcase
             null,
         );
 
-        $id = $this->content_repository->add($content);
+        $id = $this->contentrepository->add($content);
 
         $this->assert_db_record_equals_content_data($content, $id);
     }
 
-    public function test_remove(): void
-    {
+    public function test_remove(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -82,31 +81,28 @@ final class content_repository_test extends \advanced_testcase
         ]);
         $this->assertTrue(self::content_exists($id));
 
-        $this->content_repository->remove($id);
+        $this->contentrepository->remove($id);
 
         $this->assertFalse(self::content_exists($id));
     }
 
-    private function assert_db_record_equals_content_data(content $content, int $content_id): void
-    {
+    private function assert_db_record_equals_content_data(content $content, int $contentid): void {
         global $DB;
-        $content_record = $DB->get_record('ispring_content', ['id' => $content_id]);
+        $record = $DB->get_record('ispring_content', ['id' => $contentid]);
 
-        $this->assertEquals($content->get_file_id(), $content_record->file_id);
-        $this->assertEquals($content->get_ispring_module_id(), $content_record->ispring_id);
-        $this->assertEquals($content->get_creation_time(), $content_record->creation_time);
-        $this->assertEquals($content->get_content_path()->get_path(), $content_record->path);
-        $this->assertEquals($content->get_content_path()->get_filename(), $content_record->filename);
-        $this->assertEquals($content->get_version(), $content_record->version);
-        if ($report_path = $content->get_report_path())
-        {
-            $this->assertEquals($report_path->get_path(), $content_record->report_path);
-            $this->assertEquals($report_path->get_filename(), $content_record->report_filename);
+        $this->assertEquals($content->get_file_id(), $record->file_id);
+        $this->assertEquals($content->get_ispring_module_id(), $record->ispring_id);
+        $this->assertEquals($content->get_creation_time(), $record->creation_time);
+        $this->assertEquals($content->get_content_path()->get_path(), $record->path);
+        $this->assertEquals($content->get_content_path()->get_filename(), $record->filename);
+        $this->assertEquals($content->get_version(), $record->version);
+        if ($fileinfo = $content->get_report_path()) {
+            $this->assertEquals($fileinfo->get_path(), $record->report_path);
+            $this->assertEquals($fileinfo->get_filename(), $record->report_filename);
         }
     }
 
-    private static function content_exists(int $id): bool
-    {
+    private static function content_exists(int $id): bool {
         global $DB;
         return $DB->record_exists('ispring_content', ['id' => $id]);
     }

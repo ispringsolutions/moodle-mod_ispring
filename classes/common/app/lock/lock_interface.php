@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,7 +24,6 @@
 
 namespace mod_ispring\common\app\lock;
 
-interface lock_interface
-{
+interface lock_interface {
     public function release(): void;
 }

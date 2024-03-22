@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,17 +27,14 @@ namespace mod_ispring\content\infrastructure;
 use mod_ispring\ispring_module\api\ispring_module_api_interface;
 use mod_ispring\content\app\adapter\ispring_module_api_interface as api_adapter_interface;
 
-class ispring_module_api implements api_adapter_interface
-{
+class ispring_module_api implements api_adapter_interface {
     private ispring_module_api_interface $api;
 
-    public function __construct(ispring_module_api_interface $api)
-    {
+    public function __construct(ispring_module_api_interface $api) {
         $this->api = $api;
     }
 
-    public function exists(int $id): bool
-    {
+    public function exists(int $id): bool {
         return $this->api->exists($id);
     }
 }

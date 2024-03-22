@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,13 +26,10 @@ namespace mod_ispring\common\infrastructure;
 
 use mod_ispring\content\api\content_api_interface;
 
-class context_utils
-{
-    public static function get_module_context(content_api_interface $content_api, int $content_id): \context_module
-    {
-        $content = $content_api->get_by_id($content_id);
-        if (!$content)
-        {
+class context_utils {
+    public static function get_module_context(content_api_interface $contentapi, int $contentid): \context_module {
+        $content = $contentapi->get_by_id($contentid);
+        if (!$content) {
             throw new \moodle_exception('contentnotfound', 'ispring');
         }
         [, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');

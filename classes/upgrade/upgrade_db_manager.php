@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,59 +28,47 @@ use xmldb_field;
 use xmldb_key;
 use xmldb_table;
 
-final class upgrade_db_manager
-{
-    private \database_manager $db_manager;
+final class upgrade_db_manager {
+    private \database_manager $dbmanager;
 
-    public function __construct()
-    {
+    public function __construct() {
         global $DB;
-        $this->db_manager = $DB->get_manager();
+        $this->dbmanager = $DB->get_manager();
     }
 
-    public function upgrade_from($old_version): void
-    {
-        if ($old_version < 2023090720)
-        {
+    public function upgrade_from($oldversion): void {
+        if ($oldversion < 2023090720) {
             $this->upgrade_to_2023090720();
         }
-        if ($old_version < 2023090721)
-        {
+        if ($oldversion < 2023090721) {
             $this->upgrade_to_2023090721();
         }
-        if ($old_version < 2023090722)
-        {
+        if ($oldversion < 2023090722) {
             $this->upgrade_to_2023090722();
         }
-        if ($old_version < 2023090725)
-        {
+        if ($oldversion < 2023090725) {
             $this->upgrade_to_2023090725();
         }
-        if ($old_version < 2023090728)
-        {
+        if ($oldversion < 2023090728) {
             $this->upgrade_to_2023090728();
         }
-        if ($old_version < 2023090733)
-        {
+        if ($oldversion < 2023090733) {
             $this->upgrade_to_2023090733();
         }
-        if ($old_version < 2023120302)
-        {
+        if ($oldversion < 2023120302) {
             $this->upgrade_to_2023120302();
         }
-        if ($old_version < 2024012203)
-        {
+        if ($oldversion < 2024012203) {
             $this->upgrade_to_2024012203();
         }
     }
 
-    private function upgrade_to_2023090720(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023090720(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring_session');
 
-        $persist_state_field = new xmldb_field(
+        $field = new xmldb_field(
             'persist_state',
             XMLDB_TYPE_TEXT,
             null,
@@ -91,11 +78,11 @@ final class upgrade_db_manager
             null,
             'duration');
 
-        if (!$dbman->field_exists($table, $persist_state_field)) {
-            $dbman->add_field($table, $persist_state_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $persist_state_id_field = new xmldb_field(
+        $field = new xmldb_field(
             'persist_state_id',
             XMLDB_TYPE_TEXT,
             null,
@@ -105,11 +92,11 @@ final class upgrade_db_manager
             null,
             'persist_state');
 
-        if (!$dbman->field_exists($table, $persist_state_id_field)) {
-            $dbman->add_field($table, $persist_state_id_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $max_score_field = new xmldb_field(
+        $field = new xmldb_field(
             'max_score',
             XMLDB_TYPE_NUMBER,
             '10, 5',
@@ -119,11 +106,11 @@ final class upgrade_db_manager
             null,
             'persist_state_id');
 
-        if (!$dbman->field_exists($table, $max_score_field)) {
-            $dbman->add_field($table, $max_score_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $min_score_field = new xmldb_field(
+        $field = new xmldb_field(
             'min_score',
             XMLDB_TYPE_NUMBER,
             '10, 5',
@@ -133,11 +120,11 @@ final class upgrade_db_manager
             '0',
             'max_score');
 
-        if (!$dbman->field_exists($table, $min_score_field)) {
-            $dbman->add_field($table, $min_score_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $passing_score_field = new xmldb_field(
+        $field = new xmldb_field(
             'passing_score',
             XMLDB_TYPE_NUMBER,
             '10, 5',
@@ -147,11 +134,11 @@ final class upgrade_db_manager
             null,
             'min_score');
 
-        if (!$dbman->field_exists($table, $passing_score_field)) {
-            $dbman->add_field($table, $passing_score_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $score_field = new xmldb_field(
+        $field = new xmldb_field(
             'score',
             XMLDB_TYPE_NUMBER,
             '10, 5',
@@ -160,19 +147,18 @@ final class upgrade_db_manager
             null,
             null,
             'min_score');
-        $dbman->change_field_type($table, $score_field);
+        $dbman->change_field_type($table, $field);
 
         // Ispring savepoint reached.
         upgrade_mod_savepoint(true, 2023090720, 'ispring');
     }
 
-    private function upgrade_to_2023090721(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023090721(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring_content');
 
-        $report_path_field = new xmldb_field(
+        $field = new xmldb_field(
             'report_path',
             XMLDB_TYPE_CHAR,
             '128',
@@ -183,11 +169,11 @@ final class upgrade_db_manager
             'version'
         );
 
-        if (!$dbman->field_exists($table, $report_path_field)) {
-            $dbman->add_field($table, $report_path_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $report_filename_field = new xmldb_field(
+        $field = new xmldb_field(
             'report_filename',
             XMLDB_TYPE_CHAR,
             '128',
@@ -198,16 +184,15 @@ final class upgrade_db_manager
             'report_path'
         );
 
-        if (!$dbman->field_exists($table, $report_filename_field)) {
-            $dbman->add_field($table, $report_filename_field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
         upgrade_mod_savepoint(true, 2023090721, 'ispring');
     }
 
-    private function upgrade_to_2023090722(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023090722(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring_session');
         $field = new xmldb_field('detailed_report', XMLDB_TYPE_TEXT, null, null, null, null, null, 'passing_score');
@@ -219,9 +204,8 @@ final class upgrade_db_manager
         upgrade_mod_savepoint(true, 2023090722, 'ispring');
     }
 
-    private function upgrade_to_2023090725(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023090725(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring');
 
@@ -235,8 +219,7 @@ final class upgrade_db_manager
             null,
             'name');
 
-        if (!$dbman->field_exists($table, $field))
-        {
+        if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
@@ -250,8 +233,7 @@ final class upgrade_db_manager
             '0',
             'intro');
 
-        if (!$dbman->field_exists($table, $field))
-        {
+        if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
@@ -289,8 +271,7 @@ final class upgrade_db_manager
         upgrade_mod_savepoint(true, 2023090725, 'ispring');
     }
 
-    private function upgrade_to_2023090728(): void
-    {
+    private function upgrade_to_2023090728(): void {
         global $DB;
         $records = $DB->get_records_sql(
             'SELECT iss.id session_id, isc.ispring_id ispring_module_id, iss.user_id user_id
@@ -299,30 +280,27 @@ final class upgrade_db_manager
             ORDER BY isc.ispring_id, iss.user_id, isc.version, iss.attempt',
         );
 
-        $current_ispring_module_id = 0;
-        $current_user_id = 0;
+        $currentispringmoduleid = 0;
+        $currentuserid = 0;
 
-        foreach ($records as $record)
-        {
-            if ($record->user_id !== $current_user_id
-                || $record->ispring_module_id !== $current_ispring_module_id)
-            {
-                $current_ispring_module_id = $record->ispring_module_id;
-                $current_user_id = $record->user_id;
-                $current_attempt = 0;
+        foreach ($records as $record) {
+            if ($record->user_id !== $currentuserid
+                || $record->ispring_module_id !== $currentispringmoduleid) {
+                $currentispringmoduleid = $record->ispring_module_id;
+                $currentuserid = $record->user_id;
+                $currentattempt = 0;
             }
             $DB->update_record('ispring_session', [
                 'id' => $record->session_id,
-                'attempt' => ++$current_attempt,
+                'attempt' => ++$currentattempt,
             ]);
         }
 
         upgrade_mod_savepoint(true, 2023090728, 'ispring');
     }
 
-    private function upgrade_to_2023090733(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023090733(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring_content');
         $field = new xmldb_field('context_id');
@@ -334,9 +312,8 @@ final class upgrade_db_manager
         upgrade_mod_savepoint(true, 2023090733, 'ispring');
     }
 
-    private function upgrade_to_2023120302(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2023120302(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring_session');
         $field = new xmldb_field(
@@ -357,9 +334,8 @@ final class upgrade_db_manager
         upgrade_mod_savepoint(true, 2023120302, 'ispring');
     }
 
-    private function upgrade_to_2024012203(): void
-    {
-        $dbman = $this->db_manager;
+    private function upgrade_to_2024012203(): void {
+        $dbman = $this->dbmanager;
 
         $table = new xmldb_table('ispring');
         $field = new xmldb_field(

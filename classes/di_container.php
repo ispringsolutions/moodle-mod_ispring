@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -42,10 +41,8 @@ use mod_ispring\session\app\service\session_service;
 use mod_ispring\session\infrastructure\query\session_query_service;
 use mod_ispring\session\infrastructure\session_repository;
 
-class di_container
-{
-    public static function get_ispring_module_api(): ispring_module_api_interface
-    {
+class di_container {
+    public static function get_ispring_module_api(): ispring_module_api_interface {
         $repository = new ispring_module_repository();
         return new ispring_module_api(
             new ispring_module_service(
@@ -57,40 +54,38 @@ class di_container
         );
     }
 
-    public static function get_content_api(): content_api_interface
-    {
+    public static function get_content_api(): content_api_interface {
         $repository = new content_repository();
-        $file_storage = new file_storage();
-        $ispring_adapter = new \mod_ispring\content\infrastructure\ispring_module_api(di_container::get_ispring_module_api());
-        $content_query_service = new content_query_service();
+        $filestorage = new file_storage();
+        $ispringadapter = new \mod_ispring\content\infrastructure\ispring_module_api(self::get_ispring_module_api());
+        $contentqueryservice = new content_query_service();
 
         return new content_api(
             new content_service(
-                $file_storage,
+                $filestorage,
                 $repository,
-                $ispring_adapter,
-                $content_query_service
+                $ispringadapter,
+                $contentqueryservice
             ),
-            $content_query_service,
-            $file_storage
+            $contentqueryservice,
+            $filestorage
         );
     }
 
-    public static function get_session_api(): session_api_interface
-    {
+    public static function get_session_api(): session_api_interface {
         $repository = new session_repository();
-        $content_adapter = new \mod_ispring\session\infrastructure\content_api(di_container::get_content_api());
-        $ispring_adapter = new \mod_ispring\session\infrastructure\ispring_module_api(di_container::get_ispring_module_api());
-        $session_query_service = new session_query_service($ispring_adapter);
+        $contentadapter = new \mod_ispring\session\infrastructure\content_api(self::get_content_api());
+        $ispringadapter = new \mod_ispring\session\infrastructure\ispring_module_api(self::get_ispring_module_api());
+        $sessionqueryservice = new session_query_service($ispringadapter);
 
         return new session_api(
             new session_service(
                 $repository,
-                $content_adapter,
-                $session_query_service
+                $contentadapter,
+                $sessionqueryservice
             ),
-            $session_query_service,
-            $content_adapter
+            $sessionqueryservice,
+            $contentadapter
         );
     }
 }
