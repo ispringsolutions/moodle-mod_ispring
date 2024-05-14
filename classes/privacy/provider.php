@@ -117,8 +117,7 @@ class provider implements
                   JOIN {ispring} isp ON isp.id = cm.instance
                   JOIN {ispring_content} isc ON isc.ispring_id = isp.id
                   JOIN {ispring_session} iss ON iss.ispring_content_id = isc.id
-                 WHERE iss.user_id = {$userid}
-        ";
+                 WHERE iss.user_id = {$userid}";
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
@@ -142,20 +141,15 @@ class provider implements
         $contextparams['module'] = self::MOD_NAME;
         $contextparams['user_id'] = $user->id;
 
-        $sql = "SELECT
-                    iss.*,
-                    cm.id AS cmid
+        $sql = "SELECT iss.*, cm.id AS cmid
                   FROM {context} c
                   JOIN {course_modules} cm ON cm.id = c.instanceid
                   JOIN {modules} m ON m.id = cm.module AND m.name = :module
                   JOIN {ispring} isp ON isp.id = cm.instance
                   JOIN {ispring_content} isc ON isc.ispring_id = isp.id
                   JOIN {ispring_session} iss ON iss.ispring_content_id = isc.id
-                 WHERE (
-                    iss.user_id = :user_id AND
-                    c.id {$contextsql}
-                )
-        ";
+                 WHERE iss.user_id = :user_id
+                       AND c.id {$contextsql}";
 
         $sessions = $DB->get_records_sql($sql, $contextparams);
         $result = [];

@@ -22,10 +22,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\argparser\argparser;
-use mod_ispring\common\app\available\availability_checker;
-use mod_ispring\di_container;
-use mod_ispring\pages\play_page;
+use mod_ispring\local\argparser\argparser;
+use mod_ispring\local\common\app\available\availability_checker;
+use mod_ispring\local\di_container;
+use mod_ispring\local\pages\play_page;
 
 require_once('../../config.php');
 

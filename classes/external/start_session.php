@@ -32,8 +32,8 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_ispring\common\infrastructure\context_utils;
-use mod_ispring\di_container;
+use mod_ispring\local\common\infrastructure\context_utils;
+use mod_ispring\local\di_container;
 
 class start_session extends external_api {
     /**

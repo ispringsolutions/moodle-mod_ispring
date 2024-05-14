@@ -22,11 +22,11 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\argparser\argparser;
-use mod_ispring\common\app\available\availability_checker;
-use mod_ispring\di_container;
 use mod_ispring\event\course_module_viewed;
-use mod_ispring\pages\view_page;
+use mod_ispring\local\argparser\argparser;
+use mod_ispring\local\common\app\available\availability_checker;
+use mod_ispring\local\di_container;
+use mod_ispring\local\pages\view_page;
 
 require_once('../../config.php');
 $cmid = optional_param('id', '', PARAM_INT);

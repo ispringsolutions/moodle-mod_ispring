@@ -22,7 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\pages\index_page;
+use mod_ispring\local\pages\index_page;
 
 require_once('../../config.php');
 

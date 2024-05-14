@@ -31,10 +31,10 @@ require_once($CFG->libdir . '/externallib.php');
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use mod_ispring\common\infrastructure\capability_utils;
-use mod_ispring\common\infrastructure\context_utils;
-use mod_ispring\di_container;
-use mod_ispring\session\api\output\detailed_report_output;
+use mod_ispring\local\common\infrastructure\capability_utils;
+use mod_ispring\local\common\infrastructure\context_utils;
+use mod_ispring\local\di_container;
+use mod_ispring\local\session\api\output\detailed_report_output;
 
 class get_report_data extends \external_api {
     public static function execute_parameters(): external_function_parameters {

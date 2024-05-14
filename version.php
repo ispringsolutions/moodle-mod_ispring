@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_ispring';
-$plugin->release = '1.4.0';
-$plugin->version = 2024032200;
+$plugin->release = '1.5.0';
+$plugin->version = 2024051400;
 $plugin->requires = 2022112805;
 $plugin->maturity = MATURITY_ALPHA;

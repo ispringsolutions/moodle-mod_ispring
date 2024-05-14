@@ -22,9 +22,9 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\common\infrastructure\capability_utils;
-use mod_ispring\di_container;
-use mod_ispring\pages\detailed_report_page;
+use mod_ispring\local\common\infrastructure\capability_utils;
+use mod_ispring\local\di_container;
+use mod_ispring\local\pages\detailed_report_page;
 
 require_once('../../config.php');
 

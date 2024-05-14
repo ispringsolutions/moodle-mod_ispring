@@ -30,12 +30,12 @@ require_once($CFG->libdir . '/externallib.php');
 
 use external_api;
 use external_function_parameters;
-use external_value;
 use external_single_structure;
+use external_value;
 use external_warnings;
-use mod_ispring\di_container;
-use mod_ispring\session\api\input\update_input;
-use mod_ispring\session\app\exception\player_conflict_exception;
+use mod_ispring\local\di_container;
+use mod_ispring\local\session\api\input\update_input;
+use mod_ispring\local\session\app\exception\player_conflict_exception;
 
 class set_state extends external_api {
     private const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
