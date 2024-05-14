@@ -29,7 +29,7 @@ use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
-use mod_ispring\session\domain\model\session_state;
+use mod_ispring\local\session\domain\model\session_state;
 
 /**
  * Test provider class.

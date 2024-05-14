@@ -33,10 +33,10 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use external_warnings;
-use mod_ispring\di_container;
-use mod_ispring\session\api\session_api_interface;
-use mod_ispring\session\app\exception\player_conflict_exception;
-use mod_ispring\use_case\end_session_use_case;
+use mod_ispring\local\di_container;
+use mod_ispring\local\session\api\session_api_interface;
+use mod_ispring\local\session\app\exception\player_conflict_exception;
+use mod_ispring\local\use_case\end_session_use_case;
 
 class end_session extends external_api {
     private const INVALID_PLAYER_ID_CODE = 'invalidplayerid';

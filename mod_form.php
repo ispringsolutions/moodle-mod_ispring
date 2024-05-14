@@ -22,8 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\ispring_module\domain\model\grading_options;
-use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
+use mod_ispring\local\content\infrastructure\file_storage as ispring_file_storage;
+use mod_ispring\local\ispring_module\domain\model\grading_options;
 
 defined('MOODLE_INTERNAL') || die();
 

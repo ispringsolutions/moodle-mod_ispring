@@ -22,13 +22,15 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\di_container;
-use mod_ispring\event\event_types;
-use mod_ispring\event\open_close_event_controller;
-use mod_ispring\mapper\std_mapper;
-use mod_ispring\use_case\create_or_update_ispring_module_use_case;
-use mod_ispring\use_case\delete_ispring_module_use_case;
-use mod_ispring\content\infrastructure\file_storage as ispring_file_storage;
+defined('MOODLE_INTERNAL') || die();
+
+use mod_ispring\local\content\infrastructure\file_storage as ispring_file_storage;
+use mod_ispring\local\di_container;
+use mod_ispring\local\event\event_types;
+use mod_ispring\local\event\open_close_event_controller;
+use mod_ispring\local\mapper\std_mapper;
+use mod_ispring\local\use_case\create_or_update_ispring_module_use_case;
+use mod_ispring\local\use_case\delete_ispring_module_use_case;
 
 /**
  * Returns true, false or null depending on plugin support for $feature.
@@ -229,7 +231,13 @@ function ispring_update_instance(stdClass $newispring): bool {
     return true;
 }
 
-function ispring_delete_instance($id): bool {
+/**
+ * Deletes an existing instance of ispring activity module by id
+ *
+ * @param int $id activity module id.
+ * @return bool
+ */
+function ispring_delete_instance(int $id): bool {
     global $DB;
     $ispringmoduleapi = di_container::get_ispring_module_api();
     $module = $ispringmoduleapi->get_by_id($id);
@@ -355,6 +363,13 @@ function ispring_grade_item_delete($instance): int {
         $instance->id, 0, null, ['deleted' => 1]);
 }
 
+/**
+ * Gets user grades by activity module instance and user id
+ *
+ * @param stdClass $instance
+ * @param int $userid
+ * @return array|null
+ */
 function ispring_get_user_grades(stdClass $instance, int $userid): ?array {
     return di_container::get_session_api()->get_grades_for_gradebook($instance->id, $userid);
 }

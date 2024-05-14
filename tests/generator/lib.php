@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../testcase/user_file_creator.php');
+require_once(__DIR__ . '/../user_file_creator.php');
 
-use mod_ispring\ispring_module\domain\model\grading_options;
-use mod_ispring\testcase\user_file_creator;
+use mod_ispring\local\ispring_module\domain\model\grading_options;
+use mod_ispring\user_file_creator;
 
 class mod_ispring_generator extends testing_module_generator {
     public function create_instance($record = null, array $options = null) {

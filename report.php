@@ -23,10 +23,10 @@
  */
 
 
-use mod_ispring\argparser\argparser;
-use mod_ispring\common\app\available\availability_checker;
-use mod_ispring\di_container;
-use mod_ispring\pages\report_page;
+use mod_ispring\local\argparser\argparser;
+use mod_ispring\local\common\app\available\availability_checker;
+use mod_ispring\local\di_container;
+use mod_ispring\local\pages\report_page;
 
 require_once('../../config.php');
 $cmid = optional_param('id', '', PARAM_INT);

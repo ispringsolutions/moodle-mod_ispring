@@ -22,14 +22,14 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\argparser\argparser;
+use mod_ispring\local\argparser\argparser;
 
 require(__DIR__ . '/../../config.php');
 
 // Course module ID.
 $id = required_param('id', PARAM_INT);
 
-$argparser = new argparser($id, \mod_ispring\di_container::get_ispring_module_api());
+$argparser = new argparser($id, \mod_ispring\local\di_container::get_ispring_module_api());
 
 require_login($argparser->get_moodle_course(), true, $argparser->get_cm());
 

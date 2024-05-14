@@ -22,7 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_ispring\upgrade\upgrade_db_manager;
+use mod_ispring\local\upgrade\upgrade_db_manager;
 
 function xmldb_ispring_upgrade($oldversion) {
     $dbmanager = new upgrade_db_manager();
