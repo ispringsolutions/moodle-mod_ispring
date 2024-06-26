@@ -37,6 +37,7 @@ class session_mapper {
             $data->get_content_id(),
             $data->get_persist_state_id(),
             $data->get_persist_state(),
+            $data->get_suspend_data(),
             $data->get_max_score(),
             $data->get_min_score(),
             $data->get_passing_score(),
@@ -49,13 +50,13 @@ class session_mapper {
             $input->get_duration(),
             $input->get_persist_state_id(),
             $input->get_persist_state(),
-            $input->get_status(),
             $input->get_player_id(),
         );
     }
 
     public static function get_end_data(end_input $input): end_data {
         return new end_data(
+            $input->get_status(),
             $input->get_max_score(),
             $input->get_min_score(),
             $input->get_passing_score(),

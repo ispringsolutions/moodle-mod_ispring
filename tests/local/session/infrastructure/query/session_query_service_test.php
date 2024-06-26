@@ -304,6 +304,7 @@ final class session_query_service_test extends \advanced_testcase {
         $session->passing_score = 60;
         $session->detailed_report = '_report';
         $session->player_id = '1234';
+        $session->suspend_data = '_suspendData';
 
         $ids = [];
         foreach ($grades as $grade) {
@@ -339,6 +340,7 @@ final class session_query_service_test extends \advanced_testcase {
         global $DB;
         $record = $DB->get_record('ispring_session', ['id' => $sessionid]);
 
+        $this->assertCount(17, (array)$record);
         $this->assertEquals($record->id, $model->get_id());
         $this->assertEquals($record->user_id, $model->get_user_id());
         $this->assertEquals($record->ispring_content_id, $model->get_content_id());
@@ -355,6 +357,7 @@ final class session_query_service_test extends \advanced_testcase {
         $this->assertEquals($record->passing_score, $model->get_passing_score());
         $this->assertEquals($record->detailed_report, $model->get_detailed_report());
         $this->assertEquals($record->player_id, $model->get_player_id());
+        $this->assertEquals($record->suspend_data, $model->get_suspend_data());
     }
 
     private function assert_grade_equals(int $userid, float $score, ?int $dategraded, \stdClass $grade): void {

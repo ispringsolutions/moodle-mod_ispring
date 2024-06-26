@@ -54,15 +54,16 @@ class end_session_use_case {
         transaction_utils::do_in_transaction(
             db_transaction::class,
             function () use ($sessionid, $userid, $state) {
-                $this->sessionapi->update($sessionid, $userid, new update_input(
+                $updateinput = new update_input(
                     $state->get_state()->get_duration(),
                     $state->get_state()->get_id(),
                     $state->get_state()->get_persist_state(),
-                    $state->get_state()->get_status(),
                     $state->get_state()->get_player_id(),
-                ));
+                );
 
                 $this->sessionapi->end($sessionid, $userid, new end_input(
+                    $updateinput,
+                    $state->get_status(),
                     $state->get_max_score(),
                     $state->get_min_score(),
                     $state->get_passing_score(),

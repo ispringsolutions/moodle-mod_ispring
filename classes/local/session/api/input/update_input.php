@@ -28,20 +28,17 @@ class update_input {
     private int $duration;
     private string $persiststateid;
     private string $persiststate;
-    private string $status;
     private string $playerid;
 
     public function __construct(
         int $duration,
         string $persiststateid,
         string $persiststate,
-        string $status,
         string $playerid
     ) {
         $this->duration = $duration;
         $this->persiststateid = $persiststateid;
         $this->persiststate = $persiststate;
-        $this->status = $status;
         $this->playerid = $playerid;
     }
 
@@ -69,10 +66,6 @@ class update_input {
     /**
      * @return string
      */
-    public function get_status(): string {
-        return $this->status;
-    }
-
     public function get_player_id(): string {
         return $this->playerid;
     }

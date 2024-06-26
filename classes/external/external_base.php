@@ -24,49 +24,26 @@
 
 namespace mod_ispring\external;
 
-class state {
-    private int $duration;
-    private string $id;
-    private string $persiststate;
-    private string $playerid;
+class external_base {
+    public const REVIEW_SESSION_ID = -1;
+    public const ERROR_CODE_INVALID_PLAYER_ID = 'invalidplayerid';
 
-    public function __construct(
-        int $duration,
-        string $id,
-        string $persiststate,
-        string $playerid
-    ) {
-        $this->duration = $duration;
-        $this->id = $id;
-        $this->persiststate = $persiststate;
-        $this->playerid = $playerid;
+    /**
+     * Teachers only have a module preview mode.
+     * There is no need to collect teacher's progress and show it in reports.
+     *
+     * @param \context $context
+     * @return bool
+     */
+    public static function is_review_available(\context $context): bool {
+        return has_capability('mod/ispring:preview', $context);
     }
 
     /**
-     * @return int
+     * @param int $sessionid
+     * @return bool
      */
-    public function get_duration(): int {
-        return $this->duration;
-    }
-
-    /**
-     * @return string
-     */
-    public function get_id(): string {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function get_persist_state(): string {
-        return $this->persiststate;
-    }
-
-    /**
-     * @return string
-     */
-    public function get_player_id(): string {
-        return $this->playerid;
+    public static function is_review_session(int $sessionid): bool {
+        return $sessionid == self::REVIEW_SESSION_ID;
     }
 }

@@ -22,25 +22,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\external;
+namespace mod_ispring\local\common\app\exception;
 
-class start_state {
-    private string $playerid;
-    private bool $sessionrestored;
-
-    public function __construct(
-        string $playerid,
-        bool $sessionrestored
-    ) {
-        $this->playerid = $playerid;
-        $this->sessionrestored = $sessionrestored;
-    }
-
-    public function get_player_id(): string {
-        return $this->playerid;
-    }
-
-    public function get_session_restored(): bool {
-        return $this->sessionrestored;
+class inaccessible_session_exception extends common_exception {
+    public function __construct() {
+        parent::__construct('sessionnotfound');
     }
 }

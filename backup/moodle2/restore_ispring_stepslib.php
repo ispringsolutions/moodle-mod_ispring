@@ -65,5 +65,6 @@ class restore_ispring_activity_structure_step extends restore_activity_structure
 
     protected function after_execute(): void {
         $this->add_related_files('mod_ispring', 'content', null);
+        $this->add_related_files('mod_ispring', 'package', null);
     }
 }

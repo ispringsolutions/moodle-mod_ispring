@@ -26,18 +26,19 @@ namespace mod_ispring\local\ispring_module\infrastructure;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/../../../ispring_testcase.php');
+
 use mod_ispring\local\ispring_module\app\data\ispring_module_data;
 use mod_ispring\local\ispring_module\app\model\description;
 use mod_ispring\local\ispring_module\domain\model\grading_options;
-
-require_once(__DIR__ . '/../../../ispring_testcase.php');
+use mod_ispring\ispring_testcase;
 
 /**
  * Test ispring_module_repository class.
  *
  * @covers \mod_ispring\local\ispring_module\infrastructure\ispring_module_repository
  */
-final class ispring_module_repository_test extends \mod_ispring\ispring_testcase {
+final class ispring_module_repository_test extends \advanced_testcase {
     private ispring_module_repository $ispringrepository;
 
     protected function setUp(): void {
@@ -45,7 +46,7 @@ final class ispring_module_repository_test extends \mod_ispring\ispring_testcase
     }
 
     public function test_add_with_description(): void {
-        $courseid = $this->create_course();
+        $courseid = ispring_testcase::create_course($this)->id;
         $data = new ispring_module_data(
             'test_add',
             $courseid,
@@ -61,7 +62,7 @@ final class ispring_module_repository_test extends \mod_ispring\ispring_testcase
     }
 
     public function test_add_without_description(): void {
-        $courseid = $this->create_course();
+        $courseid = ispring_testcase::create_course($this)->id;
         $data = new ispring_module_data(
             'test_add',
             $courseid,
@@ -77,7 +78,7 @@ final class ispring_module_repository_test extends \mod_ispring\ispring_testcase
     }
 
     public function test_update(): void {
-        $instance = $this->create_course_and_instance();
+        $instance = ispring_testcase::create_course_and_instance($this);
         $data = new ispring_module_data(
             'test_update',
             $instance->course,

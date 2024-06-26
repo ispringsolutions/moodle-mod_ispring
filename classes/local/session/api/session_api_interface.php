@@ -34,12 +34,11 @@ interface session_api_interface {
      * Create new session for given content id and user id
      * @param int $contentid
      * @param int $userid
-     * @param string $status
      * @param string $playerid
      * @param bool $sessionrestored
      * @return int
      */
-    public function add(int $contentid, int $userid, string $status, string $playerid, bool $sessionrestored): int;
+    public function add(int $contentid, int $userid, string $playerid, bool $sessionrestored): int;
 
     /**
      * End session and save state
@@ -58,6 +57,15 @@ interface session_api_interface {
      * @return bool
      */
     public function update(int $sessionid, int $userid, update_input $data): bool;
+
+    /**
+     * Set suspend data for given session
+     * @param int $sessionid
+     * @param int $userid
+     * @param string $playerid
+     * @param string $suspenddata
+     */
+    public function set_suspend_data(int $sessionid, int $userid, string $playerid, string $suspenddata): void;
 
     /**
      * Get last user session by content id

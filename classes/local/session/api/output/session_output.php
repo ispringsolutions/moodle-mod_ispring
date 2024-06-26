@@ -28,6 +28,7 @@ class session_output {
     private int $contentid;
     private ?string $persiststateid;
     private ?string $persiststate;
+    private ?string $suspenddata;
     private ?float $maxscore;
     private ?float $minscore;
     private ?float $passingscore;
@@ -37,6 +38,7 @@ class session_output {
         int $contentid,
         ?string $persiststateid,
         ?string $persiststate,
+        ?string $suspenddata,
         ?float $maxscore,
         ?float $minscore,
         ?float $passingscore,
@@ -45,6 +47,7 @@ class session_output {
         $this->contentid = $contentid;
         $this->persiststateid = $persiststateid;
         $this->persiststate = $persiststate;
+        $this->suspenddata = $suspenddata;
         $this->maxscore = $maxscore;
         $this->minscore = $minscore;
         $this->passingscore = $passingscore;
@@ -70,6 +73,13 @@ class session_output {
      */
     public function get_persist_state(): ?string {
         return $this->persiststate;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_suspend_data(): ?string {
+        return $this->suspenddata;
     }
 
     /**

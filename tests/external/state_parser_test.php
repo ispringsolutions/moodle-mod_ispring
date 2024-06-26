@@ -39,61 +39,53 @@ final class state_parser_test extends \basic_testcase {
 
     public function test_parse_state_can_parse_valid_state(): void {
         $state = state_parser::parse_state(
-            '{"duration":10,"id":"_id","persistState":"_state","status":"incomplete","playerId":"1234"}',
+            '{"duration":10,"id":"_id","persistState":"_state","playerId":"1234"}',
         );
 
         $this->assertEquals(10, $state->get_duration());
         $this->assertEquals('_id', $state->get_id());
         $this->assertEquals('"_state"', $state->get_persist_state());
-        $this->assertEquals('incomplete', $state->get_status());
         $this->assertEquals('1234', $state->get_player_id());
     }
 
     public function test_parse_state_throws_exception_when_duration_is_missing(): void {
         $this->expectException(invalid_parameter_exception::class);
         state_parser::parse_state(
-            '{"id":"_id","persistState":"_state","status":"incomplete","playerId":"1234"}',
+            '{"id":"_id","persistState":"_state","playerId":"1234"}',
         );
     }
 
     public function test_parse_state_throws_exception_when_id_is_missing(): void {
         $this->expectException(invalid_parameter_exception::class);
         state_parser::parse_state(
-            '{"duration":10,"persistState":"_state","status":"incomplete","playerId":"1234"}',
+            '{"duration":10,"persistState":"_state","playerId":"1234"}',
         );
     }
 
     public function test_parse_state_throws_exception_when_persist_state_is_missing(): void {
         $this->expectException(invalid_parameter_exception::class);
         state_parser::parse_state(
-            '{"duration":10,"id":"_id","status":"incomplete","playerId":"1234"}',
-        );
-    }
-
-    public function test_parse_state_throws_exception_when_status_is_missing(): void {
-        $this->expectException(invalid_parameter_exception::class);
-        state_parser::parse_state(
-            '{"duration":10,"id":"_id","persistState":"_state","playerId":"1234"}',
+            '{"duration":10,"id":"_id","playerId":"1234"}',
         );
     }
 
     public function test_parse_state_throws_exception_when_player_id_is_missing(): void {
         $this->expectException(invalid_parameter_exception::class);
         state_parser::parse_state(
-            '{"duration":9.9,"id":"_id","persistState":"_state","status":"incomplete"}',
+            '{"duration":9.9,"id":"_id","persistState":"_state"}',
         );
     }
 
     public function test_parse_state_throws_exception_when_duration_is_not_number(): void {
         $this->expectException(invalid_parameter_exception::class);
         state_parser::parse_state(
-            '{"duration":"1 0","id":"_id","persistState":"_state","status":"incomplete","playerId":"1234"}',
+            '{"duration":"1 0","id":"_id","persistState":"_state","playerId":"1234"}',
         );
     }
 
     public function test_parse_state_succeeds_when_duration_is_not_integer(): void {
         $state = state_parser::parse_state(
-            '{"duration":9.9,"id":"_id","persistState":"_state","status":"incomplete","playerId":"1234"}',
+            '{"duration":9.9,"id":"_id","persistState":"_state","playerId":"1234"}',
         );
 
         $this->assertEquals(9, $state->get_duration());
@@ -113,7 +105,7 @@ final class state_parser_test extends \basic_testcase {
         $this->assertEquals(10, $state->get_duration());
         $this->assertEquals('_id', $state->get_id());
         $this->assertEquals('"_state"', $state->get_persist_state());
-        $this->assertEquals('incomplete', $state->get_status());
+        $this->assertEquals('incomplete', $resultstate->get_status());
         $this->assertEquals('1234', $state->get_player_id());
     }
 
@@ -169,16 +161,19 @@ final class state_parser_test extends \basic_testcase {
     }
 
     public function test_parse_start_state_can_parse_valid_start_state(): void {
-        $state = state_parser::parse_start_state('{"status":"incomplete","playerId":"1234","sessionRestored":"true"}');
+        $state = state_parser::parse_start_state('{"playerId":"1234","sessionRestored":"true"}');
 
-        $this->assertEquals('incomplete', $state->get_status());
         $this->assertEquals('1234', $state->get_player_id());
-        $this->assertEquals('true', $state->get_session_restored());
+        $this->assertEquals(true, $state->get_session_restored());
     }
 
-    public function test_parse_start_state_throws_exception_when_status_is_missing(): void {
+    public function test_parse_start_state_throws_exception_when_player_id_is_missing(): void {
         $this->expectException(invalid_parameter_exception::class);
+        state_parser::parse_start_state('{"sessionRestored":"true"}');
+    }
 
-        state_parser::parse_start_state('{}');
+    public function test_parse_start_state_throws_exception_when_session_restored_is_missing(): void {
+        $this->expectException(invalid_parameter_exception::class);
+        state_parser::parse_start_state('{"playerId":"1234"}');
     }
 }

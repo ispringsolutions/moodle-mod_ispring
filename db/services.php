@@ -59,4 +59,11 @@ $functions = [
         'ajax' => true,
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'mod_ispring_set_suspend_data' => [
+        'classname' => 'mod_ispring\external\set_suspend_data',
+        'description' => 'Sets suspend data associated with specified session id',
+        'type' => 'write',
+        'ajax' => true,
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

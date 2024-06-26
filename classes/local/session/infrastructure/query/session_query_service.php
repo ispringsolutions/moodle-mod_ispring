@@ -299,6 +299,7 @@ class session_query_service implements session_query_service_interface {
             $data->passing_score,
             $data->detailed_report,
             $data->player_id ?? '',
+            $data->suspend_data,
         );
     }
 

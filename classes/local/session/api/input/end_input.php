@@ -25,6 +25,8 @@
 namespace mod_ispring\local\session\api\input;
 
 class end_input {
+    private update_input $updateinput;
+    private string $status;
     private ?float $maxscore;
     private ?float $minscore;
     private ?float $passingscore;
@@ -32,17 +34,35 @@ class end_input {
     private ?string $detailedreport;
 
     public function __construct(
+        update_input $updateinput,
+        string $status,
         ?float $maxscore,
         ?float $minscore,
         ?float $passingscore,
         ?float $score,
         ?string $detailedreport
     ) {
+        $this->updateinput = $updateinput;
+        $this->status = $status;
         $this->maxscore = $maxscore;
         $this->minscore = $minscore;
         $this->passingscore = $passingscore;
         $this->score = $score;
         $this->detailedreport = $detailedreport;
+    }
+
+    /**
+     * @return update_input
+     */
+    public function get_update_input(): update_input {
+        return $this->updateinput;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_status(): string {
+        return $this->status;
     }
 
     /**

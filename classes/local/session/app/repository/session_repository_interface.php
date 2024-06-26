@@ -43,6 +43,13 @@ interface session_repository_interface {
     public function update(int $id, session $data): bool;
 
     /**
+     * Set suspend data for given session id
+     * @param int $id
+     * @param string|null $suspenddata
+     */
+    public function set_suspend_data(int $id, ?string $suspenddata): void;
+
+    /**
      * Delete sessions by content id
      * @param int $contentid
      * @return bool

@@ -52,22 +52,17 @@ class detailed_report_page extends base_page {
     }
 
     public function get_content(): string {
-        $content = $this->get_output()->single_button($this->backurl, get_string('back', 'ispring'), 'get');
-
         $user = \core_user::get_user($this->userid);
         if (!$user) {
             throw new \moodle_exception('invaliduserid');
         }
-        $content .= \html_writer::tag('div', \fullname($user), ['class' => 'detailed-report__username']);
 
-        $content .= \html_writer::start_tag('div', ['class' => 'container']);
-        $content .= \html_writer::tag('div', '', ['class' => 'preloader', 'id' => self::PRELOADER_ID]);
+        $content = \html_writer::tag('div', '', ['class' => 'preloader', 'id' => self::PRELOADER_ID]);
         $content .= \html_writer::start_tag('iframe', [
             'id' => self::PLAYER_ID,
             'class' => 'detailed-report__report',
         ]);
         $content .= \html_writer::end_tag('iframe');
-        $content .= \html_writer::end_tag('div');
 
         $this->get_page()->requires->js_call_amd('mod_ispring/detailed_report_api', 'init', [
             $this->sessionid,
@@ -75,6 +70,9 @@ class detailed_report_page extends base_page {
             self::PLAYER_ID,
             $this->reporturl,
             self::PRELOADER_ID,
+            $this->backurl,
+            \fullname($user),
+            $this->get_user_image_url($user),
         ]);
 
         return $content;
@@ -82,5 +80,15 @@ class detailed_report_page extends base_page {
 
     private function define_properties(): void {
         $this->get_page()->add_body_class('limitedwidth');
+    }
+
+    private function get_user_image_url(\stdClass $user): string {
+        if ($user->picture == 0 && empty($CFG->enablegravatar)) {
+            return '';
+        }
+
+        $userpicture = new \user_picture($user);
+        $userimageurl = $userpicture->get_url($this->get_page());
+        return $userimageurl->out(false);
     }
 }

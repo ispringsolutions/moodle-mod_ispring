@@ -25,6 +25,7 @@
 namespace mod_ispring\local\session\app\data;
 
 class end_data {
+    private string $status;
     private ?float $maxscore;
     private ?float $minscore;
     private ?float $passingscore;
@@ -32,17 +33,26 @@ class end_data {
     private ?string $detailedreport;
 
     public function __construct(
+        string $status,
         ?float $maxscore,
         ?float $minscore,
         ?float $passingscore,
         ?float $score,
         ?string $detailedreport
     ) {
+        $this->status = $status;
         $this->maxscore = $maxscore;
         $this->minscore = $minscore;
         $this->passingscore = $passingscore;
         $this->score = $score;
         $this->detailedreport = $detailedreport;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_status(): string {
+        return $this->status;
     }
 
     /**

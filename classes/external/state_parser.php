@@ -27,14 +27,13 @@ namespace mod_ispring\external;
 class state_parser {
     public static function parse_state(string $json): state {
         $data = self::parse_json($json);
-        self::require_properties($data, ['duration', 'id', 'persistState', 'status', 'playerId']);
+        self::require_properties($data, ['duration', 'id', 'persistState', 'playerId']);
         self::require_properties_are_numeric($data, ['duration']);
 
         return new state(
             (int)$data->duration,
             $data->id,
             json_encode($data->persistState),
-            $data->status,
             $data->playerId,
         );
     }
@@ -43,10 +42,12 @@ class state_parser {
         $state = self::parse_state($json);
 
         $data = self::parse_json($json);
+        self::require_properties($data, ['status']);
         self::require_properties_are_numeric($data, ['maxScore', 'minScore', 'passingScore', 'score']);
 
         return new result_state(
             $state,
+            $data->status,
             property_exists($data, 'maxScore') ? $data->maxScore : null,
             property_exists($data, 'minScore') ? $data->minScore : null,
             property_exists($data, 'passingScore') ? $data->passingScore : null,
@@ -58,10 +59,9 @@ class state_parser {
     public static function parse_start_state(string $json): start_state {
         $data = self::parse_json($json);
 
-        self::require_properties($data, ['status', 'playerId', 'sessionRestored']);
+        self::require_properties($data, ['playerId', 'sessionRestored']);
 
         return new start_state(
-            $data->status,
             $data->playerId,
             $data->sessionRestored,
         );

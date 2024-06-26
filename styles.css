@@ -10,14 +10,6 @@
     filter: brightness(0) invert(1);
 }
 
-.path-mod-ispring .detailed-report__username
-{
-    color: #42484E;
-    margin: 24px 0;
-    font-size: 28px;
-    line-height: 36px;
-}
-
 .path-mod-ispring .detailed-report__report,
 .path-mod-ispring .container,
 .path-mod-ispring .player

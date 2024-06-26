@@ -26,15 +26,39 @@ import {call} from 'core/ajax';
 const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
 
 class Api {
-    constructor(sessionId, contentId, returnUrl, boxErrorId, iframeId) {
+    constructor(sessionId, contentId, returnUrl, boxErrorId, iframeId, suspendData) {
         this._sessionId = sessionId;
         this._contentId = contentId;
         this._returnUrl = returnUrl;
         this._boxErrorId = boxErrorId;
         this._iframeId = iframeId;
+        this._suspendData = suspendData;
+    }
+
+    getSuspendData() {
+        return this._suspendData;
+    }
+
+    setSuspendData(suspendData) {
+        this._suspendData = suspendData;
+        if (this._sessionId)
+        {
+            call([{
+                methodname: 'mod_ispring_set_suspend_data',
+                args: {
+                    'session_id': this._sessionId,
+                    'player_id': this._playerId,
+                    'suspend_data': JSON.stringify(suspendData),
+                }
+            }])[0]
+                .then((response) => {
+                    showErrorBoxIfNeeded(response, this._boxErrorId, this._iframeId);
+                });
+        }
     }
 
     startSession(state) {
+        this._playerId = state.playerId;
         call([{
             methodname: 'mod_ispring_start_session',
             args: {
@@ -90,11 +114,10 @@ class Api {
  * @param {string} iframeId
  */
 function showErrorBoxIfNeeded(response, boxId, iframeId) {
-    if ('warning' in response && response['warning'].length > 0)
-    {
+    if ('warning' in response && response['warning'].length > 0) {
         const warning = response['warning'][0];
-        if (warning['warningcode'] === INVALID_PLAYER_ID_CODE)
-        {
+
+        if (warning['warningcode'] === INVALID_PLAYER_ID_CODE) {
             document.getElementById(boxId).style.display = 'block';
             document.getElementById(boxId).innerHTML = warning['message'];
             document.getElementById(iframeId).parentElement.style.display = 'none';
@@ -107,17 +130,13 @@ function showErrorBoxIfNeeded(response, boxId, iframeId) {
  * @param {string|null} persistState
  */
 function setPlayerData(persistStateId, persistState) {
-    if (localStorage && persistStateId) {
-        if (persistState) {
-            localStorage.setItem(persistStateId, persistState);
-        } else {
-            localStorage.removeItem(persistStateId);
-        }
+    if (localStorage && persistStateId && persistState) {
+        localStorage.setItem(persistStateId, persistState);
     }
 }
 
 export const init = (contentId, playerUrl, iframeId, returnUrl, preloaderId, errorBoxId) => {
-    window['ispring_moodle_connector'] = new Api(0, contentId, returnUrl, errorBoxId, iframeId);
+    let suspendData = null;
     call([{
         methodname: 'mod_ispring_get_player_data',
         args: {
@@ -126,10 +145,12 @@ export const init = (contentId, playerUrl, iframeId, returnUrl, preloaderId, err
     }])[0]
         .then((result) => {
             setPlayerData(result['persist_state_id'], result['persist_state']);
+            suspendData = JSON.parse(result['suspend_data']);
         })
         .catch(() /*noexcept*/ => {
         })
         .then(() => {
+            window['ispring_moodle_connector'] = new Api(0, contentId, returnUrl, errorBoxId, iframeId, suspendData);
             document.getElementById(iframeId).src = playerUrl;
             document.getElementById(preloaderId).remove();
         });

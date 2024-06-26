@@ -24,16 +24,32 @@
 
 namespace mod_ispring;
 
-class ispring_testcase extends \advanced_testcase {
-    final protected function create_course(): int {
-        $this->resetAfterTest();
-        $course = $this->getDataGenerator()->create_course();
-        return $course->id;
+use advanced_testcase;
+use mod_ispring\local\session\domain\model\session_state;
+
+class ispring_testcase {
+    public static function create_course(advanced_testcase $testcase): \stdClass {
+        $testcase->resetAfterTest();
+        return advanced_testcase::getDataGenerator()->create_course();
     }
 
-    final protected function create_course_and_instance(array $data = null): \stdClass {
-        $this->setAdminUser();
-        $data['course'] = $this->create_course();
-        return $this->getDataGenerator()->create_module('ispring', $data);
+    public static function create_course_and_instance(advanced_testcase $testcase, array $formdata = null): \stdClass {
+        $testcase->setAdminUser();
+        $formdata['course'] = self::create_course($testcase);
+        return advanced_testcase::getDataGenerator()->create_module('ispring', $formdata);
+    }
+
+    public static function create_mock_session($session = []): int {
+        global $DB, $USER;
+
+        $session = (array)$session + [
+                'user_id' => $USER->id,
+                'ispring_content_id' => 4,
+                'status' => session_state::INCOMPLETE,
+                'score' => 20,
+                'begin_time' => 5,
+            ];
+
+        return $DB->insert_record('ispring_session', $session);
     }
 }
