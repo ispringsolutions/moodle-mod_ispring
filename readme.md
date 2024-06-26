@@ -1,20 +1,11 @@
 iSpring Moodle plugin
 ----------------------------------------
 
-Upload quizzes created in iSpring QuizMaker to Moodle and track learner progress with iSpring Module
+Upload courses and exercises created in iSpring Suite and track learner progress with iSpring Module.
 
 Description
 -----
-With iSpring Module, teachers can upload quizzes created in iSpring QuizMaker to Moodle and gather comprehensive statistics on learner performance.
-
-Monitor students' quiz progress with summary reports and detailed breakdowns of each attempt. iSpring Module shows you comprehensive reports that include:
-- learner information
-- start date and time
-- end date and time
-- total time spent
-- completion status
-- learner awarded score
-- all learner question responses
+Keep track of students' learning performances through comprehensive summary reports and detailed insights for each attempt. Save all data related to attempts and versions. Easily navigate through reports using version and status filters for quick access and download reports to identify learning challenges.
 
 Save all data related to attempts and versions. Easily navigate through reports using version and status filters for quick access and download reports to identify learning challenges.
 
