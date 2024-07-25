@@ -41,6 +41,7 @@ class session {
     private ?float $passingscore;
     private ?string $detailedreport;
     private string $playerid;
+    private ?string $suspenddata;
 
     public function __construct(
         int $id,
@@ -58,7 +59,8 @@ class session {
         float $minscore,
         ?float $passingscore,
         ?string $detailedreport,
-        string $playerid
+        string $playerid,
+        ?string $suspenddata
     ) {
         $this->id = $id;
         $this->contentid = $contentid;
@@ -76,6 +78,7 @@ class session {
         $this->passingscore = $passingscore;
         $this->detailedreport = $detailedreport;
         $this->playerid = $playerid;
+        $this->suspenddata = $suspenddata;
     }
 
     /**
@@ -188,5 +191,12 @@ class session {
      */
     public function get_player_id(): string {
         return $this->playerid;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_suspend_data(): ?string {
+        return $this->suspenddata;
     }
 }

@@ -30,6 +30,7 @@ require_once(__DIR__ . '/../../../../user_file_creator.php');
 
 use mod_ispring\local\content\app\adapter\ispring_module_api_interface;
 use mod_ispring\local\content\app\data\content_data;
+use mod_ispring\local\content\app\exception\invalid_description_exception;
 use mod_ispring\local\content\app\model\content;
 use mod_ispring\local\content\app\model\description;
 use mod_ispring\local\content\app\model\file_info;
@@ -87,7 +88,7 @@ final class content_service_test extends \advanced_testcase {
             ->willReturn(user_file_creator::create_from_string(
                 description::FILENAME,
                 '{"course_name":"Stub","description":"Stub description",'
-                . '"params":{"entrypoint":"index.html","creation_time":42}}',
+                . '"params":{"entrypoint":"index.html","creation_time":42,"version":1}}',
             ));
 
         $this->contentrepositorymock->expects($this->exactly(0))->method('remove');
@@ -140,7 +141,7 @@ final class content_service_test extends \advanced_testcase {
                 $this->identicalTo($content->get_file_id()),
             );
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(invalid_description_exception::class);
         $this->contentservice->add_content($content);
     }
 

@@ -24,20 +24,27 @@
 
 namespace mod_ispring\local\content\app\model;
 
+use mod_ispring\local\content\app\exception\invalid_description_exception;
+use mod_ispring\local\content\app\exception\unsupported_content_exception;
 use stored_file;
 
 class description_parser {
+    private const MAX_SUPPORTED_VERSION = 1;
+
     public static function parse(stored_file $file): description {
         $content = json_decode($file->get_content(), true);
 
         if (!is_array($content)) {
-            throw new \RuntimeException("File format is wrong");
+            throw new invalid_description_exception();
         }
 
         $result = description::create($content);
 
         if (!$result) {
-            throw new \RuntimeException("Description file does not contain all required fields");
+            throw new invalid_description_exception();
+        }
+        if ($result->get_description_params()->get_version() > self::MAX_SUPPORTED_VERSION) {
+            throw new unsupported_content_exception();
         }
 
         return $result;

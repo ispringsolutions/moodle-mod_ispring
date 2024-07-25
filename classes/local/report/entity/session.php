@@ -69,8 +69,12 @@ class session extends base_entity {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
             ->add_field("{$alias}.id")
-            ->add_callback(function (string $sessionid): string {
-                $link = $this->get_detailed_report_link($sessionid);
+            ->add_field("{$alias}.detailed_report")
+            ->add_callback(function ($value, \stdClass $row): string {
+                if (!$row->detailed_report) {
+                    return '-';
+                }
+                $link = $this->get_detailed_report_link($row->id);
                 return \html_writer::link($link->out(false), get_string('reviewattempt', 'ispring'));
             });
 

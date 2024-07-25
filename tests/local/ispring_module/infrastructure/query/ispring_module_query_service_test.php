@@ -28,12 +28,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../../../ispring_testcase.php');
 
+use mod_ispring\ispring_testcase;
+
 /**
  * Test ispring_module_query_service class.
  *
  * @covers \mod_ispring\local\ispring_module\infrastructure\query\ispring_module_query_service
  */
-final class ispring_module_query_service_test extends \mod_ispring\ispring_testcase {
+final class ispring_module_query_service_test extends \advanced_testcase {
     private ispring_module_query_service $ispringqueryservice;
 
     protected function setUp(): void {
@@ -45,7 +47,7 @@ final class ispring_module_query_service_test extends \mod_ispring\ispring_testc
     }
 
     public function test_exists_returns_true_for_existent_id(): void {
-        $instance = $this->create_course_and_instance();
+        $instance = ispring_testcase::create_course_and_instance($this);
 
         $this->assertTrue($this->ispringqueryservice->exists($instance->id));
     }
@@ -55,7 +57,7 @@ final class ispring_module_query_service_test extends \mod_ispring\ispring_testc
     }
 
     public function test_get_by_id_returns_module_for_valid_id(): void {
-        $instance = $this->create_course_and_instance();
+        $instance = ispring_testcase::create_course_and_instance($this);
 
         $model = $this->ispringqueryservice->get_by_id($instance->id);
 

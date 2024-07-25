@@ -24,6 +24,7 @@
 
 namespace mod_ispring\local\session\app\service;
 
+use mod_ispring\local\common\app\exception\inaccessible_session_exception;
 use mod_ispring\local\common\infrastructure\lock\locking_service;
 use mod_ispring\local\common\infrastructure\transaction\db_transaction;
 use mod_ispring\local\common\infrastructure\transaction\transaction_utils;
@@ -32,6 +33,7 @@ use mod_ispring\local\session\app\data\end_data;
 use mod_ispring\local\session\app\data\update_data;
 use mod_ispring\local\session\app\exception\player_conflict_exception;
 use mod_ispring\local\session\app\model\session;
+use mod_ispring\local\session\app\query\model\session as query_session;
 use mod_ispring\local\session\app\query\session_query_service_interface;
 use mod_ispring\local\session\app\repository\session_repository_interface;
 use mod_ispring\local\session\domain\model\session_state;
@@ -52,10 +54,10 @@ class session_service {
         $this->queryservice = $queryservice;
     }
 
-    public function add(int $contentid, int $userid, string $status, string $playerid, bool $sessionrestored): int {
+    public function add(int $contentid, int $userid, string $playerid, bool $sessionrestored): int {
         return transaction_utils::do_in_transaction(
             db_transaction::class,
-            function () use ($contentid, $userid, $status, $playerid, $sessionrestored) {
+            function () use ($contentid, $userid, $playerid, $sessionrestored) {
                 if (!$ispringmoduleid = $this->contentapi->get_ispring_module_id_by_content_id($contentid)) {
                     throw new \RuntimeException("Invalid content id");
                 }
@@ -63,7 +65,7 @@ class session_service {
                 $lock = locking_service::get_lock('session_create', "user:{$userid}", self::CREATE_SESSION_TIMEOUT);
                 $existingsession = $this->queryservice->get_last_by_content_id($contentid, $userid);
 
-                if ($existingsession && (self::session_completed($status) || $sessionrestored)) {
+                if ($existingsession && $sessionrestored) {
                     $session = new session(
                         $existingsession->get_content_id(),
                         $existingsession->get_score(),
@@ -113,18 +115,13 @@ class session_service {
             db_transaction::class,
             function () use ($sessionid, $userid, $data) {
                 $session = $this->queryservice->get($sessionid);
-                if (!$session) {
-                    return false;
-                }
 
-                if ($session->get_user_id() !== $userid) {
-                    throw new \RuntimeException("Cannot end session started by different user");
-                }
+                self::validate_session($session, $userid);
 
                 $updatedsession = new session(
                     $session->get_content_id(),
                     $data->get_score() ?? 0,
-                    $session->get_status(),
+                    $data->get_status(),
                     $session->get_begin_time(),
                     time(),
                     $session->get_duration(),
@@ -150,26 +147,12 @@ class session_service {
             function () use ($sessionid, $userid, $data) {
                 $session = $this->queryservice->get($sessionid);
 
-                if (!$session) {
-                    return false;
-                }
-
-                if ($session->get_user_id() !== $userid) {
-                    throw new \RuntimeException('Cannot update session started by different user');
-                }
-
-                if (self::session_completed($session->get_status())) {
-                    throw new \RuntimeException('Cannot update already ended session');
-                }
-
-                if ($data->get_player_id() != $session->get_player_id()) {
-                    throw new player_conflict_exception('Cannot update from different player');
-                }
+                self::validate_session_for_update($session, $userid, $data->get_player_id());
 
                 $newsession = new session(
                     $session->get_content_id(),
                     $session->get_score(),
-                    $data->get_status(),
+                    $session->get_status(),
                     $session->get_begin_time(),
                     $session->get_end_time(),
                     $data->get_duration(),
@@ -189,8 +172,17 @@ class session_service {
         );
     }
 
-    private static function session_completed(string $state): bool {
-        return $state != session_state::INCOMPLETE;
+    public function set_suspend_data(int $sessionid, int $userid, string $playerid, string $suspenddata): void {
+        transaction_utils::do_in_transaction(
+            db_transaction::class,
+            function () use ($sessionid, $userid, $playerid, $suspenddata) {
+                $session = $this->queryservice->get($sessionid);
+
+                self::validate_session_for_update($session, $userid, $playerid);
+
+                $this->repository->set_suspend_data($sessionid, $suspenddata);
+            },
+        );
     }
 
     private function get_next_attempt_number(int $ispringmoduleid, int $userid): int {
@@ -201,5 +193,19 @@ class session_service {
 
     public function delete_by_content_id(int $contentid): bool {
         return $this->repository->delete_by_content_id($contentid);
+    }
+
+    private static function validate_session(?query_session $session, int $userid): void {
+        if (!$session || $session->get_user_id() !== $userid) {
+            throw new inaccessible_session_exception();
+        }
+    }
+
+    private static function validate_session_for_update(?query_session $session, int $userid, string $playerid): void {
+        self::validate_session($session, $userid);
+
+        if ($playerid != $session->get_player_id()) {
+            throw new player_conflict_exception('Cannot modify session from different player');
+        }
     }
 }

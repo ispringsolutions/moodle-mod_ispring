@@ -61,6 +61,9 @@ final class upgrade_db_manager {
         if ($oldversion < 2024012203) {
             $this->upgrade_to_2024012203();
         }
+        if ($oldversion < 2024022901) {
+            $this->upgrade_to_2024022901();
+        }
     }
 
     private function upgrade_to_2023090720(): void {
@@ -382,5 +385,18 @@ final class upgrade_db_manager {
         }
 
         upgrade_mod_savepoint(true, 2024012203, 'ispring');
+    }
+
+    private function upgrade_to_2024022901(): void {
+        $dbman = $this->dbmanager;
+
+        $table = new xmldb_table('ispring_session');
+        $field = new xmldb_field('suspend_data', XMLDB_TYPE_TEXT, null, null, null, null, null, 'player_id');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2024022901, 'ispring');
     }
 }

@@ -33,42 +33,42 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use external_warnings;
-use mod_ispring\local\common\app\exception\inaccessible_content_exception;
-use mod_ispring\local\common\app\exception\inaccessible_session_exception;
 use mod_ispring\local\di_container;
-use mod_ispring\local\session\api\session_api_interface;
 use mod_ispring\local\session\app\exception\player_conflict_exception;
-use mod_ispring\local\use_case\end_session_use_case;
 
-class end_session extends external_api {
+class set_suspend_data extends external_api {
     /**
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'session_id' => new external_value(PARAM_INT, 'session id'),
-            'state' => new external_value(PARAM_RAW, 'object state'),
+            'player_id' => new external_value(PARAM_RAW, 'player id'),
+            'suspend_data' => new external_value(PARAM_RAW, 'suspend data'),
         ]);
     }
 
-    public static function execute(int $sessionid, string $state): array {
-        global $USER;
-        ['session_id' => $sessionid, 'state' => $state] = self::validate_parameters(
+    public static function execute(int $sessionid, string $playerid, string $suspenddata): array {
+        [
+            'session_id' => $sessionid,
+            'player_id' => $playerid,
+            'suspend_data' => $suspenddata,
+        ] = self::validate_parameters(
             self::execute_parameters(),
-            ['session_id' => $sessionid, 'state' => $state]
+            [
+                'session_id' => $sessionid,
+                'player_id' => $playerid,
+                'suspend_data' => $suspenddata,
+            ],
         );
 
         if (external_base::is_review_session($sessionid)) {
             return ['warning' => []];
         }
 
-        $sessionapi = di_container::get_session_api();
-        $ispringmoduleid = self::get_ispring_module_id_by_session_id($sessionapi, $sessionid);
-
-        $usecase = new end_session_use_case(di_container::get_ispring_module_api(), $sessionapi);
-        $parsedstate = state_parser::parse_result_state($state);
         try {
-            $usecase->end_session($ispringmoduleid, $sessionid, $USER->id, $parsedstate);
+            global $USER;
+            di_container::get_session_api()->set_suspend_data($sessionid, $USER->id, $playerid, $suspenddata);
         } catch (player_conflict_exception $exception) {
             return ['warning' => [[
                 'warningcode' => external_base::ERROR_CODE_INVALID_PLAYER_ID,
@@ -83,25 +83,5 @@ class end_session extends external_api {
         return new external_single_structure([
             'warning' => new external_warnings(),
         ]);
-    }
-
-    /**
-     * @param session_api_interface $sessionapi
-     * @param int $sessionid
-     * @return int
-     */
-    private static function get_ispring_module_id_by_session_id(
-        session_api_interface $sessionapi,
-        int $sessionid
-    ): int {
-        $session = $sessionapi->get_by_id($sessionid);
-        if (!$session) {
-            throw new inaccessible_session_exception();
-        }
-        $content = di_container::get_content_api()->get_by_id($session->get_content_id());
-        if (!$content) {
-            throw new inaccessible_content_exception();
-        }
-        return $content->get_ispring_module_id();
     }
 }

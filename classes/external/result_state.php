@@ -27,6 +27,7 @@ namespace mod_ispring\external;
 class result_state {
 
     private state $state;
+    private string $status;
     private ?float $maxscore;
     private ?float $minscore;
     private ?float $passingscore;
@@ -35,6 +36,7 @@ class result_state {
 
     public function __construct(
         state $state,
+        string $status,
         ?float $maxscore,
         ?float $minscore,
         ?float $passingscore,
@@ -42,6 +44,7 @@ class result_state {
         ?string $detailedreport
     ) {
         $this->state = $state;
+        $this->status = $status;
         $this->maxscore = $maxscore;
         $this->minscore = $minscore;
         $this->passingscore = $passingscore;
@@ -54,6 +57,13 @@ class result_state {
      */
     public function get_state(): state {
         return $this->state;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_status(): string {
+        return $this->status;
     }
 
     /**

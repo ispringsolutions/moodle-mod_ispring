@@ -27,15 +27,18 @@ namespace mod_ispring\local\content\app\model;
 class description_params {
     private string $entrypoint;
     private int $creationtime;
+    private int $version;
     private ?string $reportentrypoint;
 
     public function __construct(
         string $entrypoint,
         int $creationtime,
+        int $version,
         ?string $reportentrypoint
     ) {
         $this->entrypoint = $entrypoint;
         $this->creationtime = $creationtime;
+        $this->version = $version;
         $this->reportentrypoint = $reportentrypoint;
     }
 
@@ -50,10 +53,12 @@ class description_params {
         }
 
         if (array_key_exists('entrypoint', $data)
-            && array_key_exists('creation_time', $data)) {
+            && array_key_exists('creation_time', $data)
+            && array_key_exists('version', $data)) {
             return new description_params(
                 $data['entrypoint'],
                 (int)$data['creation_time'],
+                $data['version'],
                 $entrypoint
             );
         }
@@ -73,6 +78,13 @@ class description_params {
      */
     public function get_creation_time(): int {
         return $this->creationtime;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_version(): int {
+        return $this->version;
     }
 
     /**

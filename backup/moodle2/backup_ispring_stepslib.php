@@ -22,7 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_ispring_activity_structure_step extends backup_activity_structure_step {
-    protected function define_structure(): backup_nested_element {
+    public static function define_ispring_structure(): backup_nested_element {
         // Define each element separately.
         $ispringmodule = new backup_nested_element('ispring', ['id'], [
             'course',
@@ -61,6 +61,7 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
             'min_score',
             'passing_score',
             'detailed_report',
+            'suspend_data',
         ]);
 
         // Build the tree.
@@ -76,7 +77,12 @@ class backup_ispring_activity_structure_step extends backup_activity_structure_s
 
         // Define file annotations.
         $ispringmodule->annotate_files('mod_ispring', 'content', null);
+        $ispringmodule->annotate_files('mod_ispring', 'package', null);
 
-        return $this->prepare_activity_structure($ispringmodule);
+        return $ispringmodule;
+    }
+
+    protected function define_structure(): backup_nested_element {
+        return $this->prepare_activity_structure(self::define_ispring_structure());
     }
 }

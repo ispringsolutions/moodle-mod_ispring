@@ -24,13 +24,14 @@
 
 namespace mod_ispring\local\common\infrastructure;
 
+use mod_ispring\local\common\app\exception\inaccessible_content_exception;
 use mod_ispring\local\content\api\content_api_interface;
 
 class context_utils {
     public static function get_module_context(content_api_interface $contentapi, int $contentid): \context_module {
         $content = $contentapi->get_by_id($contentid);
         if (!$content) {
-            throw new \moodle_exception('contentnotfound', 'ispring');
+            throw new inaccessible_content_exception();
         }
         [, $cm] = get_course_and_cm_from_instance($content->get_ispring_module_id(), 'ispring');
         return \context_module::instance($cm->id);

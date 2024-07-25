@@ -64,6 +64,21 @@ class session_repository implements session_repository_interface {
         }
     }
 
+    public function set_suspend_data(int $id, ?string $suspenddata): void {
+        $session = new \stdClass();
+        $session->id = $id;
+        $session->suspend_data = $suspenddata;
+
+        $transaction = $this->database->start_delegated_transaction();
+        try {
+            $this->database->update_record('ispring_session', $session);
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+            throw new \RuntimeException('Cannot set suspend data');
+        }
+    }
+
     public function delete_by_content_id(int $contentid): bool {
         $transaction = $this->database->start_delegated_transaction();
         try {

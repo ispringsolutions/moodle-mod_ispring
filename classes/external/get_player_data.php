@@ -32,6 +32,7 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_ispring\local\common\app\exception\inaccessible_content_exception;
 use mod_ispring\local\common\infrastructure\context_utils;
 use mod_ispring\local\di_container;
 
@@ -51,22 +52,27 @@ class get_player_data extends external_api {
         );
 
         $modulecontext = self::get_module_context($contentid);
+        try {
+            self::validate_context($modulecontext);
+        } catch (\Throwable $e) {
+            throw new inaccessible_content_exception();
+        }
+
+        if (external_base::is_review_available($modulecontext)) {
+            return [
+                'persist_state_id' => null,
+                'persist_state' => null,
+                'suspend_data' => null,
+            ];
+        }
 
         $sessionapi = di_container::get_session_api();
         $session = $sessionapi->get_last_by_content_id($contentid, $USER->id);
 
-        if (has_capability('mod/ispring:preview', $modulecontext)) {
-            $persiststate = null;
-        } else if (has_capability('mod/ispring:view', $modulecontext)) {
-            $persiststate = $session ? $session->get_persist_state() : null;
-        } else {
-            throw new \moodle_exception('contentnotfound', 'ispring');
-        }
-        self::validate_context($modulecontext);
-
         return [
             'persist_state_id' => $session ? $session->get_persist_state_id() : null,
-            'persist_state' => $persiststate,
+            'persist_state' => $session ? $session->get_persist_state() : null,
+            'suspend_data' => $session ? $session->get_suspend_data() : null,
         ];
     }
 
@@ -74,6 +80,7 @@ class get_player_data extends external_api {
         return new external_single_structure([
             'persist_state_id' => new external_value(PARAM_RAW, 'content persist state id'),
             'persist_state' => new external_value(PARAM_RAW, 'content persist state'),
+            'suspend_data' => new external_value(PARAM_RAW, 'suspend data'),
         ]);
     }
 

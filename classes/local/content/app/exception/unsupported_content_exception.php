@@ -22,25 +22,12 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ispring\external;
+namespace mod_ispring\local\content\app\exception;
 
-class start_state {
-    private string $playerid;
-    private bool $sessionrestored;
+use mod_ispring\local\common\app\exception\common_exception;
 
-    public function __construct(
-        string $playerid,
-        bool $sessionrestored
-    ) {
-        $this->playerid = $playerid;
-        $this->sessionrestored = $sessionrestored;
-    }
-
-    public function get_player_id(): string {
-        return $this->playerid;
-    }
-
-    public function get_session_restored(): bool {
-        return $this->sessionrestored;
+class unsupported_content_exception extends common_exception {
+    public function __construct() {
+        parent::__construct('contentversiontoonew');
     }
 }

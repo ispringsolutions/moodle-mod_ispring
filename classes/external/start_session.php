@@ -53,13 +53,17 @@ class start_session extends external_api {
             ['content_id' => $contentid, 'state' => $state]
         );
 
-        self::require_access_to_content($contentid);
+        $context = self::get_context($contentid);
+
+        if (external_base::is_review_available($context)) {
+            return ['session_id' => external_base::REVIEW_SESSION_ID];
+        }
+
         $state = state_parser::parse_start_state($state);
 
         $sessionid = di_container::get_session_api()->add(
             $contentid,
             $USER->id,
-            $state->get_status(),
             $state->get_player_id(),
             $state->get_session_restored()
         );
@@ -73,12 +77,13 @@ class start_session extends external_api {
         ]);
     }
 
-    private static function require_access_to_content(int $contentid): void {
+    private static function get_context(int $contentid): \context {
         $contentapi = di_container::get_content_api();
         $modulecontext = context_utils::get_module_context($contentapi, $contentid);
 
         try {
             self::validate_context($modulecontext);
+            return $modulecontext;
         } catch (\Throwable $e) {
             throw new \moodle_exception('contentnotfound', 'ispring');
         }

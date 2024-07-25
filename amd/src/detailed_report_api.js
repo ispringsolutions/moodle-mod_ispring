@@ -24,9 +24,12 @@
 import {call} from 'core/ajax';
 
 class Api {
-    constructor(reportData, languageCode) {
+    constructor(reportData, languageCode, returnUrl, userName, userImageUrl) {
         this._reportData = reportData;
         this._languageCode = languageCode;
+        this._returnUrl = returnUrl;
+        this._userName = userName;
+        this._userImageUrl = userImageUrl;
     }
 
     state() {
@@ -36,9 +39,36 @@ class Api {
     currentLanguage() {
         return this._languageCode;
     }
+
+    /**
+     * @return {string}
+     */
+    getUserName() {
+        return this._userName;
+    }
+
+    /**
+     * @return {string}
+     */
+    getUserImage() {
+        return this._userImageUrl;
+    }
+
+    goBack() {
+        window.location.replace(this._returnUrl);
+    }
 }
 
-export const init = (sessionId, languageCode, iframeId, reportUrl, preloaderId) => {
+export const init = (
+    sessionId,
+    languageCode,
+    iframeId,
+    reportUrl,
+    preloaderId,
+    returnUrl,
+    userName,
+    userImageUrl,
+) => {
     call([{
         methodname: 'mod_ispring_get_report_data',
         args: {
@@ -46,7 +76,13 @@ export const init = (sessionId, languageCode, iframeId, reportUrl, preloaderId) 
         }
     }])[0]
         .then((result) => {
-            window['ispring_report_connector'] = new Api(result['report_data'], languageCode);
+            window['ispring_report_connector'] = new Api(
+                result['report_data'],
+                languageCode,
+                returnUrl,
+                userName,
+                userImageUrl,
+            );
             document.getElementById(iframeId).src = reportUrl;
             document.getElementById(preloaderId).remove();
         });

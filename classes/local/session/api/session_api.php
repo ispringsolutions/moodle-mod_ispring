@@ -48,8 +48,8 @@ class session_api implements session_api_interface {
         $this->contentapi = $contentapi;
     }
 
-    public function add(int $contentid, int $userid, string $status, string $playerid, bool $sessionrestored): int {
-        return $this->service->add($contentid, $userid, $status, $playerid, $sessionrestored);
+    public function add(int $contentid, int $userid, string $playerid, bool $sessionrestored): int {
+        return $this->service->add($contentid, $userid, $playerid, $sessionrestored);
     }
 
     public function get_last_by_content_id(int $contentid, int $userid): ?session_output {
@@ -65,7 +65,8 @@ class session_api implements session_api_interface {
     }
 
     public function end(int $sessionid, int $userid, end_input $data): bool {
-        return $this->service->end($sessionid, $userid, session_mapper::get_end_data($data));
+        return $this->update($sessionid, $userid, $data->get_update_input())
+            && $this->service->end($sessionid, $userid, session_mapper::get_end_data($data));
     }
 
     public function get_grades_for_gradebook(int $id, int $userid): ?array {
@@ -87,6 +88,10 @@ class session_api implements session_api_interface {
 
     public function update(int $sessionid, int $userid, update_input $data): bool {
         return $this->service->update($sessionid, $userid, session_mapper::get_update_data($data));
+    }
+
+    public function set_suspend_data(int $sessionid, int $userid, string $playerid, string $suspenddata): void {
+        $this->service->set_suspend_data($sessionid, $userid, $playerid, $suspenddata);
     }
 
     public function get_detailed_report(int $sessionid): ?detailed_report_output {

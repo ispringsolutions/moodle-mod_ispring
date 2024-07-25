@@ -63,6 +63,7 @@ class provider implements
                 'passing_score' => 'privacy:metadata:ispring_session:passing_score',
                 'detailed_report' => 'privacy:metadata:ispring_session:detailed_report',
                 'player_id' => 'privacy:metadata:ispring_session:player_id',
+                'suspend_data' => 'privacy:metadata:ispring_session:suspend_data',
             ],
             'privacy:metadata:ispring_session'
         );

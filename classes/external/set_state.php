@@ -38,8 +38,6 @@ use mod_ispring\local\session\api\input\update_input;
 use mod_ispring\local\session\app\exception\player_conflict_exception;
 
 class set_state extends external_api {
-    private const INVALID_PLAYER_ID_CODE = 'invalidplayerid';
-
     /**
      * @return external_function_parameters
      */
@@ -58,6 +56,10 @@ class set_state extends external_api {
             ['session_id' => $sessionid, 'state' => $state]
         );
 
+        if (external_base::is_review_session($sessionid)) {
+            return ['warning' => []];
+        }
+
         $parsedstate = state_parser::parse_state($state);
 
         try {
@@ -65,12 +67,11 @@ class set_state extends external_api {
                 $parsedstate->get_duration(),
                 $parsedstate->get_id(),
                 $parsedstate->get_persist_state(),
-                $parsedstate->get_status(),
                 $parsedstate->get_player_id(),
             ));
         } catch (player_conflict_exception $exception) {
             return ['warning' => [[
-                'warningcode' => self::INVALID_PLAYER_ID_CODE,
+                'warningcode' => external_base::ERROR_CODE_INVALID_PLAYER_ID,
                 'message' => get_string('invalidplayerid', 'ispring'),
             ]]];
         }
