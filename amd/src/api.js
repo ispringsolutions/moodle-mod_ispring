@@ -126,6 +126,19 @@ function showErrorBoxIfNeeded(response, boxId, iframeId) {
 }
 
 /**
+ * Delete all cached player data before settings new data
+ * @return void
+ */
+function deleteAllPlayerData() {
+    const regex = /^ispring::/;
+    Object.keys(localStorage).forEach((key) => {
+        if (regex.test(key)) {
+            localStorage.removeItem(key);
+        }
+    });
+}
+
+/**
  * @param {string|null} persistStateId
  * @param {string|null} persistState
  */
@@ -144,6 +157,7 @@ export const init = (contentId, playerUrl, iframeId, returnUrl, preloaderId, err
         }
     }])[0]
         .then((result) => {
+            deleteAllPlayerData();
             setPlayerData(result['persist_state_id'], result['persist_state']);
             suspendData = JSON.parse(result['suspend_data']);
         })
