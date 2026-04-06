@@ -64,6 +64,9 @@ final class upgrade_db_manager {
         if ($oldversion < 2024022901) {
             $this->upgrade_to_2024022901();
         }
+        if ($oldversion < 2026032400) {
+            $this->upgrade_to_2026032400();
+        }
     }
 
     private function upgrade_to_2023090720(): void {
@@ -398,5 +401,27 @@ final class upgrade_db_manager {
         }
 
         upgrade_mod_savepoint(true, 2024022901, 'ispring');
+    }
+
+    private function upgrade_to_2026032400(): void {
+        $dbman = $this->dbmanager;
+
+        $table = new xmldb_table('ispring');
+        $field = new xmldb_field(
+            'timemodified',
+            XMLDB_TYPE_INTEGER,
+            10,
+            null,
+            XMLDB_NOTNULL,
+            null,
+            0,
+            'timeclose'
+        );
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026032400, 'ispring');
     }
 }

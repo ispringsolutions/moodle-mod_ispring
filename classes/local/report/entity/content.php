@@ -85,4 +85,13 @@ class content extends base_entity {
 
         return $filters;
     }
+
+    protected function get_default_tables(): array
+    {
+        return [
+            'ispring',
+            'ispring_content',
+            'ispring_session'
+        ];
+    }
 }

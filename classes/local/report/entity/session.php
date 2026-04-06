@@ -254,4 +254,14 @@ class session extends base_entity {
         }
         return new \moodle_url('/mod/ispring/detailed_report.php', $args);
     }
+
+
+    protected function get_default_tables(): array
+    {
+        return [
+            'ispring',
+            'ispring_content',
+            'ispring_session'
+        ];
+    }
 }
