@@ -131,4 +131,13 @@ class ispring_module extends base_entity {
         $modinfo = get_fast_modinfo($courseid);
         return $modinfo->get_instances_of('ispring')[$ispringmoduleid] ?? null;
     }
+
+    protected function get_default_tables(): array
+    {
+        return [
+            'ispring',
+            'ispring_content',
+            'ispring_session'
+        ];
+    }
 }

@@ -85,6 +85,7 @@ class ispring_module_repository implements ispring_module_repository_interface {
         $result->grademethod = $data->get_grade_method();
         $result->timeopen = $data->get_time_open();
         $result->timeclose = $data->get_time_close();
+        $result->timemodified = time();
 
         if ($description = $data->get_description()) {
             $result->intro = $description->get_text();
